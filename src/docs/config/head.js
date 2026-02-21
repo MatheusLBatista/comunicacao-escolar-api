@@ -38,12 +38,12 @@ const getSwaggerOptions = () => {
         swaggerDefinition: {
             openapi: "3.0.0",
             info: {
-                title: "API Componentes Eletrônicos",
+                title: "API Comunicação Escolar",
                 version: "1.0.0",
-                description: "API para gestão de componentes eletrônicos \n\nÉ necessário autenticar com token JWT antes de utilizar a maioria das rotas. Faça isso na rota /login com um email e senha válido. Esta API conta com refresh token, que pode ser obtido na rota /refresh, e com logout, que pode ser feito na rota /logout. Para revogação de acesso use a rota /revoke. Para mais informações, acesse a documentação.",
+                description: "API para gestão de comunicação escolar \n\nÉ necessário autenticar com token JWT antes de utilizar a maioria das rotas. Faça isso na rota /login com um email e senha válido. Esta API conta com refresh token, que pode ser obtido na rota /refresh, e com logout, que pode ser feito na rota /logout. Para revogação de acesso use a rota /revoke. Para mais informações, acesse a documentação.",
                 contact: {
                     name: "Equipe de Desenvolvimento",
-                    email: "dev@componentes-eletronicos.com",
+                    email: "dev@comunicacao-escolar.com",
                 },
             },
             servers: getServersInCorrectOrder(),

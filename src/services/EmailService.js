@@ -39,7 +39,7 @@ class EmailService {
         }
 
         const mailOptions = {
-            from: `"${process.env.COMPANY_NAME || 'Estoque Inteligente'}" <${process.env.EMAIL_USER}>`,
+            from: `"${process.env.COMPANY_NAME || 'Comunicação Escolar'}" <${process.env.EMAIL_USER}>`,
             to: to,
             subject: subject,
             text: text,
@@ -76,7 +76,7 @@ ${activationUrl}
 
 Link válido por 5 minutos.
 
-Equipe Estoque Inteligente
+Equipe Comunicação Escolar
         `.trim();
 
         const html = `
@@ -85,7 +85,7 @@ Equipe Estoque Inteligente
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h1 style="color: #306FCC; font-size: 24px; margin-bottom: 20px; margin-top: 0;">Bem-vindo ao Estoque Inteligente!</h1>
+            <h1 style="color: #306FCC; font-size: 24px; margin-bottom: 20px; margin-top: 0;">Bem-vindo ao Comunicação Escolar!</h1>
             <p style="margin: 0 0 15px 0; font-size: 18px;">Olá, <strong>${nome}</strong>!</p>
             <p style="margin: 0 0 20px 0; font-size: 18px;">Sua conta foi criada no sistema. Para começar, clique no botão abaixo e defina sua senha.</p>
             <div style="text-align: center; margin: 30px 0;">
@@ -96,7 +96,7 @@ Equipe Estoque Inteligente
             </div>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
                 <p style="margin: 0 0 8px 0; font-size: 16px;">Não solicitou este cadastro? Ignore este e-mail.</p>
-                <p style="margin: 0; font-size: 16px; color: #999;">Equipe Estoque Inteligente</p>
+                <p style="margin: 0; font-size: 16px; color: #999;">Equipe Comunicação Escolar</p>
             </div>
         </div>
     </div>
@@ -116,7 +116,7 @@ Equipe Estoque Inteligente
         const text = `
 Olá, ${nome}!
 
-Você solicitou a recuperação de senha da sua conta no Estoque Inteligente.
+Você solicitou a recuperação de senha da sua conta no Comunicação Escolar.
 
 Clique no link abaixo para redefinir sua senha:
 ${resetUrl}
@@ -125,7 +125,7 @@ Este link é válido por 5 minutos.
 
 Se você não solicitou esta recuperação, ignore este e-mail.
 
-Equipe Estoque Inteligente
+Equipe Comunicação Escolar
         `.trim();
 
         const html = `
@@ -145,7 +145,7 @@ Equipe Estoque Inteligente
             </div>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
                 <p style="margin: 0 0 8px 0; font-size: 16px;">Não solicitou esta recuperação? Ignore este e-mail.</p>
-                <p style="margin: 0; font-size: 16px; color: #999;">Equipe Estoque Inteligente</p>
+                <p style="margin: 0; font-size: 16px; color: #999;">Equipe Comunicação Escolar</p>
             </div>
         </div>
     </div>
