@@ -1,7 +1,4 @@
 import EstoqueRepository from '../repositories/EstoqueRepository.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
-import ComponenteModel from '../models/Componente.js';
-import LocalizacaoModel from '../models/Localizacao.js';
 
 class EstoqueService {
     constructor() {

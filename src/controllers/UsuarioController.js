@@ -1,7 +1,7 @@
 import UsuarioService from '../services/UsuarioService.js';
 import { UsuarioQuerySchema, UsuarioIdSchema } from '../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
 import { UsuarioSchema, UsuarioUpdateSchema } from '../utils/validators/schemas/zod/UsuarioSchema.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse, CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class UsuarioController {
     constructor() {
@@ -10,9 +10,9 @@ class UsuarioController {
 
     async criar(req, res) {
         const parsedData = UsuarioSchema.parse(req.body);
-        let data = await this.service.criar(parsedData);
+        const data = await this.service.criar(parsedData);
 
-        let usuarioLimpo = data.toObject();
+        const usuarioLimpo = data.toObject();
         delete usuarioLimpo.senha;
 
         return CommonResponse.created(res, usuarioLimpo);
@@ -20,9 +20,9 @@ class UsuarioController {
 
     async criarComSenha(req, res) {
         const parsedData = UsuarioSchema.parse(req.body);
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
 
-        let usuarioLimpo = data.toObject();
+        const usuarioLimpo = data.toObject();
 
         return CommonResponse.created(res, usuarioLimpo);
     }

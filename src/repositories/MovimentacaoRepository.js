@@ -1,6 +1,6 @@
 import MovimentacaoFilterBuilder from './filters/MovimentacaoFilterBuilder.js';
 import MovimentacaoModel from '../models/Movimentacao.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, messages } from '../utils/helpers/index.js';
 
 class MovimentacaoRepository {
     constructor({
@@ -100,7 +100,7 @@ class MovimentacaoRepository {
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id });
+        const query = this.model.findOne({ _id: id });
 
         const movimentacao = await query;
 

@@ -1,5 +1,4 @@
 import Grupo from "../models/Grupo.js";
-import { fakeMappings } from "./globalFakeMapping.js";
 
 export default async function seedGrupos(rotas) {
     await Grupo.deleteMany();

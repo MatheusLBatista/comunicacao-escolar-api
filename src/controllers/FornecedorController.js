@@ -1,7 +1,7 @@
 import FornecedorService from '../services/FornecedorService.js';
 import { FornecedorQuerySchema, FornecedorIdSchema } from '../utils/validators/schemas/zod/querys/FornecedorQuerySchema.js';
 import { FornecedorSchema, FornecedorUpdateSchema } from '../utils/validators/schemas/zod/FornecedorSchema.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 
 class FornecedorController {
     constructor() {
@@ -10,9 +10,9 @@ class FornecedorController {
 
     async criar(req, res) {
         const parsedData = FornecedorSchema.parse(req.body);
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
 
-        let fornecedorLimpo = data.toObject();
+        const fornecedorLimpo = data.toObject();
 
         return CommonResponse.created(res, fornecedorLimpo);
     };

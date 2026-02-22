@@ -152,7 +152,7 @@ describe('Modelo de Componente', () => {
         };
         
         // Teste para quantidade = 0 (Indisponível)
-        let componente = new Componente(componenteData);
+        const componente = new Componente(componenteData);
         await componente.save();
         expect(componente.status).toBe('Indisponível');
         

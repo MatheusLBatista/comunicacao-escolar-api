@@ -1,7 +1,7 @@
 // src/controllers/RotaController.js
 
 import RotaService from '../services/RotaService.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 import { RotaQuerySchema, RotaIdSchema } from '../utils/validators/schemas/zod/querys/RotaQuerySchema.js';
 import { RotaSchema, RotaUpdateSchema } from '../utils/validators/schemas/zod/RotaSchema.js';
 

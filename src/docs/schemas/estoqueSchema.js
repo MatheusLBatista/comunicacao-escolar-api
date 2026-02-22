@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import EstoqueModel from '../../models/Estoque.js';
 
 const estoqueJsonSchema = mongoose.model('estoques').schema.jsonSchema();
 

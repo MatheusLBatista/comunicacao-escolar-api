@@ -1,7 +1,7 @@
 import CategoriaService from '../services/CategoriaService.js';
 import { CategoriaQuerySchema, CategoriaIdSchema } from '../utils/validators/schemas/zod/querys/CategoriaQuerySchema.js';
 import { CategoriaSchema, CategoriaUpdateSchema } from '../utils/validators/schemas/zod/CategoriaSchema.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 
 class CategoriaController {
     constructor() {
@@ -10,9 +10,9 @@ class CategoriaController {
 
     async criar(req, res) {
         const parsedData = CategoriaSchema.parse(req.body);
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
 
-        let categoriaLimpa = data.toObject();
+        const categoriaLimpa = data.toObject();
 
         return CommonResponse.created(res, categoriaLimpa);
     };

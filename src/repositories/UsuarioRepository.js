@@ -1,7 +1,7 @@
 import UsuarioFilterBuilder from './filters/UsuarioFilterBuilder.js';
 import UsuarioModel from '../models/Usuario.js';
 import NotificacaoModel from '../models/Notificacao.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, messages } from '../utils/helpers/index.js';
 
 class UsuarioRepository {
     constructor({

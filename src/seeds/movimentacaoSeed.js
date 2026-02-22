@@ -2,7 +2,6 @@ import { fakeMappings } from "./globalFakeMapping.js";
 import Movimentacao from "../models/Movimentacao.js";
 import Componente from "../models/Componente.js";
 import Localizacao from "../models/Localizacao.js";
-import Usuario from "../models/Usuario.js";
 
 export default async function movimentacaoSeed(adminId) {
     const componenteList = await Componente.find({});

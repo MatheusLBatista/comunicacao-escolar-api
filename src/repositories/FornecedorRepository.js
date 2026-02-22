@@ -1,6 +1,6 @@
 import FornecedorFilterBuilder from './filters/FornecedorFilterBuilder.js';
 import FornecedorModel from '../models/Fornecedor.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, messages } from '../utils/helpers/index.js';
 
 class FornecedorRepository {
     constructor({
@@ -109,7 +109,7 @@ class FornecedorRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, ativo: true });
+        const query = this.model.findOne({ _id: id, ativo: true });
 
         const fornecedor = await query;
 

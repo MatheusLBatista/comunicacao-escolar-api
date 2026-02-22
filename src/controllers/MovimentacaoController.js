@@ -1,7 +1,7 @@
 import MovimentacaoService from '../services/MovimentacaoService.js';
 import { MovimentacaoQuerySchema, MovimentacaoIdSchema } from '../utils/validators/schemas/zod/querys/MovimentacaoQuerySchema.js';
-import { MovimentacaoSchema, MovimentacaoUpdateSchema } from '../utils/validators/schemas/zod/MovimentacaoSchema.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { MovimentacaoSchema } from '../utils/validators/schemas/zod/MovimentacaoSchema.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 
 class MovimentacaoController {
     constructor() {
@@ -10,9 +10,9 @@ class MovimentacaoController {
 
     async criar(req, res) {
         const parsedData = MovimentacaoSchema.parse(req.body);
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
 
-        let movimentacaoLimpa = data.toObject();
+        const movimentacaoLimpa = data.toObject();
 
         return CommonResponse.created(res, movimentacaoLimpa);
     };

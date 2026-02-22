@@ -1,5 +1,5 @@
 import ComponenteRepository from '../repositories/ComponenteRepository.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, HttpStatusCodes, messages } from '../utils/helpers/index.js';
 import CategoriaModel from '../models/Categoria.js';
 import minioClient from '../config/MinIO.js';
 import compress from '../config/SharpConfig.js';

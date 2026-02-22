@@ -1,6 +1,6 @@
 import NotificacaoService from "../services/NotificacaoService.js";
 import { NotificacaoSchema } from "../utils/validators/schemas/zod/NotificacaoSchema.js";
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class NotificacaoController {
     constructor() {
@@ -26,7 +26,7 @@ class NotificacaoController {
     async criar(req, res) {
         const parsedData = NotificacaoSchema.parse(req.body);
 
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
         return CommonResponse.created(res, data);
     };
 

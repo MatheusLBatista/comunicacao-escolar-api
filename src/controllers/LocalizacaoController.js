@@ -1,7 +1,7 @@
 import LocalizacaoService from '../services/LocalizacaoService.js';
 import { LocalizacaoQuerySchema, LocalizacaoIdSchema } from '../utils/validators/schemas/zod/querys/LocalizacaoQuerySchema.js';
 import { LocalizacaoSchema, LocalizacaoUpdateSchema } from '../utils/validators/schemas/zod/LocalizacaoSchema.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 
 class LocalizacaoController {
     constructor() {
@@ -10,9 +10,9 @@ class LocalizacaoController {
 
     async criar(req, res) {
         const parsedData = LocalizacaoSchema.parse(req.body);
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
 
-        let localizacaoLimpa = data.toObject();
+        const localizacaoLimpa = data.toObject();
 
         return CommonResponse.created(res, localizacaoLimpa);
     };

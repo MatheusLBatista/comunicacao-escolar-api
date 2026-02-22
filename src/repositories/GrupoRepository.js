@@ -1,6 +1,5 @@
 // src/repositories/GrupoRepository.js
 
-import mongoose from 'mongoose';
 import GrupoModel from '../models/Grupo.js';
 import UsuarioModel from '../models/Usuario.js';
 import RotaModel from '../models/Rota.js';

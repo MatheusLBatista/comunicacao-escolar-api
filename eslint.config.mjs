@@ -1,10 +1,14 @@
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 export default [
     js.configs.recommended,
     eslintConfigPrettier,
     {
+        plugins: {
+            'unused-imports': unusedImports,
+        },
         languageOptions: {
             ecmaVersion: 'latest',
             sourceType: 'module',
@@ -22,7 +26,12 @@ export default [
             },
         },
         rules: {
-            'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            'no-unused-vars': 'off',
+            'unused-imports/no-unused-imports': 'error',
+            'unused-imports/no-unused-vars': [
+                'warn',
+                { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+            ],
             'no-console': ['warn', { allow: ['warn', 'error'] }],
             'no-debugger': 'error',
             'no-duplicate-imports': 'error',
@@ -51,7 +60,8 @@ export default [
             },
         },
         rules: {
-            'no-unused-vars': 'off',
+            'unused-imports/no-unused-imports': 'off',
+            'unused-imports/no-unused-vars': 'off',
             'no-console': 'off',
         },
     },

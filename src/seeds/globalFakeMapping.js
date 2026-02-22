@@ -202,7 +202,7 @@ function validateModelMapping(model, modelName, mapping) {
 
 async function validateAllMappings() {
     const models = await loadModels();
-    let totalMissing = {};
+    const totalMissing = {};
 
     models.forEach(({ model, name }) => {
         // Combina os campos comuns com os específicos de cada model.

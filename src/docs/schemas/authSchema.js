@@ -1,4 +1,4 @@
-import { deepCopy, generateExample } from '../utils/schemaGenerate.js';
+import { generateExample } from '../utils/schemaGenerate.js';
 
 const authSchemas = {
     // Schema para login de usuário

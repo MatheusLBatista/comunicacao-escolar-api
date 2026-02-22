@@ -1,6 +1,6 @@
 import OrcamentoFilterBuilder from './filters/OrcamentoFilterBuilder.js';
 import OrcamentoModel from '../models/Orcamento.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, messages } from '../utils/helpers/index.js';
 
 class OrcamentoRepository {
     constructor({
@@ -112,13 +112,13 @@ class OrcamentoRepository {
 
     async adicionarComponente(orcamentoId, novoComponente, req) {
         const orcamento = await this.model.findOne({ _id: orcamentoId, ativo: true });
-        if (!orcamento) throw new CustomError({
+        if (!orcamento) { throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
             field: 'Orçamento',
             details: [],
             customMessage: messages.error.resourceNotFound('Orçamento')
-        });
+        });}
 
         orcamento.componentes.push(novoComponente);
         orcamento.total = parseFloat(orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
@@ -129,23 +129,23 @@ class OrcamentoRepository {
 
     async atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req) {
         const orcamento = await this.model.findOne({ _id: orcamentoId, ativo: true });
-        if (!orcamento) throw new CustomError({
+        if (!orcamento) { throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
             field: 'Orçamento',
             details: [],
             customMessage: messages.error.resourceNotFound('Orçamento')
-        });
+        });}
 
         const componentes = Array.isArray(orcamento.componentes) ? orcamento.componentes : [];
         const idx = componentes.findIndex(c => c && c._id && c._id.toString() === componenteId);
-        if (idx === -1) throw new CustomError({
+        if (idx === -1) { throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
             field: 'Componente',
             details: [],
             customMessage: 'Componente não encontrado.'
-        });
+        });}
 
         componentes[idx] = { ...((typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx]), ...componenteAtualizado };
         orcamento.componentes = componentes;
@@ -157,13 +157,13 @@ class OrcamentoRepository {
 
     async removerComponente(orcamentoId, componenteId, req) {
         const orcamento = await this.model.findOne({ _id: orcamentoId, ativo: true });
-        if (!orcamento) throw new CustomError({
+        if (!orcamento) { throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
             field: 'Orçamento',
             details: [],
             customMessage: messages.error.resourceNotFound('Orçamento')
-        });
+        });}
 
         orcamento.componentes = orcamento.componentes.filter(c => c._id.toString() !== componenteId);
         orcamento.total = parseFloat(orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
@@ -175,7 +175,7 @@ class OrcamentoRepository {
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, ativo: true });
+        const query = this.model.findOne({ _id: id, ativo: true });
 
         const orcamento = await query;
         if (!orcamento) {

@@ -11,7 +11,7 @@ export default async function estoqueSeed() {
 
     await Estoque.deleteMany({});
 
-    for (let componente of componenteList) {
+    for (const componente of componenteList) {
         const numLocalizacoes = Math.floor(Math.random() * 3) + 1;
         const localizacoesSelecionadas = [];
         
@@ -24,7 +24,7 @@ export default async function estoqueSeed() {
             localizacoesSelecionadas.push(localizacaoRandom);
         }
 
-        for (let localizacao of localizacoesSelecionadas) {
+        for (const localizacao of localizacoesSelecionadas) {
             const usuarioRandom = usuarios[Math.floor(Math.random() * usuarios.length)];
             
             const estoque = {
@@ -38,7 +38,7 @@ export default async function estoqueSeed() {
         }
     }
 
-    for (let componente of componenteList) {
+    for (const componente of componenteList) {
         await Estoque.atualizarQuantidadeComponente(componente._id);
     }
 };

@@ -1,6 +1,5 @@
 import { fakeMappings } from "./globalFakeMapping.js";
 import Categoria from "../models/Categoria.js";
-import Usuario from "../models/Usuario.js";
 
 export default async function categoriaSeed(adminId) {
     await Categoria.deleteMany({});

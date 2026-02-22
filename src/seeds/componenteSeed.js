@@ -1,7 +1,6 @@
 import { fakeMappings } from "./globalFakeMapping.js";
 import Componente from "../models/Componente.js";
 import Categoria from "../models/Categoria.js";
-import Usuario from "../models/Usuario.js";
 
 export default async function componenteSeed(adminId) {
     const categoriaList = await Categoria.find({});
@@ -9,7 +8,7 @@ export default async function componenteSeed(adminId) {
     await Componente.deleteMany({});
 
     const nomesFixos = fakeMappings.Componente.nomesFixos;
-    for (let nome of nomesFixos) {
+    for (const nome of nomesFixos) {
         const categoriaRandom = categoriaList[Math.floor(Math.random() * categoriaList.length)];
 
         const componente = {

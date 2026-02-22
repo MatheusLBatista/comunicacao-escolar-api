@@ -1,7 +1,4 @@
 import NotificacaoRepository from "../repositories/NotificacaoRepository.js";
-import Notificacao from "../models/Notificacao.js";
-import Usuario from "../models/Usuario.js";
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class NotificacaoService {
     constructor() {

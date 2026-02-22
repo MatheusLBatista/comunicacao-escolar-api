@@ -1,10 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, HttpStatusCodes, messages } from '../utils/helpers/index.js';
 import tokenUtil from '../utils/TokenUtil.js';
-import { v4 as uuid } from 'uuid';
 import AuthHelper from '../utils/AuthHelper.js';
-import fetch from 'node-fetch'
 
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import EmailService from './EmailService.js';

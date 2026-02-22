@@ -13,7 +13,7 @@ class Validator {
     // Método privado que retorna a instância atual para permitir encadeamento
     _validar(condicao, mensagemKey, placeholders = {}) {
         if (this._erro === null && condicao()) {
-            let mensagem = i18n.__(`validation.${mensagemKey}`, placeholders);
+            const mensagem = i18n.__(`validation.${mensagemKey}`, placeholders);
             this._erro = mensagem;
         }
         return this;

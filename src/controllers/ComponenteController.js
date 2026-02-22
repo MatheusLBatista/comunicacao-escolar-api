@@ -1,7 +1,7 @@
 import ComponenteService from '../services/ComponenteService.js';
 import { ComponenteQuerySchema, ComponenteIdSchema } from '../utils/validators/schemas/zod/querys/ComponenteQuerySchema.js';
 import { ComponenteSchema, ComponenteUpdateSchema } from '../utils/validators/schemas/zod/ComponenteSchema.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 import { UsuarioIdSchema } from '../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
 
 class ComponenteController {
@@ -11,9 +11,9 @@ class ComponenteController {
 
     async criar(req, res) {
         const parsedData = ComponenteSchema.parse(req.body);
-        let data = await this.service.criar(parsedData, req);
+        const data = await this.service.criar(parsedData, req);
 
-        let componenteLimpo = data.toObject();
+        const componenteLimpo = data.toObject();
 
         return CommonResponse.created(res, componenteLimpo);
     };

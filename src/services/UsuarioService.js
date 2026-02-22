@@ -1,9 +1,8 @@
 import bcrypt from 'bcrypt';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import GrupoRepository from '../repositories/GrupoRepository.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, HttpStatusCodes, messages } from '../utils/helpers/index.js';
 import minioClient from '../config/MinIO.js';
-import path from 'path';
 import compress from '../config/SharpConfig.js';
 import EmailService from './EmailService.js';
 import tokenUtil from '../utils/TokenUtil.js';

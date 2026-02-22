@@ -1,7 +1,6 @@
 //src/utils/validators/schemas/zod/grupoSchema.js
 
 import { z } from 'zod';
-import objectIdSchema from './ObjectIdSchema.js';
 import { RotaSchema } from './RotaSchema.js';
 
 const GrupoSchema = z.object({

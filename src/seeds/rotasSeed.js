@@ -1,6 +1,4 @@
 import Rota from "../models/Rota.js";
-import { fakeMappings } from "./globalFakeMapping.js";
-import bcrypt from 'bcrypt';
 
 export default async function seedRotas() {
     // Remove

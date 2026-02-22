@@ -1,6 +1,6 @@
 import CategoriaFilterBuilder from './filters/CategoriaFilterBuilder.js';
 import CategoriaModel from '../models/Categoria.js';
-import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { CustomError, messages } from '../utils/helpers/index.js';
 
 class CategoriaRepository {
     constructor({
@@ -106,7 +106,7 @@ class CategoriaRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, ativo: true });
+        const query = this.model.findOne({ _id: id, ativo: true });
 
         const categoria = await query;
 

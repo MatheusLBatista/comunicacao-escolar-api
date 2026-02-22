@@ -1,6 +1,5 @@
 import { fakeMappings } from "./globalFakeMapping.js";
 import Localizacao from "../models/Localizacao.js";
-import Usuario from "../models/Usuario.js";
 
 export default async function localizacaoSeed(adminId) {
     await Localizacao.deleteMany({});
