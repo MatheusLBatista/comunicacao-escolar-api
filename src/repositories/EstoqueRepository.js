@@ -2,152 +2,144 @@ import EstoqueModel from '../models/Estoque.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class EstoqueRepository {
-    constructor({
-        estoqueModel = EstoqueModel,
-    } = {}) {
-        this.model = estoqueModel;
+  constructor({ estoqueModel = EstoqueModel } = {}) {
+    this.model = estoqueModel;
+  }
+
+  async criar(parsedData) {
+    const estoque = new this.model(parsedData);
+    const estoqueSalvo = await estoque.save();
+    return await this.model
+      .findById(estoqueSalvo._id)
+      .populate('componente')
+      .populate('localizacao');
+  }
+
+  async listar(req) {
+    const { componente, localizacao, quantidade, page = 1 } = req.query;
+    const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
+
+    const filtros = {};
+
+    if (componente) {
+      filtros.componente = componente;
+    }
+
+    if (localizacao) {
+      filtros.localizacao = localizacao;
+    }
+
+    if (quantidade !== undefined && quantidade !== null && quantidade !== '') {
+      const num = Number(quantidade);
+      if (!isNaN(num)) {
+        filtros.quantidade = num;
+      }
+    }
+
+    const options = {
+      page: parseInt(page),
+      limit: parseInt(limite),
+      populate: ['componente', 'localizacao'],
+      sort: { createdAt: -1 },
     };
 
-    async criar(parsedData) {
-        const estoque = new this.model(parsedData);
-        const estoqueSalvo = await estoque.save();
-        return await this.model.findById(estoqueSalvo._id)
-            .populate('componente')
-            .populate('localizacao');
+    const resultado = await this.model.paginate(filtros, options);
+
+    return resultado;
+  }
+
+  async listarPorComponente(req) {
+    const { componenteId } = req.params;
+    const { localizacao, quantidade, page = 1 } = req.query;
+    const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
+
+    const filtros = {
+      componente: componenteId,
     };
 
-    async listar(req) {
-        const { componente, localizacao, quantidade, page = 1 } = req.query;
-        const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
+    if (localizacao) {
+      filtros.localizacao = localizacao;
+    }
 
-        const filtros = {};
+    if (quantidade !== undefined && quantidade !== null && quantidade !== '') {
+      const num = Number(quantidade);
+      if (!isNaN(num)) {
+        filtros.quantidade = num;
+      }
+    }
 
-        if (componente) {
-            filtros.componente = componente;
-        }
-
-        if (localizacao) {
-            filtros.localizacao = localizacao;
-        }
-
-        if (quantidade !== undefined && quantidade !== null && quantidade !== '') {
-            const num = Number(quantidade);
-            if (!isNaN(num)) {
-                filtros.quantidade = num;
-            }
-        }
-
-        const options = {
-            page: parseInt(page),
-            limit: parseInt(limite),
-            populate: [
-                'componente',
-                'localizacao'
-            ],
-            sort: { createdAt: -1 },
-        };
-
-        const resultado = await this.model.paginate(filtros, options);
-
-        return resultado;
+    const options = {
+      page: parseInt(page),
+      limit: parseInt(limite),
+      populate: ['componente', 'localizacao'],
+      sort: { createdAt: -1 },
     };
 
-    async listarPorComponente(req) {
-        const { componenteId } = req.params;
-        const { localizacao, quantidade, page = 1 } = req.query;
-        const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
+    const resultado = await this.model.paginate(filtros, options);
 
-        const filtros = { 
-            componente: componenteId 
-        };
+    return resultado;
+  }
 
-        if (localizacao) {
-            filtros.localizacao = localizacao;
-        }
+  async atualizar(id, parsedData, req) {
+    const estoque = await this.model
+      .findOneAndUpdate({ _id: id }, parsedData, { new: true })
+      .populate('componente')
+      .populate('localizacao')
+      .lean();
 
-        if (quantidade !== undefined && quantidade !== null && quantidade !== '') {
-            const num = Number(quantidade);
-            if (!isNaN(num)) {
-                filtros.quantidade = num;
-            }
-        }
+    if (!estoque) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Estoque',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Estoque'),
+      });
+    }
 
-        const options = {
-            page: parseInt(page),
-            limit: parseInt(limite),
-            populate: [
-                'componente',
-                'localizacao'
-            ],
-            sort: { createdAt: -1 },
-        };
+    return estoque;
+  }
 
-        const resultado = await this.model.paginate(filtros, options);
+  async deletar(id, req) {
+    const estoque = await this.model
+      .findOne({ _id: id })
+      .populate('componente')
+      .populate('localizacao');
 
-        return resultado;
-    };
+    if (!estoque) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Estoque',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Estoque'),
+      });
+    }
 
-    async atualizar(id, parsedData, req) {
-        const estoque = await this.model.findOneAndUpdate(
-            { _id: id }, 
-            parsedData, 
-            { new: true }
-        )
-            .populate('componente')
-            .populate('localizacao')
-            .lean();
-            
-        if (!estoque) {
-            throw new CustomError({
-                statusCode: 404,
-                errorType: 'resourceNotFound',
-                field: 'Estoque',
-                details: [],
-                customMessage: messages.error.resourceNotFound('Estoque')
-            });
-        };
+    await this.model.findOneAndDelete({ _id: id });
+    return estoque;
+  }
 
-        return estoque;
-    };
+  // Métodos auxiliares
 
-    async deletar(id, req) {
-        const estoque = await this.model.findOne({ _id: id })
-            .populate('componente')
-            .populate('localizacao');
+  async buscarPorId(id, req) {
+    const estoque = await this.model
+      .findOne({ _id: id })
+      .populate('componente')
+      .populate('localizacao');
 
-        if (!estoque) {
-            throw new CustomError({
-                statusCode: 404,
-                errorType: 'resourceNotFound',
-                field: 'Estoque',
-                details: [],
-                customMessage: messages.error.resourceNotFound('Estoque')
-            });
-        }
+    if (!estoque) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Estoque',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Estoque'),
+      });
+    }
 
-        await this.model.findOneAndDelete({ _id: id });
-        return estoque;
-    };
-
-    // Métodos auxiliares
-
-    async buscarPorId(id, req) {
-        const estoque = await this.model.findOne({ _id: id })
-            .populate('componente')
-            .populate('localizacao');
-
-        if (!estoque) {
-            throw new CustomError({
-                statusCode: 404,
-                errorType: 'resourceNotFound',
-                field: 'Estoque',
-                details: [],
-                customMessage: messages.error.resourceNotFound('Estoque')
-            });
-        };
-
-        return estoque;
-    };
-};
+    return estoque;
+  }
+}
 
 export default EstoqueRepository;

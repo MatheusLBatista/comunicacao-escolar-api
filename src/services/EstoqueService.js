@@ -1,27 +1,27 @@
 import EstoqueRepository from '../repositories/EstoqueRepository.js';
 
 class EstoqueService {
-    constructor() {
-        this.repository = new EstoqueRepository();
-    };
+  constructor() {
+    this.repository = new EstoqueRepository();
+  }
 
-    async listar(req) {
-        const data = await this.repository.listar(req);
+  async listar(req) {
+    const data = await this.repository.listar(req);
 
-        return data;
-    };
+    return data;
+  }
 
-    async buscarPorId(req) {
-        const data = await this.repository.buscarPorId(req.params.id, req);
+  async buscarPorId(req) {
+    const data = await this.repository.buscarPorId(req.params.id, req);
 
-        return data;
-    };
+    return data;
+  }
 
-    async listarPorComponente(req) {
-        const data = await this.repository.listarPorComponente(req);
+  async listarPorComponente(req) {
+    const data = await this.repository.listarPorComponente(req);
 
-        return data;
-    };
-};
+    return data;
+  }
+}
 
 export default EstoqueService;

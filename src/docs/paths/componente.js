@@ -1,13 +1,13 @@
-import componentesSchemas from "../schemas/componenteSchema.js";
-import commonResponses from "../schemas/swaggerCommonResponses.js";
-import { generateParameters } from "./utils/generateParameters.js";
+import componentesSchemas from '../schemas/componenteSchema.js';
+import commonResponses from '../schemas/swaggerCommonResponses.js';
+import { generateParameters } from './utils/generateParameters.js';
 
 const componentesRoutes = {
-    "/componentes": {
-        post: {
-            tags: ["Componentes"],
-            summary: "Cria um novo componente",
-            description: `
+  '/componentes': {
+    post: {
+      tags: ['Componentes'],
+      summary: 'Cria um novo componente',
+      description: `
             + Caso de uso: Criação de novo componente eletrônico no sistema.
             
             + Função de Negócio:
@@ -30,30 +30,30 @@ const componentesRoutes = {
             + Resultado Esperado:
                 - HTTP 201 Created com corpo conforme **ComponenteDetalhes**, contendo todos os dados do componente criado.
             `,
-            security: [{ bearerAuth: [] }],
-            requestBody: {
-                content: {
-                    "application/json": {
-                        schema: {
-                            $ref: "#/components/schemas/ComponentePost"
-                        }
-                    }
-                }
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ComponentePost',
             },
-            responses: {
-                201: commonResponses[201]("#/components/schemas/ComponenteDetalhes"),
-                400: commonResponses[400](),
-                401: commonResponses[401](),
-                409: commonResponses[409](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
+          },
         },
-        
-        get: {
-            tags: ["Componentes"],
-            summary: "Lista todos os componentes",
-            description: `
+      },
+      responses: {
+        201: commonResponses[201]('#/components/schemas/ComponenteDetalhes'),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        409: commonResponses[409](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
+
+    get: {
+      tags: ['Componentes'],
+      summary: 'Lista todos os componentes',
+      description: `
         + Caso de uso: Listagem de componentes para gerenciamento e consulta.
         
         + Função de Negócio:
@@ -74,56 +74,58 @@ const componentesRoutes = {
                 • **data**: array de componentes.  
                 • **dados de paginação**: totalDocs, limit, totalPages, page, pagingCounter, hasPrevPage, hasNextPage, prevPage, nextPage.
             `,
-            security: [{ bearerAuth: [] }],
-            parameters: generateParameters(componentesSchemas.ComponenteFiltro).concat([
-                {
-                    name: "page",
-                    in: "query",
-                    required: false,
-                    schema: {
-                        type: "integer",
-                        minimum: 1,
-                        default: 1
-                    },
-                    description: "Número da página"
-                },
-                {
-                    name: "limite",
-                    in: "query",
-                    required: false,
-                    schema: {
-                        type: "integer",
-                        minimum: 1,
-                        maximum: 100,
-                        default: 10
-                    },
-                    description: "Quantidade de itens por página (máximo 100)"
-                }
-            ]),
-            responses: {
-                200: {
-                    description: "Lista de componentes retornada com sucesso",
-                    content: {
-                        "application/json": {
-                            schema: {
-                                $ref: "#/components/schemas/ComponenteListagem"
-                            }
-                        }
-                    }
-                },
-                400: commonResponses[400](),
-                401: commonResponses[401](),
-                404: commonResponses[404](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
+      security: [{ bearerAuth: [] }],
+      parameters: generateParameters(
+        componentesSchemas.ComponenteFiltro,
+      ).concat([
+        {
+          name: 'page',
+          in: 'query',
+          required: false,
+          schema: {
+            type: 'integer',
+            minimum: 1,
+            default: 1,
+          },
+          description: 'Número da página',
         },
+        {
+          name: 'limite',
+          in: 'query',
+          required: false,
+          schema: {
+            type: 'integer',
+            minimum: 1,
+            maximum: 100,
+            default: 10,
+          },
+          description: 'Quantidade de itens por página (máximo 100)',
+        },
+      ]),
+      responses: {
+        200: {
+          description: 'Lista de componentes retornada com sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ComponenteListagem',
+              },
+            },
+          },
+        },
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        404: commonResponses[404](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
     },
-    "/componentes/{id}": {
-        get: {
-            tags: ["Componentes"],
-            summary: "Obtém detalhes de um componente",
-            description: `
+  },
+  '/componentes/{id}': {
+    get: {
+      tags: ['Componentes'],
+      summary: 'Obtém detalhes de um componente',
+      description: `
             + Caso de uso: Consulta de detalhes de componente específico.
             
             + Função de Negócio:
@@ -140,32 +142,32 @@ const componentesRoutes = {
             + Resultado Esperado:
                 - HTTP 200 OK com corpo conforme **ComponenteDetalhes**, contendo dados completos do componente.
         `,
-            security: [{ bearerAuth: [] }],
-            parameters: [
-                {
-                    name: "id",
-                    in: "path",
-                    required: true,
-                    schema: {
-                        type: "string",
-                    },
-                    description: "ID do componente"
-                }
-            ],
-            responses: {
-                200: commonResponses[200]("#/components/schemas/ComponenteDetalhes"),
-                400: commonResponses[400](),
-                401: commonResponses[401](),
-                404: commonResponses[404](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+          description: 'ID do componente',
         },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/ComponenteDetalhes'),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        404: commonResponses[404](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
 
-        patch: {
-            tags: ["Componentes"],
-            summary: "Atualiza um componente",
-            description: `
+    patch: {
+      tags: ['Componentes'],
+      summary: 'Atualiza um componente',
+      description: `
             + Caso de uso: Atualização parcial de dados do componente.
             
             + Função de Negócio:
@@ -184,43 +186,43 @@ const componentesRoutes = {
             + Resultado Esperado:
                 - HTTP 200 OK com corpo conforme **ComponenteDetalhes**, refletindo as alterações.
         `,
-            security: [{ bearerAuth: [] }],
-            parameters: [
-                {
-                    name: "id",
-                    in: "path",
-                    required: true,
-                    schema: {
-                        type: "string",
-                    },
-                    description: "ID do componente"
-                }
-            ],
-            requestBody: {
-                content: {
-                    "application/json": {
-                        schema: {
-                            $ref: "#/components/schemas/ComponentePutPatch"
-                        }
-                    }
-                }
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+          description: 'ID do componente',
+        },
+      ],
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ComponentePutPatch',
             },
-            responses: {
-                200: commonResponses[200]("#/components/schemas/ComponenteDetalhes"),
-                400: commonResponses[400](),
-                401: commonResponses[401](),
-                404: commonResponses[404](),
-                409: commonResponses[409](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
-        }
+          },
+        },
+      },
+      responses: {
+        200: commonResponses[200]('#/components/schemas/ComponenteDetalhes'),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        404: commonResponses[404](),
+        409: commonResponses[409](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
     },
-    "/componentes/{id}/inativar": {
-        patch: {
-            tags: ["Componentes"],
-            summary: "Inativa um componente",
-            description: `
+  },
+  '/componentes/{id}/inativar': {
+    patch: {
+      tags: ['Componentes'],
+      summary: 'Inativa um componente',
+      description: `
             + Caso de uso: Inativação de componente preservando integridade referencial.
             
             + Função de Negócio:
@@ -238,33 +240,33 @@ const componentesRoutes = {
             + Resultado Esperado:
                 - HTTP 200 OK com corpo conforme **ComponenteDetalhes**, com ativo = false.
             `,
-            security: [{ bearerAuth: [] }],
-            parameters: [
-                {
-                    name: "id",
-                    in: "path",
-                    required: true,
-                    schema: {
-                        type: "string",
-                    },
-                    description: "ID do componente"
-                }
-            ],
-            responses: {
-                200: commonResponses[200]("#/components/schemas/ComponenteDetalhes"),
-                400: commonResponses[400](),
-                401: commonResponses[401](),
-                404: commonResponses[404](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
-        }
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+          description: 'ID do componente',
+        },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/ComponenteDetalhes'),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        404: commonResponses[404](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
     },
-    "/componentes/{id}/foto": {
-        post: {
-            tags: ["Componentes"],
-            summary: "Faz upload da foto do componente",
-            description: `
+  },
+  '/componentes/{id}/foto': {
+    post: {
+      tags: ['Componentes'],
+      summary: 'Faz upload da foto do componente',
+      description: `
             + Caso de uso: Upload de foto do componente eletrônico.
             
             + Função de Negócio:
@@ -285,58 +287,58 @@ const componentesRoutes = {
                 - Em caso de componente inexistente, retorna erro 404.
                 - Em caso de arquivo inválido, retorna erro 400.
             `,
-            security: [{ bearerAuth: [] }],
-            parameters: [
-                {
-                    name: "id",
-                    in: "path",
-                    required: true,
-                    schema: {
-                        type: "string",
-                    },
-                    description: "ID do componente"
-                }
-            ],
-            requestBody: {
-                required: true,
-                content: {
-                    "multipart/form-data": {
-                        schema: {
-                            type: "object",
-                            required: ["file"],
-                            properties: {
-                                file: {
-                                    type: "string",
-                                    format: "binary",
-                                    description: "Arquivo de imagem do componente"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            responses: {
-                201: {
-                    description: "Foto enviada com sucesso",
-                    content: {
-                        "application/json": {
-                            schema: {
-                                $ref: "#/components/schemas/ComponenteUploadFotoResposta"
-                            }
-                        }
-                    }
-                },
-                400: commonResponses[400](),
-                401: commonResponses[401](),
-                404: commonResponses[404](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+          description: 'ID do componente',
         },
-        delete: {
-            tags: ["Componentes"],
-            summary: "Deleta a foto do componente",
-            description: `
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              required: ['file'],
+              properties: {
+                file: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Arquivo de imagem do componente',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: 'Foto enviada com sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ComponenteUploadFotoResposta',
+              },
+            },
+          },
+        },
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        404: commonResponses[404](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
+    delete: {
+      tags: ['Componentes'],
+      summary: 'Deleta a foto do componente',
+      description: `
             + Caso de uso: Remoção da foto do componente eletrônico.
             
             + Função de Negócio:
@@ -355,27 +357,27 @@ const componentesRoutes = {
                 - Em caso de componente inexistente, retorna erro 404.
                 - Em caso de erro no serviço de armazenamento, retorna erro 500.
             `,
-            security: [{ bearerAuth: [] }],
-            parameters: [
-                {
-                    name: "id",
-                    in: "path",
-                    required: true,
-                    schema: {
-                        type: "string",
-                    },
-                    description: "ID do componente"
-                }
-            ],
-            responses: {
-                200: commonResponses[200](),
-                401: commonResponses[401](),
-                404: commonResponses[404](),
-                498: commonResponses[498](),
-                500: commonResponses[500]()
-            }
-        }
-    }
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+          description: 'ID do componente',
+        },
+      ],
+      responses: {
+        200: commonResponses[200](),
+        401: commonResponses[401](),
+        404: commonResponses[404](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
+  },
 };
 
 export default componentesRoutes;
