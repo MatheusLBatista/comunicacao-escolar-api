@@ -27,13 +27,7 @@ const routes = (app) => {
     swaggerUI.setup(swaggerDocs)(req, res, next);
   });
 
-  app.use(
-    express.json(),
-    auth,
-    usuarios,
-    grupos,
-    rotas,
-  );
+  app.use(express.json(), auth, usuarios, grupos, rotas);
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Rota não encontrada' });
