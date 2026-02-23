@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: comunicacao-escolar-mongodb
+  name: vol-comunicacao-escolar-mongodb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1000Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: comunicacao-escolar-mongodb
+  name: comunicacao-escolar-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: comunicacao-escolar-mongodb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: comunicacao-escolar-mongodb
+    spec:
+      containers:
+        - image: mongo:8
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - db.adminCommand('ping')
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: comunicacao-escolar-mongodb
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: comunicacao-escolar-env
+          volumeMounts:
+            - mountPath: /data/db
+              name: vol-comunicacao-escolar-mongodb
+      restartPolicy: Always
+      volumes:
+        - name: vol-comunicacao-escolar-mongodb
+          persistentVolumeClaim:
+            claimName: vol-comunicacao-escolar-mongodb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: comunicacao-escolar-mongodb
+  name: comunicacao-escolar-mongodb
+spec:
+  type: ClusterIP
+  ports:
+    - name: '27017'
+      port: 27017
+      targetPort: 27017
+  selector:
+    io.kompose.service: comunicacao-escolar-mongodb
