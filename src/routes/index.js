@@ -5,14 +5,6 @@ import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
 import usuarios from './usuarioRoutes.js';
-import categorias from './categoriaRoutes.js';
-import localizacoes from './localizacaoRoutes.js';
-import componentes from './componenteRoutes.js';
-import estoques from './estoqueRoutes.js';
-import fornecedores from './fornecedorRoutes.js';
-import movimentacoes from './movimentacaoRoutes.js';
-import notificacoes from './notificacaoRoutes.js';
-import orcamentos from './orcamentoRoutes.js';
 import grupos from './grupoRoutes.js';
 import rotas from './rotaRoutes.js';
 
@@ -39,14 +31,6 @@ const routes = (app) => {
     express.json(),
     auth,
     usuarios,
-    categorias,
-    localizacoes,
-    componentes,
-    estoques,
-    fornecedores,
-    movimentacoes,
-    notificacoes,
-    orcamentos,
     grupos,
     rotas,
   );

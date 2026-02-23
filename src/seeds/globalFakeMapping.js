@@ -1,7 +1,6 @@
 import fakebr from 'faker-br';
 import mongoose from 'mongoose';
 import { v4 as uuid } from 'uuid';
-// import TokenUtil from '../utils/TokenUtil.js';
 import loadModels from './loadModels.js';
 import TokenUtil from '../utils/TokenUtil.js';
 
@@ -11,10 +10,6 @@ export const fakeMappings = {
       `${fakebr.name.firstName()} ${fakebr.name.lastName()} ${fakebr.name.lastName()}`,
     descricao: () => fakebr.lorem.sentence(),
     data_hora: () => new Date().toISOString(),
-    quantidade: () => fakebr.random.number({ min: 1, max: 100 }),
-    valor_unitario: () => fakebr.commerce.price(1, 1000, 2),
-    categoria: () => new mongoose.Types.ObjectId().toString(),
-    localizacao: () => new mongoose.Types.ObjectId().toString(),
     rota: () => fakebr.lorem.word(10),
     dominio: () => fakebr.internet.url(),
     ativo: () => fakebr.random.boolean(),
@@ -54,109 +49,6 @@ export const fakeMappings = {
     tokenConvite: () => uuid(),
     convidadoEm: () => null,
     ativadoEm: () => null,
-  },
-
-  Notificacao: {
-    mensagem: () => {
-      const dispositivo = fakeMappings.Componente.nome();
-      const quantidade = fakebr.random.number({ min: 1, max: 50 });
-      return `${dispositivo} está com estoque baixo (${quantidade} unidades)`;
-    },
-    data_hora: () => new Date().toISOString(),
-    visualizada: () => fakebr.random.boolean(),
-    dataLeitura: () =>
-      fakebr.random.boolean()
-        ? new Date(
-            Date.now() - fakebr.random.number({ min: 0, max: 86400000 }),
-          ).toISOString()
-        : null,
-    ativo: () => true,
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-  },
-
-  Categoria: {
-    categorias: ['Sensores', 'Cabos', 'Microcontroladores'],
-    nome(index) {
-      return this.categorias[index];
-    },
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-  },
-
-  Localizacao: {
-    nome: () =>
-      `${String.fromCharCode(65 + fakebr.random.number({ min: 0, max: 25 }))}${fakebr.random.number({ min: 1, max: 100 })}`,
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-  },
-
-  Componente: {
-    nomesFixos: [
-      'Placa Arduino Uno',
-      'Placa Arduino Mega',
-      'Sensor de Movimento',
-      'Sensor de Temperatura DHT11',
-      'Sensor de Umidade DHT22',
-      'Display LCD 16x2',
-      'Display OLED 0.96',
-      'Módulo Relé 4 Canais',
-      'Módulo Relé 1 Canal',
-      'Módulo Wifi ESP8266',
-      'Módulo Bluetooth HC-05',
-      'Módulo Ethernet ENC28J60',
-      'Microcontrolador ESP32',
-      'Microcontrolador ATmega328P',
-      'Kit Jumpers 120 peças',
-      'Protoboard 400 pontos',
-      'Resistor Pack 1k-10M',
-      'Capacitor Pack',
-      'Sensor Ultrassônico HC-SR04',
-      'Módulo Sensor de Luz LDR',
-    ],
-    nome: () => fakebr.helpers.randomize(fakeMappings.Componente.nomesFixos),
-    quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
-    estoque_minimo: () => fakebr.random.number({ min: 1, max: 20 }),
-    descricao: () => fakebr.lorem.sentence(),
-    imagem: () => fakebr.image.imageUrl(),
-    categoria: () => new mongoose.Types.ObjectId().toString(),
-    ativo: () => true,
-    status: () =>
-      fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-  },
-
-  Estoque: {
-    quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
-    componente: () => new mongoose.Types.ObjectId().toString(),
-    localizacao: () => new mongoose.Types.ObjectId().toString(),
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-  },
-
-  Fornecedor: {
-    nome: () => fakebr.company.companyName(),
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-    url: () => fakebr.internet.url(),
-    contato: () => fakebr.phone.phoneNumber(),
-    descricao: () => fakebr.lorem.sentence(),
-  },
-
-  Movimentacao: {
-    tipos: ['entrada', 'saida'],
-    tipo: () => fakebr.helpers.randomize(fakeMappings.Movimentacao.tipos),
-    data_hora: () => new Date().toISOString(),
-    quantidade: () => fakebr.random.number({ min: 1, max: 10 }),
-    componente: () => new mongoose.Types.ObjectId().toString(),
-    localizacao: () => new mongoose.Types.ObjectId().toString(),
-    usuario: () => new mongoose.Types.ObjectId().toString(),
-  },
-
-  Orcamento: {
-    produtoNome: () => fakebr.commerce.productName(),
-    adjetivoNome: () => fakebr.lorem.word(),
-    nome: () =>
-      `Projeto ${fakeMappings.Orcamento.adjetivoNome()} - ${fakeMappings.Orcamento.produtoNome()}`,
-    descricao: () => fakebr.lorem.sentence(),
-    total: () => 0, // Será calculado automaticamente pelo middleware
-    componentes: () => [], // Será preenchido no seed
-    usuario: () => new mongoose.Types.ObjectId().toString(),
   },
 };
 

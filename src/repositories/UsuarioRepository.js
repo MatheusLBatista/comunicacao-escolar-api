@@ -1,6 +1,5 @@
 import UsuarioFilterBuilder from './filters/UsuarioFilterBuilder.js';
 import UsuarioModel from '../models/Usuario.js';
-import NotificacaoModel from '../models/Notificacao.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class UsuarioRepository {
@@ -96,18 +95,6 @@ class UsuarioRepository {
   }
 
   async deletar(id) {
-    const existeNotificacao = await NotificacaoModel.exists({ usuario: id });
-    if (existeNotificacao) {
-      throw new CustomError({
-        statusCode: 400,
-        errorType: 'resourceInUse',
-        field: 'Usuário',
-        details: [],
-        customMessage:
-          'Não é possível deletar: usuário está vinculado a notificações.',
-      });
-    }
-
     const usuario = await this.model.findByIdAndDelete(id);
     return usuario;
   }

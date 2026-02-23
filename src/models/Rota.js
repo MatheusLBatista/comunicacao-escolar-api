@@ -1,4 +1,3 @@
-// models/Rota.js
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
@@ -18,13 +17,9 @@ class Rota {
       { timestamps: true },
     );
 
-    // Adiciona a restrição de unicidade para o campo 'rota' + 'dominio'
     rotaSchema.index({ rota: 1, dominio: 1 }, { unique: true });
-
-    // Plugin de paginação
     rotaSchema.plugin(mongoosePaginate);
 
-    // Hook para garantir que o campo 'rota' está em minúsculas antes de salvar
     rotaSchema.pre('save', function (next) {
       if (this.rota) {
         this.rota = this.rota.toLowerCase();

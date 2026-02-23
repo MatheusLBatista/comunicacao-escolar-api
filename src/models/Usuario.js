@@ -55,8 +55,8 @@ class Usuario {
       ],
       permissoes: [
         {
-          rota: { type: String, index: true, required: true }, // usuários / grupos / unidades / rotas
-          dominio: { type: String }, // http://localhost:3000
+          rota: { type: String, index: true, required: true },
+          dominio: { type: String },
           ativo: { type: Boolean, default: false },
           buscar: { type: Boolean, default: false },
           enviar: { type: Boolean, default: false },
@@ -66,6 +66,33 @@ class Usuario {
         },
       ],
       fotoPerfil: { type: String, required: false },
+      fcm_tokens: [{ type: String }],
+      memberships: [
+        {
+          school_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'escolas',
+            required: true,
+          },
+          role: {
+            type: String,
+            enum: ['admin', 'teacher', 'parent', 'student'],
+            required: true,
+          },
+          // Apenas para alunos
+          class_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            default: null,
+          },
+          // Apenas para pais
+          associated_students: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'usuarios',
+            },
+          ],
+        },
+      ],
     });
 
     usuarioSchema.plugin(mongoosePaginate);

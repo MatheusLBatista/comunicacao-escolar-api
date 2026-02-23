@@ -8,7 +8,6 @@ export default async function usuarioSeed() {
   await Usuario.deleteMany({});
 
   const rotasCompletas = await seedRotas();
-
   const grupos = await seedGrupos(rotasCompletas);
 
   const grupoUsuario = grupos.find((g) => g.nome === 'Usuario');
@@ -37,14 +36,13 @@ export default async function usuarioSeed() {
     senha: await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Senha@123', 10),
     ativo: true,
     permissoes: rotasCompletas.map((r) => r.toObject()),
-    grupos: grupos[0],
+    grupos: grupos[0] ? [grupos[0]._id] : [],
   };
 
   usuarios.push(admin);
 
   const result = await Usuario.collection.insertMany(usuarios);
 
-  // Buscar o admin criado para retornar seu ID
   const adminCriado = await Usuario.findOne({
     email: process.env.ADMIN_EMAIL || 'admin@admin.com',
   });

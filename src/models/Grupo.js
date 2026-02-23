@@ -1,4 +1,3 @@
-// models/Grupo.js
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
@@ -9,10 +8,6 @@ class Grupo {
         nome: { type: String, index: true, unique: true },
         descricao: { type: String, required: true },
         ativo: { type: Boolean, default: true },
-        /**
-         * Permissões personalizadas para cada rota, a rota e o domínio
-         * devem ser únicos e conrrespondentes a rota e domínio do sistema em /rotas
-         */
         permissoes: [
           {
             rota: { type: String, index: true, required: true }, // usuários / grupos / rotas
@@ -32,7 +27,6 @@ class Grupo {
       },
     );
 
-    // Validação personalizada para garantir que rota + dominio sejam únicos dentro do grupo
     grupoSchema.pre('save', function (next) {
       const permissoes = this.permissoes;
       const combinacoes = permissoes.map((p) => `${p.rota}_${p.dominio}`);
