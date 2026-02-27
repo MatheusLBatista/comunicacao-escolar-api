@@ -1,34 +1,35 @@
 import { z } from 'zod';
 
-const senhaRegex =
-  /^(?=.*[?@!#$%^&*()/\\])(?=.*[0-9])(?=.*[a-zA-Z])[?@!#$%^&*()/\\a-zA-Z0-9]+$/;
-const nomeRegex =
-  /^([A-ZÀ-Ö][a-zà-öø-ÿ]{1,})( ((de|da|do|das|dos)|[A-ZÀ-Ö][a-zà-öø-ÿ]{1,}))*$/;
+const taxIdSchema = z
+  .string('CNPJ é obrigatório.')
+  .refine((doc) => {
+    const replacedDoc = doc.replace(/\D/g, '');
+    return replacedDoc.length >= 11;
+  }, 'CNPJ deve conter no mínimo 11 caracteres.')
+  .refine((doc) => {
+    const replacedDoc = doc.replace(/\D/g, '');
+    return replacedDoc.length <= 14;
+  }, 'CNPJ deve conter no máximo 14 caracteres.')
+  .refine((doc) => {
+    const replacedDoc = doc.replace(/\D/g, '');
+    return !!Number(replacedDoc);
+  }, 'CNPJ deve conter apenas números.');
 
-const UsuarioSchema = z.object({
-  nome: z
+const zipCodeSchema = z
+  .string()
+  .refine((zip) => {
+    const replacedZip = zip.replace(/\D/g, '');
+    return replacedZip.length === 8;
+  }, 'CEP deve conter exatamente 8 caracteres numéricos.');
+
+const SchoolSchema = z.object({
+  name: z
     .string()
     .min(1, 'Campo nome é obrigatório.')
-    .max(100, 'O nome deve ter no máximo 100 caracteres.'),
-  email: z
-    .string()
-    .email('Formato de email inválido.')
-    .min(1, 'Campo email é obrigatório.'),
-  senha: z
-    .string()
-    .min(8, 'A senha deve ter pelo menos 8 caracteres.')
-    .refine(
-      (senha) => {
-        return senhaRegex.test(senha);
-      },
-      {
-        message:
-          'A senha deve conter pelo menos 1 letra maiúscula, 1 letra minúscula, 1 número e 1 caractere especial.',
-      },
-    ),
-  ativo: z.boolean().default(true),
+    .max(100, 'O nome da escola deve ter no máximo 100 caracteres.'),
+  active: z.boolean().default(true),
 });
 
-const UsuarioUpdateSchema = UsuarioSchema.omit({ email: true }).partial();
+const SchoolUpdateSchema = SchoolSchema.omit({ tax_id: true }).partial();
 
-export { UsuarioSchema, UsuarioUpdateSchema };
+export { SchoolSchema, SchoolUpdateSchema };
