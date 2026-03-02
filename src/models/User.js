@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Usuario {
+class User {
   constructor() {
-    const usuarioSchema = new mongoose.Schema({
+    const userSchema = new mongoose.Schema({
       nome: {
         type: String,
         index: true,
@@ -88,17 +88,17 @@ class Usuario {
           associated_students: [
             {
               type: mongoose.Schema.Types.ObjectId,
-              ref: 'usuarios',
+              ref: 'Users',
             },
           ],
         },
       ],
     });
 
-    usuarioSchema.plugin(mongoosePaginate);
+    userSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('usuarios', usuarioSchema);
+    this.model = mongoose.model('Users', userSchema);
   }
 }
 
-export default new Usuario().model;
+export default new User().model;
