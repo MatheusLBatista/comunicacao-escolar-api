@@ -28,29 +28,29 @@ describe('Model de Usuário', () => {
 
   it('deve criar um usuário válido e definir ativo como false por padrão', async () => {
     const userData = {
-      nome: 'Usuário Teste',
+      full_name: 'Usuário Teste',
       email: 'teste@exemplo.com',
-      senha: 'senha123',
+      password: 'senha123',
     };
     const user = new Usuario(userData);
     await user.save();
     const savedUser = await Usuario.findById(user._id);
-    expect(savedUser.nome).toBe(userData.nome);
+    expect(savedUser.full_name).toBe(userData.full_name);
     expect(savedUser.email).toBe(userData.email);
-    expect(savedUser.ativo).toBe(false);
+    expect(savedUser.active).toBe(false);
     expect(savedUser._id).toBeDefined();
   });
 
   it('não deve criar usuário sem nome, email ou senha', async () => {
-    const noNome = new Usuario({ email: 'a@a.com', senha: '123' });
+    const noNome = new Usuario({ email: 'a@a.com', password: '123' });
     await expect(noNome.save()).rejects.toThrow();
-    const noEmail = new Usuario({ nome: 'A', senha: '123' });
+    const noEmail = new Usuario({ full_name: 'A', password: '123' });
     await expect(noEmail.save()).rejects.toThrow();
-    const noSenha = new Usuario({ nome: 'A', email: 'a@a.com' });
+    const noSenha = new Usuario({ full_name: 'A', email: 'a@a.com' });
     await expect(noSenha.save()).rejects.toThrow();
   });
   it('não deve criar usuário com email duplicado', async () => {
-    const userData = { nome: 'A', email: 'dup@a.com', senha: '123' };
+    const userData = { full_name: 'A', email: 'dup@a.com', password: '123' };
     await new Usuario(userData).save();
 
     // Espera especificamente por um erro do MongoDB relacionado a duplicação
@@ -65,8 +65,8 @@ describe('Model de Usuário', () => {
 
   it('deve retornar todos os usuários cadastrados', async () => {
     await Usuario.create([
-      { nome: 'U1', email: 'u1@a.com', senha: '123' },
-      { nome: 'U2', email: 'u2@a.com', senha: '123' },
+      { full_name: 'U1', email: 'u1@a.com', password: '123' },
+      { full_name: 'U2', email: 'u2@a.com', password: '123' },
     ]);
     const users = await Usuario.find();
     expect(users.length).toBe(2);
@@ -76,12 +76,12 @@ describe('Model de Usuário', () => {
   });
 
   it('por padrão, o campo senha não deve ser retornado em queries', async () => {
-    const userData = { nome: 'SemSenha', email: 'sem@a.com', senha: '123' };
+    const userData = { full_name: 'SemSenha', email: 'sem@a.com', password: '123' };
     const user = new Usuario(userData);
     await user.save();
     const found = await Usuario.findById(user._id);
-    expect(found.senha).toBeUndefined();
-    const foundWithSenha = await Usuario.findById(user._id).select('+senha');
-    expect(foundWithSenha.senha).toBeDefined();
+    expect(found.password).toBeUndefined();
+    const foundWithPassword = await Usuario.findById(user._id).select('+password');
+    expect(foundWithPassword.password).toBeDefined();
   });
 });

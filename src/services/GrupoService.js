@@ -68,7 +68,7 @@ class GrupoService {
   async verificarGrupo(user, id) {
     const usuario = await this.usuarioRepository.buscarPorId(user.id);
     const grupoUsuario = usuario.toObject();
-    for (const grupo of grupoUsuario.grupos) {
+    for (const grupo of grupoUsuario.groups) {
       if (grupo._id.toString() === id) {
         throw new CustomError({
           statusCode: HttpStatusCodes.FORBIDDEN.code,
@@ -103,7 +103,7 @@ class GrupoService {
         customMessage: messages.error.resourceNotFound('Rotas'),
       });
     }
-    const existRota = grupo.permissoes.find((item) => item.rota === rota.rota);
+    const existRota = grupo.permissions.find((item) => item.route === rota.route);
     if (existRota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,

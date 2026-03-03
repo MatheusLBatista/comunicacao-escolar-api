@@ -16,8 +16,8 @@ describe('Grupos', () => {
   beforeAll(async () => {
     const res = await request(BASE_URL)
       .post('/login')
-      .send({ email: 'admin@admin.com', senha: 'Senha@123' });
-    tokenAdmin = res.body?.data?.user?.accesstoken;
+      .send({ email: 'admin@admin.com', password: 'Senha@123' });
+    tokenAdmin = res.body?.data?.user?.access_token;
   });
   it('Deve listar os grupos com sucesso sendo administrador e verificar se todos os campos estão sendo informados', async () => {
     const res = await request(BASE_URL)
@@ -29,7 +29,7 @@ describe('Grupos', () => {
     expect(res.body?.data?.docs[0]).toHaveProperty('nome');
     expect(res.body?.data?.docs[0]).toHaveProperty('descricao');
     expect(res.body?.data?.docs[0]).toHaveProperty('ativo');
-    expect(res.body?.data?.docs[0]).toHaveProperty('permissoes');
+    expect(res.body?.data?.docs[0]).toHaveProperty('permissions');
     expect(res.body?.message).toEqual('Requisição bem-sucedida');
     idGrupo = res.body?.data?.docs[0]._id;
   });
@@ -43,7 +43,7 @@ describe('Grupos', () => {
     expect(res.body?.data).toHaveProperty('nome');
     expect(res.body?.data).toHaveProperty('descricao');
     expect(res.body?.data).toHaveProperty('ativo');
-    expect(res.body?.data).toHaveProperty('permissoes');
+    expect(res.body?.data).toHaveProperty('permissions');
     expect(res.body?.message).toEqual('Requisição bem-sucedida');
   });
   it('Deve listar grupos pelo nome, usando Usuario', async () => {
@@ -55,7 +55,7 @@ describe('Grupos', () => {
     expect(res.body?.data?.docs[0]).toHaveProperty('nome');
     expect(res.body?.data?.docs[0]).toHaveProperty('_id');
     expect(res.body?.data?.docs[0]).toHaveProperty('ativo');
-    expect(res.body?.data?.docs[0]).toHaveProperty('permissoes');
+    expect(res.body?.data?.docs[0]).toHaveProperty('permissions');
     expect(res.body?.data?.docs[0]).toHaveProperty('descricao');
     expect(res.body?.data?.docs).toHaveLength(1);
     expect(res.body?.data?.docs[0].nome).toEqual('Usuario');
@@ -69,7 +69,7 @@ describe('Grupos', () => {
     expect(res.body?.data?.docs[0]).toHaveProperty('nome');
     expect(res.body?.data?.docs[0]).toHaveProperty('_id');
     expect(res.body?.data?.docs[0]).toHaveProperty('ativo');
-    expect(res.body?.data?.docs[0]).toHaveProperty('permissoes');
+    expect(res.body?.data?.docs[0]).toHaveProperty('permissions');
     expect(res.body?.data?.docs[0]).toHaveProperty('descricao');
     expect(res.body?.data?.docs[0].descricao).toEqual(
       'Grupo com acesso total a todas as rotas',
@@ -85,13 +85,13 @@ describe('Grupos', () => {
     expect(res.body?.data?.docs[0]).toHaveProperty('nome');
     expect(res.body?.data?.docs[0]).toHaveProperty('_id');
     expect(res.body?.data?.docs[0]).toHaveProperty('ativo');
-    expect(res.body?.data?.docs[0]).toHaveProperty('permissoes');
+    expect(res.body?.data?.docs[0]).toHaveProperty('permissions');
     expect(res.body?.data?.docs[0]).toHaveProperty('descricao');
     expect(res.body?.data?.docs[0].ativo).toEqual(true);
   });
   it('Deve falhar ao tentar listar grupos não sendo um administrador', async () => {
     const login = await logar('vinicius@gmail.com', 'Senha@123');
-    tokenUser = login.body?.data?.user?.accesstoken;
+    tokenUser = login.body?.data?.user?.access_token;
     const res = await request(BASE_URL)
       .get('/grupos')
       .set('Authorization', `Bearer ${tokenUser}`);
@@ -99,9 +99,9 @@ describe('Grupos', () => {
     expect([403, 498]).toContain(res.status);
   });
 });
-async function logar(email, senha) {
+async function logar(email, password) {
   const res = await request(BASE_URL)
     .post('/login')
-    .send({ email: email, senha: senha });
+    .send({ email: email, password: password });
   return res;
 }

@@ -87,7 +87,7 @@ class AuthService {
     }
 
     // Validar a senha
-    const senhaValida = await bcrypt.compare(body.senha, userEncontrado.senha);
+    const senhaValida = await bcrypt.compare(body.password, userEncontrado.password);
     if (!senhaValida) {
       throw new CustomError({
         statusCode: 401,
@@ -99,7 +99,7 @@ class AuthService {
     }
 
     // Gerar novo access token utilizando a instância injetada
-    const accesstoken = await this.TokenUtil.generateAccessToken(
+    const access_token = await this.TokenUtil.generateAccessToken(
       userEncontrado._id,
     );
 
@@ -108,17 +108,17 @@ class AuthService {
       userEncontrado._id,
       true,
     );
-    let refreshtoken = userComTokens.refreshtoken;
+    let refresh_token = userComTokens.refresh_token;
 
-    if (refreshtoken) {
+    if (refresh_token) {
       try {
-        jwt.verify(refreshtoken, process.env.JWT_SECRET_REFRESH_TOKEN);
+        jwt.verify(refresh_token, process.env.JWT_SECRET_REFRESH_TOKEN);
       } catch (error) {
         if (
           error.name === 'TokenExpiredError' ||
           error.name === 'JsonWebTokenError'
         ) {
-          refreshtoken = await this.TokenUtil.generateRefreshToken(
+          refresh_token = await this.TokenUtil.generateRefreshToken(
             userEncontrado._id,
           );
         } else {
@@ -135,7 +135,7 @@ class AuthService {
       }
     } else {
       // Se o refresh token não existe, gera um novo
-      refreshtoken = await this.TokenUtil.generateRefreshToken(
+      refresh_token = await this.TokenUtil.generateRefreshToken(
         userEncontrado._id,
       );
     }
@@ -143,17 +143,17 @@ class AuthService {
     // Armazenar os tokens atualizados
     await this.repository.armazenarTokens(
       userEncontrado._id,
-      accesstoken,
-      refreshtoken,
+      access_token,
+      refresh_token,
     );
 
     // Buscar novamente o usuário e remover a senha
     const userLogado = await this.repository.buscarPorEmail(body.email);
-    delete userLogado.senha;
+    delete userLogado.password;
     const userObjeto = userLogado.toObject();
 
     // Retornar o usuário com os tokens
-    return { user: { accesstoken, refreshtoken, ...userObjeto } };
+    return { user: { access_token, refresh_token, ...userObjeto } };
   }
 
   // RecuperaSenhaService.js
@@ -231,9 +231,9 @@ class AuthService {
     // ───────────────────────────────────────────────
     const expMs = Date.now() + 60 * 60 * 1000; // 1 hora de expiração
     const data = await this.repository.atualizar(userEncontrado._id, {
-      tokenUnico,
-      codigo_recupera_senha: codigoRecuperaSenha,
-      exp_codigo_recupera_senha: new Date(expMs).toISOString(), // Armazenar expiração como string ISO TMZ0 Ex.: 2023-10-01T12:00:00.000Z
+      unique_token: tokenUnico,
+      password_recovery_code: codigoRecuperaSenha,
+      password_recovery_code_exp: new Date(expMs).toISOString(),
     });
 
     if (!data) {
@@ -251,7 +251,7 @@ class AuthService {
     // ───────────────────────────────────────────────
     try {
       await EmailService.enviarEmailRecuperacaoSenha(
-        userEncontrado.nome,
+        userEncontrado.full_name,
         userEncontrado.email,
         tokenUnico,
       );
@@ -263,9 +263,9 @@ class AuthService {
       console.error('Erro ao enviar e-mail de recuperação:', error);
       // Se falhar ao enviar o e-mail, reverte a atualização do usuário
       await this.repository.atualizar(userEncontrado._id, {
-        tokenUnico: null,
-        codigo_recupera_senha: null,
-        exp_codigo_recupera_senha: null,
+        unique_token: null,
+        password_recovery_code: null,
+        password_recovery_code_exp: null,
       });
       throw new CustomError({
         statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
@@ -305,7 +305,7 @@ class AuthService {
     );
 
     // 2) Gera o hash da senha pura
-    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.senha);
+    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.password);
     console.log('Senha hasheada:', senhaHasheada);
 
     // Buscar usuário pelo token unico
@@ -353,7 +353,7 @@ class AuthService {
     }
 
     // 2) Verifica expiração
-    if (user.exp_codigo_recupera_senha < new Date()) {
+    if (user.password_recovery_code_exp < new Date()) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
         field: 'Código de Recuperação',
@@ -363,7 +363,7 @@ class AuthService {
     }
 
     // 3) Hash da nova senha
-    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.senha);
+    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.password);
 
     // 4) Atualiza no repositório
     const atualizado = await this.repository.atualizarSenha(
@@ -396,7 +396,7 @@ class AuthService {
       });
     }
 
-    if (userEncontrado.refreshtoken !== token) {
+    if (userEncontrado.refresh_token !== token) {
       console.log('Token inválido');
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
@@ -408,32 +408,32 @@ class AuthService {
     }
 
     // Gerar novo access token utilizando a instância injetada
-    const accesstoken = await this.TokenUtil.generateAccessToken(id);
+    const access_token = await this.TokenUtil.generateAccessToken(id);
 
     /**
      * Se SINGLE_SESSION_REFRESH_TOKEN for true, gera um novo refresh token
      * Senão, mantém o token armazenado
      */
-    let refreshtoken = '';
+    let refresh_token = '';
     if (process.env.SINGLE_SESSION_REFRESH_TOKEN === 'true') {
-      refreshtoken = await this.TokenUtil.generateRefreshToken(id);
+      refresh_token = await this.TokenUtil.generateRefreshToken(id);
     } else {
-      refreshtoken = userEncontrado.refreshtoken;
+      refresh_token = userEncontrado.refresh_token;
     }
 
     // Atualiza o usuário com os novos tokens
-    await this.repository.armazenarTokens(id, accesstoken, refreshtoken);
+    await this.repository.armazenarTokens(id, access_token, refresh_token);
 
     // monta o objeto de usuário com os tokens para resposta
     const userLogado = await this.repository.buscarPorId(id, {
       includeTokens: true,
     });
-    delete userLogado.senha;
+    delete userLogado.password;
     const userObjeto = userLogado.toObject();
 
     const userComTokens = {
-      accesstoken,
-      refreshtoken,
+      access_token,
+      refresh_token,
       ...userObjeto,
     };
 

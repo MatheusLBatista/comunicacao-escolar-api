@@ -22,38 +22,38 @@ class GrupoRepository {
   /**
    * Verificar se há permissões duplicadas na requisição.
    */
-  async obterParesRotaDominioUnicos(permissoes) {
-    const combinacoes = permissoes.map(
-      (p) => `${p.rota}_${p.dominio || 'undefined'}`,
+  async obterParesRotaDominioUnicos(permissions) {
+    const combinations = permissions.map(
+      (p) => `${p.route}_${p.domain || 'undefined'}`,
     );
-    const combinacoesUnicas = [...new Set(combinacoes)];
-    return combinacoesUnicas.map((combinacao) => {
-      const [rota, dominio] = combinacao.split('_');
-      return { rota, dominio: dominio === 'undefined' ? null : dominio };
+    const uniqueCombinations = [...new Set(combinations)];
+    return uniqueCombinations.map((combination) => {
+      const [route, domain] = combination.split('_');
+      return { route, domain: domain === 'undefined' ? null : domain };
     });
   }
 
   /**
    * Obter permissões duplicadas na requisição.
    */
-  obterPermissoesDuplicadas(permissoes, combinacoesRecebidas) {
-    const combinacoes = permissoes.map(
-      (permissao) => `${permissao.rota}_${permissao.dominio}`,
+  obterPermissoesDuplicadas(permissions, combinationsReceived) {
+    const combinations = permissions.map(
+      (permission) => `${permission.route}_${permission.domain}`,
     );
     const counts = {};
-    combinacoes.forEach((combinacao) => {
-      counts[combinacao] = (counts[combinacao] || 0) + 1;
+    combinations.forEach((combination) => {
+      counts[combination] = (counts[combination] || 0) + 1;
     });
     const duplicates = Object.keys(counts).filter(
-      (combinacao) => counts[combinacao] > 1,
+      (combination) => counts[combination] > 1,
     );
     const uniqueDuplicates = [];
     const seen = new Set();
-    permissoes.forEach((permissao) => {
-      const combinacao = `${permissao.rota}_${permissao.dominio}`;
-      if (duplicates.includes(combinacao) && !seen.has(combinacao)) {
-        seen.add(combinacao);
-        uniqueDuplicates.push(permissao);
+    permissions.forEach((permission) => {
+      const combination = `${permission.route}_${permission.domain}`;
+      if (duplicates.includes(combination) && !seen.has(combination)) {
+        seen.add(combination);
+        uniqueDuplicates.push(permission);
       }
     });
     return uniqueDuplicates;
@@ -101,12 +101,12 @@ class GrupoRepository {
    * para saber se a permissão existe no cadastrado de rotas e domínios
    * O método deve buscar combinando rota e domínio
    */
-  async buscarPorPermissao(permissoes) {
+  async buscarPorPermissao(permissions) {
     // find recursivo lendo um array de objetos de permissão,
-    // Mapear as permissões para combinar rota e domínio
-    const query = permissoes.map((p) => ({
-      rota: p.rota,
-      dominio: p.dominio || null,
+    // Mapear as permissões para combinar route e domain
+    const query = permissions.map((p) => ({
+      route: p.route,
+      domain: p.domain || null,
     }));
 
     const rotasEncontradas = await this.rotaModel.find({ $or: query });
@@ -121,7 +121,7 @@ class GrupoRepository {
       const id = req.params.id || null;
 
       if (id) {
-        const data = await this.model.findById(id).populate('permissoes');
+        const data = await this.model.findById(id).populate('permissions');
 
         if (!data) {
           throw new this.customError({
@@ -134,7 +134,7 @@ class GrupoRepository {
         }
 
         // Utilizando o length dos arrays
-        const totalPermissoes = data.permissoes ? data.permissoes.length : 0;
+        const totalPermissoes = data.permissions ? data.permissions.length : 0;
 
         const dataWithStats = {
           ...data.toObject(),
@@ -166,7 +166,7 @@ class GrupoRepository {
       const options = {
         page: parseInt(page),
         limit: parseInt(limite),
-        populate: ['permissoes'],
+        populate: ['permissions'],
         sort: { nome: 1 },
       };
 
@@ -178,8 +178,8 @@ class GrupoRepository {
         const grupoObj =
           typeof doc.toObject === 'function' ? doc.toObject() : doc;
 
-        const totalPermissoes = grupoObj.permissoes
-          ? grupoObj.permissoes.length
+        const totalPermissoes = grupoObj.permissions
+          ? grupoObj.permissions.length
           : 0;
 
         return {
@@ -216,7 +216,7 @@ class GrupoRepository {
   async verificarUsuariosAssociados(id) {
     try {
       const usuariosAssociados = await this.usuarioModel.findOne({
-        grupos: id,
+        groups: id,
       });
       return usuariosAssociados; // Retorna true se houver usuários, false caso contrário
     } catch (error) {
@@ -307,7 +307,7 @@ class GrupoRepository {
   async adiciotarRota(id, rota) {
     try {
       const grupo = await this.model.findById(id);
-      grupo.permissoes.push(rota);
+      grupo.permissions.push(rota);
       const data = await grupo.save();
       console.log('aqui');
       return data;

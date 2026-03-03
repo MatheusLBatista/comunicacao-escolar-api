@@ -15,15 +15,15 @@ class PermissionService {
 
   async hasPermission(
     userId,
-    rota,
-    dominio,
-    metodo,
+    route,
+    domain,
+    method,
     params = {},
     httpMethod = '',
   ) {
     try {
       const usuario = await this.repository.buscarPorId(userId, {
-        grupos: true,
+        groups: true,
       });
       if (!usuario) {
         throw new CustomError({
@@ -35,42 +35,42 @@ class PermissionService {
         });
       }
 
-      if (rota === 'usuarios' && params.id && params.id === userId) {
+      if (route === 'usuarios' && params.id && params.id === userId) {
         const metodosPermitidos = ['GET', 'PATCH', 'PUT', 'DELETE'];
         if (metodosPermitidos.includes(httpMethod)) {
           return true;
         }
       }
 
-      let permissoes = usuario.permissoes || [];
+      let permissions = usuario.permissions || [];
 
-      if (Array.isArray(usuario.grupos)) {
-        for (const grupo of usuario.grupos) {
-          permissoes = permissoes.concat(grupo.permissoes || []);
+      if (Array.isArray(usuario.groups)) {
+        for (const grupo of usuario.groups) {
+          permissions = permissions.concat(grupo.permissions || []);
         }
       }
 
-      const permissoesUnicas = [];
-      const combinacoes = new Set();
+      const uniquePermissions = [];
+      const combinations = new Set();
 
-      permissoes.forEach((permissao) => {
-        const chave = `${permissao.rota}_${permissao.dominio}`;
-        if (!combinacoes.has(chave)) {
-          combinacoes.add(chave);
-          permissoesUnicas.push(permissao);
+      permissions.forEach((permission) => {
+        const key = `${permission.route}_${permission.domain}`;
+        if (!combinations.has(key)) {
+          combinations.add(key);
+          uniquePermissions.push(permission);
         }
       });
 
-      const hasPermissao = permissoesUnicas.some((permissao) => {
+      const hasPermission = uniquePermissions.some((permission) => {
         return (
-          permissao.rota === rota &&
-          permissao.dominio === dominio &&
-          permissao.ativo &&
-          permissao[metodo]
+          permission.route === route &&
+          permission.domain === domain &&
+          permission.active &&
+          permission[method]
         );
       });
 
-      return hasPermissao;
+      return hasPermission;
     } catch (error) {
       console.error('Erro ao verificar permissões:', error);
       return false;

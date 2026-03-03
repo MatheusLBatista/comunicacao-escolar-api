@@ -6,6 +6,6 @@ const objectIdSchema = z
 
 export const BaseRotaSchema = z.object({
   _id: objectIdSchema.optional(),
-  rota: z.string().min(1, 'O campo rota é obrigatório.'),
-  dominio: z.string().default('localhost'),
+  route: z.string().min(1, 'O campo route é obrigatório.'),
+  domain: z.string().default('localhost'),
 });
