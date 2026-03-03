@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Escola {
+class School {
   constructor() {
-    const escolaSchema = new mongoose.Schema(
+    const schoolSchema = new mongoose.Schema(
       {
         nome: {
           type: String,
@@ -29,10 +29,10 @@ class Escola {
       { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
     );
 
-    escolaSchema.plugin(mongoosePaginate);
+    schoolSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('escolas', escolaSchema);
+    this.model = mongoose.model('Schools', schoolsSchema);
   }
 }
 
-export default new Escola().model;
+export default new School().model;
