@@ -40,7 +40,7 @@ export const fakeMappings = {
     user_id: () => new mongoose.Types.ObjectId(),
   },
 
-  Usuario: {
+  User: {
     full_name: () =>
       `${fakebr.name.firstName()} ${fakebr.name.lastName()} ${fakebr.name.lastName()}`,
     email: () => fakebr.internet.email(),
@@ -64,7 +64,7 @@ export const fakeMappings = {
     password_recovery_code_exp: () => null,
   },
 
-  Conversa: {
+  Chat: {
     participants: () => [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()],
     type: () => fakebr.random.arrayElement(['private', 'daily_log_reply']),
     last_message_at: () => null,
@@ -92,7 +92,7 @@ export const fakeMappings = {
     ],
   },
 
-  Escola: {
+  School: {
     cnpj: () => fakebr.br.cnpj(),
     endereco: () => ({
       logradouro: fakebr.address.streetAddress(),
@@ -106,7 +106,7 @@ export const fakeMappings = {
     post_id: () => new mongoose.Types.ObjectId(),
   },
 
-  Mensagem: {
+  Message: {
     conversation_id: () => new mongoose.Types.ObjectId(),
     sender_id: () => new mongoose.Types.ObjectId(),
     texto: () => fakebr.lorem.sentence(),

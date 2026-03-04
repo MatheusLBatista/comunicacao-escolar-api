@@ -14,7 +14,7 @@ export default async function seedGrupos(rotas) {
   grupos.push(grupoAdministrador);
 
   const grupoVisitante = {
-    nome: 'Usuario',
+    nome: 'User',
     descricao: 'Grupo com acesso aos visualização de pontos históricos',
     ativo: true,
     permissions: rotas.map((r) => {
