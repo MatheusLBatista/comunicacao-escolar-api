@@ -36,10 +36,10 @@ class AuthController {
   /**
    *  Metodo para recuperar a senha do usuário
    */
-  recuperaSenha = async (req, res) => {
+  recoverPassword = async (req, res) => {
     // Validar apenas o email
     const validatedBody = EmailSchema.parse(req.body);
-    const data = await this.service.recuperaSenha(validatedBody);
+    const data = await this.service.recoverPassword(validatedBody);
     return CommonResponse.success(res, data);
   };
 
@@ -54,9 +54,9 @@ class AuthController {
    *    → Busca usuário pelo campo `codigo_recupera_senha`, salva hash da nova senha (mesmo se inativo),
    *      e “zera” o campo `codigo_recupera_senha`.
    */
-  async atualizarSenhaToken(req, res, next) {
+  async updatePasswordByToken(req, res, next) {
     const tokenRecuperacao = req.query.token || req.params.token || null; // token de recuperação passado na URL
-    const senha = req.body.password || null; // nova senha passada no body
+    const password = req.body.password || null; // nova senha passada no body
 
     // 1) Verifica se veio o token de recuperação
     if (!tokenRecuperacao) {
@@ -71,10 +71,10 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UserUpdateSchema.parse({ password: senha });
+    const passwordSchema = UserUpdateSchema.parse({ password: password });
 
     // atualiza a senha
-    await this.service.atualizarSenhaToken(tokenRecuperacao, senhaSchema);
+    await this.service.updatePasswordByToken(tokenRecuperacao, passwordSchema);
 
     return CommonResponse.success(
       res,
@@ -85,12 +85,12 @@ class AuthController {
     );
   }
 
-  async atualizarSenhaCodigo(req, res, next) {
+  async updatePasswordByCode(req, res, next) {
     const password_recovery_code = req.body.password_recovery_code || null; // código de recuperação passado no body
-    const senha = req.body.password || null; // nova senha passada no body
+      const password = req.body.password || null; // new password passed in body
 
     console.log('password_recovery_code:', password_recovery_code);
-    console.log('senha:', senha);
+    console.log('password:', password);
 
     // 1) Verifica se veio o código de recuperação
     if (!password_recovery_code) {
@@ -105,10 +105,10 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UserUpdateSchema.parse({ password: senha });
+    const passwordSchema = UserUpdateSchema.parse({ password });
 
     // atualiza a senha
-    await this.service.atualizarSenhaCodigo(password_recovery_code, senhaSchema);
+    await this.service.updatePasswordByCode(password_recovery_code, passwordSchema);
 
     return CommonResponse.success(
       res,

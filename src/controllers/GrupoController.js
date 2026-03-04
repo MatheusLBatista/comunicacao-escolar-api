@@ -29,7 +29,7 @@ class GrupoController {
    * Caso contrário, retorna todos os objetos com suporte a filtros e paginação.
    */
 
-  async listar(req, res) {
+  async list(req, res) {
     console.log(
       'Estou no listar em GrupoController, enviando  req para GrupoService',
     );
@@ -49,7 +49,7 @@ class GrupoController {
     }
 
     // Chama o serviço para listar os grupos
-    const data = await this.service.listar(req);
+    const data = await this.service.list(req);
 
     console.log('Estou retornando os dados em GrupoController');
     return CommonResponse.success(res, data);
@@ -58,13 +58,13 @@ class GrupoController {
   /**
    * Criar um novo grupo.
    */
-  async criar(req, res) {
+  async create(req, res) {
     console.log('Estou no criar em GrupoController');
 
     // Validação dos dados de entrada usando Zod (estrutural)
     const parsedData = GrupoSchema.parse(req.body);
 
-    const data = await this.service.criar(parsedData);
+    const data = await this.service.create(parsedData);
 
     // Se chegou até aqui, é porque deu tudo certo, retornar 201 Created
     return CommonResponse.created(res, data);
@@ -73,7 +73,7 @@ class GrupoController {
   /**
    * Atualiza um grupo existente.
    */
-  async atualizar(req, res) {
+  async update(req, res) {
     console.log('Estou no atualizar em GrupoController');
 
     //1ª Validação estrutural - validação do ID passado por parâmetro
@@ -86,7 +86,7 @@ class GrupoController {
     const parsedData = GrupoUpdateSchema.parse(req.body);
 
     // Chama o serviço para atualizar o grupo
-    const data = await this.service.atualizar(parsedData, id, req.user);
+    const data = await this.service.update(parsedData, id, req.user);
 
     // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
     return CommonResponse.success(res, data);
@@ -95,7 +95,7 @@ class GrupoController {
   /**
    * Deleta um grupo existente.
    */
-  async deletar(req, res) {
+  async delete(req, res) {
     console.log('Estou no deletar em GrupoController');
 
     // Validação estrutural - validação do ID passado por parâmetro
@@ -109,7 +109,7 @@ class GrupoController {
     }
 
     // Chama o serviço para deletar o grupo
-    const data = await this.service.deletar(id, req.user);
+    const data = await this.service.delete(id, req.user);
 
     // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
     return CommonResponse.success(
@@ -120,7 +120,7 @@ class GrupoController {
     );
   }
 
-  async adicionarRota(req, res) {
+  async addRoute(req, res) {
     console.log('Estou no adicionarRota em GrupoController');
 
     const { id } = req.params;
@@ -128,7 +128,7 @@ class GrupoController {
     GrupoIdSchema.parse(id);
     ObjectIdSchema.parse(idRota);
 
-    const data = await this.service.adicionarRota(id, idRota);
+    const data = await this.service.addRoute(id, idRota);
     return CommonResponse.success(
       res,
       data,

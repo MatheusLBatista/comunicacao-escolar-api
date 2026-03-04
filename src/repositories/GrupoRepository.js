@@ -20,7 +20,7 @@ class GrupoRepository {
   /**
    * Verificar se há permissões duplicadas na requisição.
    */
-  async obterParesRotaDominioUnicos(permissions) {
+  async getUniqueDomainRoutePairs(permissions) {
     const combinations = permissions.map(
       (p) => `${p.route}_${p.domain || 'undefined'}`,
     );
@@ -60,7 +60,7 @@ class GrupoRepository {
   /**
    * Buscar grupo por nome e, opcionalmente, por um ID diferente.
    */
-  async buscarPorNome(nome, idIgnorado = null) {
+  async getByName(nome, idIgnorado = null) {
     // Criar o filtro base
     const filtro = { nome };
 
@@ -81,7 +81,7 @@ class GrupoRepository {
    * para retornar um usuário e ser utilizado em outras funções de validação
    * cujo listar não atende por exigir req.
    */
-  async buscarPorId(id) {
+  async getById(id) {
     const group = await this.model.findById(id);
     if (!group) {
       throw new this.customError({
@@ -114,7 +114,7 @@ class GrupoRepository {
   /**
    * Método listar grupo tanto com filtro quanto sem filtro ou por ID, caso seja passado
    */
-  async listar(req) {
+  async list(req) {
     try {
       const id = req.params.id || null;
 
@@ -230,13 +230,13 @@ class GrupoRepository {
   }
 
   // Método criar grupo
-  async criar(parsedData) {
+  async create(parsedData) {
     const grupo = new this.model(parsedData);
     return await grupo.save();
   }
 
   // Método atualizar grupo
-  async atualizar(id, parsedData) {
+  async update(id, parsedData) {
     try {
       const grupo = await this.model.findByIdAndUpdate(id, parsedData, {
         new: true,
@@ -272,7 +272,7 @@ class GrupoRepository {
   /**
    * Método deletar grupo.
    */
-  async deletar(id) {
+  async delete(id) {
     try {
       const grupoDeletado = await this.model.findByIdAndDelete(id);
 

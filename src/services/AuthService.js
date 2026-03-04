@@ -18,7 +18,7 @@ class AuthService {
     this.repository = new UserRepository();
   }
 
-  async carregatokens(id, token) {
+  async loadTokens(id, token) {
     const data = await this.repository.getById(id, { includeTokens: true });
     return { data };
   }
@@ -149,7 +149,7 @@ class AuthService {
   }
 
   // RecuperaSenhaService.js
-  async recuperaSenha(body) {
+  async recoverPassword(body) {
     console.log('Dados recebidos para recuperação de senha:', body);
     // ───────────────────────────────────────────────
     // Passo 1 – Buscar usuário pelo e-mail informado
@@ -289,7 +289,7 @@ class AuthService {
    *    → Busca usuário pelo campo `codigo_recupera_senha`, salva hash da nova senha (mesmo se inativo),
    *      e “zera” o campo `codigo_recupera_senha`.
    */
-  async atualizarSenhaToken(tokenRecuperacao, senhaBody) {
+  async updatePasswordByToken(tokenRecuperacao, senhaBody) {
     // 1) Decodifica o token para obter o ID do usuário
     const usuarioId = await this.TokenUtil.decodePasswordRecoveryToken(
       tokenRecuperacao,
@@ -331,7 +331,7 @@ class AuthService {
   /**
    * Atualiza senha via código de recuperação
    */
-  async atualizarSenhaCodigo(codigoRecuperaSenha, senhaBody) {
+  async updatePasswordByCode(codigoRecuperaSenha, senhaBody) {
     // 1) Busca usuário pelo código de recuperação
     const user =
       await this.repository.getByRecoveryCode(codigoRecuperaSenha);

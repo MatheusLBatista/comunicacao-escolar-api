@@ -8,7 +8,7 @@ class AuthRepository {
     this.rotaModel = rotaModel;
   }
 
-  async armazenarTokens(id, accesstoken, refreshtoken) {
+  async storeTokens(id, accesstoken, refreshtoken) {
     const documento = await this.model.findById(id);
     if (!documento) {
       throw new CustomError({
@@ -27,7 +27,7 @@ class AuthRepository {
     return data;
   }
 
-  async removeToken(id) {
+  async deleteToken(id) {
     const parsedData = {
       access_token: null,
       refresh_token: null,

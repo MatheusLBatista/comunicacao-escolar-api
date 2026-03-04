@@ -14,13 +14,13 @@ class GrupoService {
     this.rotaRepository = new RotaRepository();
   }
 
-  async listar(req) {
-    const data = await this.repository.listar(req);
+  async list(req) {
+    const data = await this.repository.list(req);
     return data;
   }
 
-  async criar(parsedData) {
-    const grupo = await this.repository.buscarPorNome(parsedData.nome);
+  async create(parsedData) {
+    const grupo = await this.repository.getByName(parsedData.nome);
     if (grupo) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
@@ -33,14 +33,14 @@ class GrupoService {
         ),
       });
     }
-    const data = this.repository.criar(parsedData);
+    const data = this.repository.create(parsedData);
     return data;
   }
 
-  async atualizar(parsedData, id, user) {
-    await this.repository.buscarPorId(id);
-    const grupo = await this.repository.buscarPorNome(parsedData.nome, id);
-    await this.verificarGrupo(user, id);
+  async update(parsedData, id, user) {
+    await this.repository.getById(id);
+    const grupo = await this.repository.getByName(parsedData.nome, id);
+    await this.checkGroup(user, id);
     if (grupo) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
@@ -55,17 +55,17 @@ class GrupoService {
     }
     const usuario = await this.usuarioRepository.getById(user.id);
     const grupoUsuario = usuario.toObject();
-    const data = await this.repository.atualizar(id, parsedData);
+    const data = await this.repository.update(id, parsedData);
     return data;
   }
-  async deletar(id, user) {
-    await this.repository.buscarPorId(id);
-    await this.verificarGrupo(user, id);
-    const data = this.repository.deletar(id);
+  async delete(id, user) {
+    await this.repository.getById(id);
+    await this.checkGroup(user, id);
+    const data = this.repository.delete(id);
     return data;
   }
 
-  async verificarGrupo(user, id) {
+  async checkGroup(user, id) {
     const usuario = await this.usuarioRepository.getById(user.id);
     const grupoUsuario = usuario.toObject();
     for (const grupo of grupoUsuario.groups) {
@@ -80,8 +80,8 @@ class GrupoService {
       }
     }
   }
-  async adicionarRota(idGrupo, idRota) {
-    const grupo = await this.repository.buscarPorId(idGrupo);
+  async addRoute(idGrupo, idRota) {
+    const grupo = await this.repository.getById(idGrupo);
     if (!grupo) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
@@ -92,7 +92,7 @@ class GrupoService {
       });
     }
 
-    const rota = await this.rotaRepository.buscarPorId(idRota);
+    const rota = await this.rotaRepository.getById(idRota);
 
     if (!rota) {
       throw new CustomError({

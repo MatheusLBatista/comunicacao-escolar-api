@@ -10,11 +10,11 @@ router
   .post('/login', asyncWrapper(authController.login.bind(authController)))
   .post(
     '/recover',
-    asyncWrapper(authController.recuperaSenha.bind(authController)),
+    asyncWrapper(authController.recoverPassword.bind(authController)),
   )
   .post(
     '/redefinir-senha',
-    asyncWrapper(authController.atualizarSenhaToken.bind(authController)),
+    asyncWrapper(authController.updatePasswordByToken.bind(authController)),
   )
   .post('/logout', asyncWrapper(authController.logout.bind(authController)))
   .post('/revoke', asyncWrapper(authController.revoke.bind(authController)))

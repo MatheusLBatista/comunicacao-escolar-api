@@ -14,7 +14,7 @@ class RotaRepository {
    * para retornar um usuário e ser utilizado em outras funções de validação
    * cujo listar não atende por exigir req.
    */
-  async buscarPorId(id) {
+  async getById(id) {
     const rota = await this.model.findById(id);
     if (!rota) {
       throw new CustomError({
@@ -31,7 +31,7 @@ class RotaRepository {
   /**
    * Método para listar rotas no banco de dados.
    */
-  async listar(req) {
+  async list(req) {
     const id = req?.params?.id || null;
 
     // Se um ID foi fornecido, retornar a rota correspondente
@@ -104,7 +104,7 @@ class RotaRepository {
   /**
    * Método para criar uma nova rota no banco de dados.
    */
-  async criar(dados) {
+  async create(dados) {
     const rota = new this.model(dados);
     return await rota.save();
   }
@@ -112,7 +112,7 @@ class RotaRepository {
   /**
    * Método para atualizar uma rota existente no banco de dados.
    */
-  async atualizar(parsedData, id) {
+  async update(parsedData, id) {
     const data = await this.model.findByIdAndUpdate(id, parsedData);
 
     // Garante que a rota exista
@@ -131,7 +131,7 @@ class RotaRepository {
   /**
    * Método para deletar uma rota existente no banco de dados.
    */
-  async deletar(id) {
+  async delete(id) {
     const data = await this.model.findByIdAndDelete(id);
 
     // Garante que a rota exista
@@ -146,7 +146,7 @@ class RotaRepository {
     }
     return data;
   }
-  async buscarRotaPorNome(route, idIgnorado = null) {
+  async getRouteByName(route, idIgnorado = null) {
     const filtro = { route: route };
     if (idIgnorado) {
       filtro._id = { $ne: idIgnorado };
