@@ -79,7 +79,10 @@ class AuthService {
     }
 
     // Validar a senha
-    const senhaValida = await bcrypt.compare(body.password, userEncontrado.password);
+    const senhaValida = await bcrypt.compare(
+      body.password,
+      userEncontrado.password,
+    );
     if (!senhaValida) {
       throw new CustomError({
         statusCode: 401,
@@ -333,8 +336,7 @@ class AuthService {
    */
   async updatePasswordByCode(codigoRecuperaSenha, senhaBody) {
     // 1) Busca usuário pelo código de recuperação
-    const user =
-      await this.repository.getByRecoveryCode(codigoRecuperaSenha);
+    const user = await this.repository.getByRecoveryCode(codigoRecuperaSenha);
     if (!user) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,

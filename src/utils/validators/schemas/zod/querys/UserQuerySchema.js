@@ -22,8 +22,7 @@ export const UserQuerySchema = z.object({
     .string()
     .optional()
     .refine(
-      (val) =>
-        !val || ['admin', 'teacher', 'parent', 'student'].includes(val),
+      (val) => !val || ['admin', 'teacher', 'parent', 'student'].includes(val),
       { message: "Role deve ser 'admin', 'teacher', 'parent' ou 'student'" },
     ),
   active: z

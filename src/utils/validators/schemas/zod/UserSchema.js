@@ -6,7 +6,11 @@ const passwordRegex =
 const MembershipSchema = z.object({
   school_id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'school_id inválido'),
   role: z.enum(['admin', 'teacher', 'parent', 'student']),
-  class_id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'class_id inválido').nullable().optional(),
+  class_id: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, 'class_id inválido')
+    .nullable()
+    .optional(),
   associated_students: z
     .array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'ID de aluno inválido'))
     .optional()
@@ -62,14 +66,16 @@ const AdminCreateSchema = z.object({
   active: z.boolean().default(true),
 });
 
-const UserUpdateSchema = z.object({
-  full_name: z
-    .string()
-    .min(1, 'Campo full_name é obrigatório.')
-    .max(100, 'O nome deve ter no máximo 100 caracteres.')
-    .optional(),
-  active: z.boolean().optional(),
-  memberships: z.array(MembershipSchema).optional(),
-}).partial();
+const UserUpdateSchema = z
+  .object({
+    full_name: z
+      .string()
+      .min(1, 'Campo full_name é obrigatório.')
+      .max(100, 'O nome deve ter no máximo 100 caracteres.')
+      .optional(),
+    active: z.boolean().optional(),
+    memberships: z.array(MembershipSchema).optional(),
+  })
+  .partial();
 
 export { UserSchema, AdminCreateSchema, UserUpdateSchema, MembershipSchema };

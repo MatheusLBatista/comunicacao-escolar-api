@@ -87,7 +87,7 @@ class AuthController {
 
   async updatePasswordByCode(req, res, next) {
     const password_recovery_code = req.body.password_recovery_code || null; // código de recuperação passado no body
-      const password = req.body.password || null; // new password passed in body
+    const password = req.body.password || null; // new password passed in body
 
     console.log('password_recovery_code:', password_recovery_code);
     console.log('password:', password);
@@ -108,7 +108,10 @@ class AuthController {
     const passwordSchema = UserUpdateSchema.parse({ password });
 
     // atualiza a senha
-    await this.service.updatePasswordByCode(password_recovery_code, passwordSchema);
+    await this.service.updatePasswordByCode(
+      password_recovery_code,
+      passwordSchema,
+    );
 
     return CommonResponse.success(
       res,

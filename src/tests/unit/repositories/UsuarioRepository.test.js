@@ -53,7 +53,13 @@ describe('UsuarioRepository', () => {
     it('deve listar usuários com filtros', async () => {
       const req = {
         params: {},
-        query: { full_name: 'Usuário', email: '', active: '', page: 1, limite: 10 },
+        query: {
+          full_name: 'Usuário',
+          email: '',
+          active: '',
+          page: 1,
+          limite: 10,
+        },
       };
       UsuarioModel.paginate = jest
         .fn()
@@ -96,15 +102,17 @@ describe('UsuarioRepository', () => {
         .fn()
         .mockResolvedValue({ ...makeFakeUser(), full_name: 'Novo Nome' });
       UsuarioModel.findByIdAndUpdate = jest.fn(() => ({ lean: leanMock }));
-      const result = await repo.atualizar('user123', { full_name: 'Novo Nome' });
+      const result = await repo.atualizar('user123', {
+        full_name: 'Novo Nome',
+      });
       expect(result.full_name).toBe('Novo Nome');
     });
     it('deve lançar erro 404 se usuário não encontrado', async () => {
       const leanMock = jest.fn().mockResolvedValue(null);
       UsuarioModel.findByIdAndUpdate = jest.fn(() => ({ lean: leanMock }));
-      await expect(repo.atualizar('notfound', { full_name: 'X' })).rejects.toThrow(
-        CustomError,
-      );
+      await expect(
+        repo.atualizar('notfound', { full_name: 'X' }),
+      ).rejects.toThrow(CustomError);
     });
   });
 

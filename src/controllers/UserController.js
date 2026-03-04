@@ -20,7 +20,9 @@ class UserController {
     const parsedData = AdminCreateSchema.parse(req.body);
     const data = await this.service.createAdmin(parsedData);
 
-    const userLimpo = data.toObject ? data.toObject() : { ...data._doc || data };
+    const userLimpo = data.toObject
+      ? data.toObject()
+      : { ...(data._doc || data) };
     delete userLimpo.password;
 
     return CommonResponse.created(res, userLimpo);
@@ -33,7 +35,9 @@ class UserController {
     const parsedData = UserSchema.parse(req.body);
     const data = await this.service.createAtSchool(schoolId, parsedData);
 
-    const userLimpo = data.toObject ? data.toObject() : { ...data._doc || data };
+    const userLimpo = data.toObject
+      ? data.toObject()
+      : { ...(data._doc || data) };
     delete userLimpo.password;
 
     return CommonResponse.created(res, userLimpo);
@@ -75,7 +79,12 @@ class UserController {
     UserIdSchema.parse(id);
 
     const data = await this.service.delete(id);
-    return CommonResponse.success(res, data, 200, 'Usuário desativado com sucesso.');
+    return CommonResponse.success(
+      res,
+      data,
+      200,
+      'Usuário desativado com sucesso.',
+    );
   }
 }
 

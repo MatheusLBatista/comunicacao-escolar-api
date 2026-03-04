@@ -63,7 +63,9 @@ class UserService {
           statusCode: HttpStatusCodes.CONFLICT.code,
           errorType: 'duplicateEntry',
           field: 'email',
-          details: [{ path: 'email', message: 'Usuário já vinculado a esta escola.' }],
+          details: [
+            { path: 'email', message: 'Usuário já vinculado a esta escola.' },
+          ],
           customMessage: 'Usuário já vinculado a esta escola.',
         });
       }
