@@ -4,7 +4,7 @@ import swaggerUI from 'swagger-ui-express';
 import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
-import usuarios from './usuarioRoutes.js';
+import users from './userRoutes.js';
 import grupos from './grupoRoutes.js';
 import rotas from './rotaRoutes.js';
 
@@ -27,7 +27,7 @@ const routes = (app) => {
     swaggerUI.setup(swaggerDocs)(req, res, next);
   });
 
-  app.use(express.json(), auth, usuarios, grupos, rotas);
+  app.use(express.json(), auth, users, grupos, rotas);
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Rota não encontrada' });

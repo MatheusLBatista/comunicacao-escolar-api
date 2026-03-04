@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
-export const UsuarioIdSchema = z
+export const UserIdSchema = z
   .string()
   .refine((id) => mongoose.Types.ObjectId.isValid(id), {
     message: 'ID inválido',
   });
 
-export const UsuarioQuerySchema = z.object({
+export const UserQuerySchema = z.object({
   full_name: z
     .string()
     .optional()
@@ -18,6 +18,14 @@ export const UsuarioQuerySchema = z.object({
   email: z
     .union([z.string().email('Formato de email inválido'), z.undefined()])
     .optional(),
+  role: z
+    .string()
+    .optional()
+    .refine(
+      (val) =>
+        !val || ['admin', 'teacher', 'parent', 'student'].includes(val),
+      { message: "Role deve ser 'admin', 'teacher', 'parent' ou 'student'" },
+    ),
   active: z
     .string()
     .optional()
@@ -31,11 +39,11 @@ export const UsuarioQuerySchema = z.object({
     .refine((val) => Number.isInteger(val) && val > 0, {
       message: 'Page deve ser um número inteiro maior que 0',
     }),
-  limite: z
+  limit: z
     .string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 10))
     .refine((val) => Number.isInteger(val) && val > 0 && val <= 100, {
-      message: 'Limite deve ser um número inteiro entre 1 e 100',
+      message: 'Limit deve ser um número inteiro entre 1 e 100',
     }),
 });

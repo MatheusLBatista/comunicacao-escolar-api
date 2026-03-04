@@ -7,8 +7,8 @@ import {
   messages,
 } from '../utils/helpers/index.js';
 import { LoginSchema } from '../utils/validators/schemas/zod/LoginSchema.js';
-import { UsuarioUpdateSchema } from '../utils/validators/schemas/zod/UsuarioSchema.js';
-import { UsuarioIdSchema } from '../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
+import { UserUpdateSchema } from '../utils/validators/schemas/zod/UserSchema.js';
+import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { RequestAuthorizationSchema } from '../utils/validators/schemas/zod/querys/RequestAuthorizationSchema.js';
 import { EmailSchema } from '../utils/validators/schemas/zod/EmailSchema.js';
 
@@ -71,7 +71,7 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UsuarioUpdateSchema.parse({ password: senha });
+    const senhaSchema = UserUpdateSchema.parse({ password: senha });
 
     // atualiza a senha
     await this.service.atualizarSenhaToken(tokenRecuperacao, senhaSchema);
@@ -105,7 +105,7 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UsuarioUpdateSchema.parse({ password: senha });
+    const senhaSchema = UserUpdateSchema.parse({ password: senha });
 
     // atualiza a senha
     await this.service.atualizarSenhaCodigo(password_recovery_code, senhaSchema);
@@ -223,7 +223,7 @@ class AuthController {
       });
     }
     // Valida o ID do usuário
-    UsuarioIdSchema.parse(decoded.id);
+    UserIdSchema.parse(decoded.id);
 
     // Encaminha o token para o serviço de logout
     const data = await this.service.logout(decoded.id, token);
@@ -250,7 +250,7 @@ class AuthController {
       );
 
     // 3. Valida ID de usuário
-    UsuarioIdSchema.parse(decoded.id);
+    UserIdSchema.parse(decoded.id);
 
     // 4. Prepara campos de introspecção
     const now = Math.floor(Date.now() / 1000);

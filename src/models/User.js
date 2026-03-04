@@ -47,7 +47,7 @@ class User {
           {
             school_id: {
               type: mongoose.Schema.Types.ObjectId,
-              ref: 'escolas',
+              ref: 'Schools',
               required: true,
             },
             role: {

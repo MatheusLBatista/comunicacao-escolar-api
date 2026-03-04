@@ -1,5 +1,5 @@
 import GrupoRepository from '../repositories/GrupoRepository.js';
-import UsuarioRepository from '../repositories/UsuarioRepository.js';
+import UserRepository from '../repositories/UserRepository.js';
 import RotaRepository from '../repositories/RotaRepository.js';
 import {
   CustomError,
@@ -10,7 +10,7 @@ import {
 class GrupoService {
   constructor() {
     this.repository = new GrupoRepository();
-    this.usuarioRepository = new UsuarioRepository();
+    this.usuarioRepository = new UserRepository();
     this.rotaRepository = new RotaRepository();
   }
 
@@ -53,7 +53,7 @@ class GrupoService {
         ),
       });
     }
-    const usuario = await this.usuarioRepository.buscarPorId(user.id);
+    const usuario = await this.usuarioRepository.getById(user.id);
     const grupoUsuario = usuario.toObject();
     const data = await this.repository.atualizar(id, parsedData);
     return data;
@@ -66,7 +66,7 @@ class GrupoService {
   }
 
   async verificarGrupo(user, id) {
-    const usuario = await this.usuarioRepository.buscarPorId(user.id);
+    const usuario = await this.usuarioRepository.getById(user.id);
     const grupoUsuario = usuario.toObject();
     for (const grupo of grupoUsuario.groups) {
       if (grupo._id.toString() === id) {

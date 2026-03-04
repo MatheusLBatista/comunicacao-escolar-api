@@ -1,7 +1,5 @@
-// src/repositories/GrupoRepository.js
-
 import GrupoModel from '../models/Grupo.js';
-import UsuarioModel from '../models/Usuario.js';
+import UsuarioModel from '../models/User.js';
 import RotaModel from '../models/Rota.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 import GrupoFilterBuilder from './filters/GrupoFilterBuilder.js';

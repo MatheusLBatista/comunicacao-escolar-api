@@ -1,12 +1,12 @@
-import Usuario from '../models/Usuario.js';
+import Usuario from '../models/User.js';
 import Grupo from '../models/Grupo.js';
 import Rota from '../models/Rota.js';
-import UsuarioRepository from '../repositories/UsuarioRepository.js';
+import UserRepository from '../repositories/UserRepository.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class PermissionService {
   constructor() {
-    this.repository = new UsuarioRepository();
+    this.repository = new UserRepository();
     this.Usuario = Usuario;
     this.Grupo = Grupo;
     this.Rota = Rota;
@@ -22,7 +22,7 @@ class PermissionService {
     httpMethod = '',
   ) {
     try {
-      const usuario = await this.repository.buscarPorId(userId, {
+      const usuario = await this.repository.getById(userId, {
         groups: true,
       });
       if (!usuario) {
