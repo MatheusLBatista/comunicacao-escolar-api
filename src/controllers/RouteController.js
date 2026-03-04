@@ -1,5 +1,3 @@
-// src/controllers/RotaController.js
-
 import RotaService from '../services/RotaService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
 import {
