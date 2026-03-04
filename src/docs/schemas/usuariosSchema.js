@@ -13,9 +13,9 @@ const usuariosSchemas = {
   UsuarioFiltro: {
     type: 'object',
     properties: {
-      nome: usuarioJsonSchema.properties.nome,
+      full_name: usuarioJsonSchema.properties.full_name,
       email: usuarioJsonSchema.properties.email,
-      ativo: usuarioJsonSchema.properties.ativo,
+      active: usuarioJsonSchema.properties.active,
     },
   },
   UsuarioListagem: {
@@ -49,7 +49,7 @@ const usuariosSchemas = {
   },
   UsuarioPost: {
     ...deepCopy(usuarioJsonSchema),
-    required: ['nome', 'email', 'senha'],
+    required: ['full_name', 'email', 'password'],
     description: 'Schema para criação de usuário',
   },
   UsuarioPutPatch: {
@@ -59,7 +59,7 @@ const usuariosSchemas = {
   },
   UsuarioLogin: {
     ...deepCopy(usuarioJsonSchema),
-    required: ['email', 'senha'],
+    required: ['email', 'password'],
     description: 'Schema para login de usuário',
   },
   UsuarioRespostaLogin: {
@@ -105,22 +105,22 @@ const usuariosSchemas = {
 };
 
 const removalMapping = {
-  UsuarioItem: ['accesstoken', 'refreshtoken', 'tokenUnico', 'senha'],
-  UsuarioDetalhes: ['accesstoken', 'tokenUnico', 'refreshtoken', 'senha'],
+  UsuarioItem: ['access_token', 'refresh_token', 'unique_token', 'password'],
+  UsuarioDetalhes: ['access_token', 'unique_token', 'refresh_token', 'password'],
   UsuarioPost: [
-    'accesstoken',
-    'refreshtoken',
-    'tokenUnico',
+    'access_token',
+    'refresh_token',
+    'unique_token',
     'createdAt',
     'updatedAt',
     '__v',
     '_id',
   ],
   UsuarioPutPatch: [
-    'accesstoken',
-    'refreshtoken',
-    'tokenUnico',
-    'senha',
+    'access_token',
+    'refresh_token',
+    'unique_token',
+    'password',
     'email',
     'createdAt',
     'updatedAt',
@@ -128,19 +128,19 @@ const removalMapping = {
     '_id',
   ],
   UsuarioLogin: [
-    'accesstoken',
-    'refreshtoken',
-    'tokenUnico',
-    'ativo',
+    'access_token',
+    'refresh_token',
+    'unique_token',
+    'active',
     'createdAt',
     'updatedAt',
     '__v',
     '_id',
-    'nome',
+    'full_name',
   ],
   UsuarioRespostaLogin: [
-    'tokenUnico',
-    'senha',
+    'unique_token',
+    'password',
     'createdAt',
     'updatedAt',
     '__v',

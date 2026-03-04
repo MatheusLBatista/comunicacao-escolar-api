@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { BaseRotaSchema } from './BaseRotaSchema.js';
 
 const RotaSchema = BaseRotaSchema.extend({
-  ativo: z.boolean().default(true),
-  buscar: z.boolean().default(false),
-  enviar: z.boolean().default(false),
-  substituir: z.boolean().default(false),
-  modificar: z.boolean().default(false),
-  excluir: z.boolean().default(false),
+  active: z.boolean().default(true),
+  get: z.boolean().default(false),
+  post: z.boolean().default(false),
+  put: z.boolean().default(false),
+  patch: z.boolean().default(false),
+  delete: z.boolean().default(false),
 });
 
 const RotaUpdateSchema = RotaSchema.partial();

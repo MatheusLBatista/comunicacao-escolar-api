@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Mensagem {
+class Message {
   constructor() {
-    const mensagemSchema = new mongoose.Schema(
+    const messageSchema = new mongoose.Schema(
       {
         conversation_id: {
           type: mongoose.Schema.Types.ObjectId,
@@ -41,10 +41,10 @@ class Mensagem {
       { timestamps: false },
     );
 
-    mensagemSchema.plugin(mongoosePaginate);
+    messageSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('mensagens', mensagemSchema);
+    this.model = mongoose.model('Messages', messageSchema);
   }
 }
 
-export default new Mensagem().model;
+export default new Message().model;

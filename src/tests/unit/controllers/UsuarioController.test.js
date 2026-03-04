@@ -100,18 +100,18 @@ describe('UsuarioController - regras de negócio (simples)', () => {
       const user = {
         toObject: () => ({
           _id: '1',
-          nome: 'Fulano',
+          full_name: 'Fulano',
           email: 'f@f.com',
-          senha: 'hash',
+          password: 'hash',
         }),
       };
-      req.body = { nome: 'Fulano', email: 'f@f.com', senha: '123' };
+      req.body = { full_name: 'Fulano', email: 'f@f.com', password: '123' };
       UsuarioSchema.parse.mockReturnValue(req.body);
       controller.service.criar.mockResolvedValue(user);
       await controller.criar(req, res, next);
       expect(CommonResponse.created).toHaveBeenCalledWith(
         res,
-        expect.not.objectContaining({ senha: expect.anything() }),
+        expect.not.objectContaining({ password: expect.anything() }),
       );
     });
     it('deve lançar erro se schema inválido', async () => {
@@ -161,18 +161,18 @@ describe('UsuarioController - regras de negócio (simples)', () => {
   describe('atualizar', () => {
     it('deve atualizar usuário e nunca retornar senha', async () => {
       req.params = { id: '1' };
-      req.body = { nome: 'Novo' };
+      req.body = { full_name: 'Novo' };
       UsuarioIdSchema.parse.mockReturnValue('1');
       UsuarioUpdateSchema.parse.mockReturnValue(req.body);
       controller.service.atualizar.mockResolvedValue({
         _id: '1',
-        nome: 'Novo',
-        senha: 'hash',
+        full_name: 'Novo',
+        password: 'hash',
       });
       await controller.atualizar(req, res, next);
       expect(CommonResponse.success).toHaveBeenCalledWith(
         res,
-        expect.not.objectContaining({ senha: expect.anything() }),
+        expect.not.objectContaining({ password: expect.anything() }),
         200,
         expect.any(String),
       );

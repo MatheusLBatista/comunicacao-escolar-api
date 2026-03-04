@@ -31,7 +31,7 @@ class School {
 
     schoolSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('schools', schoolSchema);
+    this.model = mongoose.model('Schools', schoolSchema);
   }
 }
 

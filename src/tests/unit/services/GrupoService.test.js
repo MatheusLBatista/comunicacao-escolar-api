@@ -11,7 +11,7 @@ const makeGrupo = (props = {}) => ({
   nome: 'Administradores',
   descricao: 'Grupo administrativo',
   ativo: true,
-  permissoes: [],
+  permissions: [],
   usuario: 'user123',
   ...props,
 });
@@ -22,7 +22,7 @@ const makeUser = (props = {}) => ({
   nome: 'Usuario Teste',
   toObject: () => ({
     _id: 'user123',
-    grupos: [],
+    groups: [],
   }),
   ...props,
 });
@@ -234,7 +234,7 @@ describe('GrupoService', () => {
         ...user,
         toObject: () => ({
           _id: 'user123',
-          grupos: [{ _id: grupoId }],
+          groups: [{ _id: grupoId }],
         }),
       };
 

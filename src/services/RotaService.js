@@ -17,7 +17,7 @@ class RotaService {
 
   async criar(req) {
     console.log('Estou no criar em RotaService');
-    const rota = await this.repository.buscarRotaPorNome(req.rota);
+    const rota = await this.repository.buscarRotaPorNome(req.route);
     if (rota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
@@ -35,7 +35,7 @@ class RotaService {
   }
 
   async atualizar(req, id) {
-    const rota = await this.repository.buscarRotaPorNome(req.rota, id);
+    const rota = await this.repository.buscarRotaPorNome(req.route, id);
     if (rota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
@@ -64,7 +64,7 @@ class RotaService {
       });
     }
     const rotaAtual = req.route.path.replace(/\//g, '');
-    if (rotaAtual === rota.rota || rotaAtual.includes(rota.rota)) {
+    if (rotaAtual === rota.route || rotaAtual.includes(rota.route)) {
       throw new CustomError({
         statusCode: HttpStatusCodes.FORBIDDEN.code,
         errorTypes: 'resourceNotFound',
