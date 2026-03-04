@@ -8,9 +8,9 @@ class UsuarioFilterBuilder {
     this.usuarioModel = UsuarioModel;
   }
 
-  comNome(nome) {
-    if (nome) {
-      this.filtros.nome = { $regex: nome, $options: 'i' };
+  comNome(full_name) {
+    if (full_name) {
+      this.filtros.full_name = { $regex: full_name, $options: 'i' };
     }
     return this;
   }
@@ -22,12 +22,12 @@ class UsuarioFilterBuilder {
     return this;
   }
 
-  comAtivo(ativo = 'true') {
-    if (ativo === 'true') {
-      this.filtros.ativo = true;
+  comAtivo(active = 'true') {
+    if (active === 'true') {
+      this.filtros.active = true;
     }
-    if (ativo === 'false') {
-      this.filtros.ativo = false;
+    if (active === 'false') {
+      this.filtros.active = false;
     }
     return this;
   }

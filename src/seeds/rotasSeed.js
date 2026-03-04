@@ -27,14 +27,14 @@ export default async function seedRotas() {
   ];
 
   const rotas = rotas_array.map((rota) => ({
-    rota,
-    dominio: 'localhost',
-    ativo: true,
-    buscar: true,
-    enviar: true,
-    substituir: true,
-    modificar: true,
-    excluir: true,
+    route: rota,
+    domain: 'localhost',
+    active: true,
+    get: true,
+    post: true,
+    put: true,
+    patch: true,
+    delete: true,
   }));
 
   const result = await Rota.collection.insertMany(rotas);

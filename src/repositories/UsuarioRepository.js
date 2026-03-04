@@ -36,13 +36,13 @@ class UsuarioRepository {
       return dataWithStats;
     }
 
-    const { nome, email, ativo, page = 1 } = req.query;
+    const { full_name, email, active, page = 1 } = req.query;
     const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
     const filterBuilder = new UsuarioFilterBuilder()
-      .comNome(nome || '')
+      .comNome(full_name || '')
       .comEmail(email || '')
-      .comAtivo(ativo || '');
+      .comAtivo(active || '');
 
     if (typeof filterBuilder.build !== 'function') {
       throw new CustomError({
@@ -59,7 +59,7 @@ class UsuarioRepository {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limite, 10),
-      sort: { nome: 1 },
+      sort: { full_name: 1 },
     };
 
     const resultado = await this.model.paginate(filtros, options);
@@ -108,7 +108,7 @@ class UsuarioRepository {
       filtro._id = { $ne: idIgnorado };
     }
 
-    const documento = await this.model.findOne(filtro, '+senha');
+    const documento = await this.model.findOne(filtro, '+password');
 
     return documento;
   }
@@ -117,7 +117,7 @@ class UsuarioRepository {
     let query = this.model.findById(id);
 
     if (includeTokens) {
-      query = query.select('+refreshtoken +accesstoken');
+      query = query.select('+refresh_token +access_token');
     }
 
     const user = await query;
@@ -147,31 +147,31 @@ class UsuarioRepository {
       });
     }
 
-    documento.accesstoken = accesstoken;
-    documento.refreshtoken = refreshtoken;
+    documento.access_token = accesstoken;
+    documento.refresh_token = refreshtoken;
 
     const data = await documento.save();
     return data;
   }
 
   async buscarPorCodigoRecuperacao(codigo) {
-    return await this.model.findOne({ codigo_recupera_senha: codigo });
+    return await this.model.findOne({ password_recovery_code: codigo });
   }
 
   async buscarPorTokenConvite(token) {
     return await this.model
-      .findOne({ tokenConvite: token })
-      .select('+tokenConvite +convidadoEm');
+      .findOne({ invite_token: token })
+      .select('+invite_token +invited_at');
   }
 
   async atualizarSenha(id, senhaHash) {
     const usuario = await this.model.findByIdAndUpdate(
       id,
       {
-        senha: senhaHash,
-        tokenUnico: null,
-        codigo_recupera_senha: null,
-        exp_codigo_recupera_senha: null,
+        password: senhaHash,
+        unique_token: null,
+        password_recovery_code: null,
+        password_recovery_code_exp: null,
       },
       { new: true },
     );
@@ -191,8 +191,8 @@ class UsuarioRepository {
 
   async buscarPorTokenUnico(token) {
     return await this.model
-      .findOne({ tokenUnico: token })
-      .select('+tokenUnico');
+      .findOne({ unique_token: token })
+      .select('+unique_token');
   }
 
   async removeToken(id) {
@@ -207,8 +207,8 @@ class UsuarioRepository {
       });
     }
 
-    usuarioExistente.accesstoken = null;
-    usuarioExistente.refreshtoken = null;
+    usuarioExistente.access_token = null;
+    usuarioExistente.refresh_token = null;
 
     await usuarioExistente.save();
     return usuarioExistente;

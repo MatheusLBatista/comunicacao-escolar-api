@@ -5,71 +5,70 @@ class RotaFilterBuilder {
     this.filtros = {};
   }
 
-  comRota(rota) {
-    if (rota) {
-      this.filtros.rota = { $regex: rota, $options: 'i' }; // Filtro para rota usando regex (case-insensitive)
+  comRota(route) {
+    if (route) {
+      this.filtros.route = { $regex: route, $options: 'i' };
     }
     return this;
   }
 
-  comDominio(dominio) {
-    if (dominio) {
-      this.filtros.dominio = { $regex: dominio, $options: 'i' }; // Filtro para domínio usando regex (case-insensitive)
+  comDominio(domain) {
+    if (domain) {
+      this.filtros.domain = { $regex: domain, $options: 'i' };
     }
     return this;
   }
 
-  comAtivo(ativo) {
-    if (ativo === 'true') {
-      this.filtros.ativo = true;
-    } else if (ativo === 'false') {
-      this.filtros.ativo = false;
+  comAtivo(active) {
+    if (active === 'true') {
+      this.filtros.active = true;
+    } else if (active === 'false') {
+      this.filtros.active = false;
     }
     return this;
   }
 
-  comGet(buscar) {
-    if (buscar === 'true') {
-      this.filtros.buscar = true;
-    } else if (buscar === 'false') {
-      this.filtros.buscar = false;
+  comGet(get) {
+    if (get === 'true') {
+      this.filtros.get = true;
+    } else if (get === 'false') {
+      this.filtros.get = false;
     }
     return this;
   }
 
-  comPost(enviar) {
-    if (enviar === 'true') {
-      this.filtros.enviar = true;
-    } else if (enviar === 'false') {
-      this.filtros.enviar = false;
+  comPost(post) {
+    if (post === 'true') {
+      this.filtros.post = true;
+    } else if (post === 'false') {
+      this.filtros.post = false;
     }
     return this;
   }
 
-  comPut(substituir) {
-    if (substituir === 'true') {
-      this.filtros.substituir = true;
-    } else if (substituir === 'false') {
-      this.filtros.substituir = false;
+  comPut(put) {
+    if (put === 'true') {
+      this.filtros.put = true;
+    } else if (put === 'false') {
+      this.filtros.put = false;
     }
     return this;
   }
 
-  comPatch(modificar) {
-    if (modificar === 'true') {
-      this.filtros.modificar = true;
-    } else if (modificar === 'false') {
-      this.filtros.modificar = false;
+  comPatch(patch) {
+    if (patch === 'true') {
+      this.filtros.patch = true;
+    } else if (patch === 'false') {
+      this.filtros.patch = false;
     }
     return this;
   }
 
-  comDelete(excluir) {
-    // 'delete' é uma palavra reservada, então usamos 'del'
-    if (excluir === 'true') {
-      this.filtros.excluir = true;
-    } else if (excluir === 'false') {
-      this.filtros.excluir = false;
+  comDelete(del) {
+    if (del === 'true') {
+      this.filtros.delete = true;
+    } else if (del === 'false') {
+      this.filtros.delete = false;
     }
     return this;
   }

@@ -5,24 +5,24 @@ class Rota {
   constructor() {
     const rotaSchema = new mongoose.Schema(
       {
-        rota: { type: String, index: true, trim: true, lowercase: true },
-        dominio: { type: String, required: true },
-        ativo: { type: Boolean, default: false }, // false
-        buscar: { type: Boolean, default: false }, // false
-        enviar: { type: Boolean, default: false }, // false
-        substituir: { type: Boolean, default: false }, // false
-        modificar: { type: Boolean, default: false }, // false
-        excluir: { type: Boolean, default: false }, // falseæ
+        route: { type: String, index: true, trim: true, lowercase: true },
+        domain: { type: String, required: true },
+        active: { type: Boolean, default: false },
+        get: { type: Boolean, default: false },
+        post: { type: Boolean, default: false },
+        put: { type: Boolean, default: false },
+        patch: { type: Boolean, default: false },
+        delete: { type: Boolean, default: false },
       },
       { timestamps: true },
     );
 
-    rotaSchema.index({ rota: 1, dominio: 1 }, { unique: true });
+    rotaSchema.index({ route: 1, domain: 1 }, { unique: true });
     rotaSchema.plugin(mongoosePaginate);
 
     rotaSchema.pre('save', function (next) {
-      if (this.rota) {
-        this.rota = this.rota.toLowerCase();
+      if (this.route) {
+        this.route = this.route.toLowerCase();
       }
       next();
     });

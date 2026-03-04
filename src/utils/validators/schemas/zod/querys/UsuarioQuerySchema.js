@@ -8,7 +8,7 @@ export const UsuarioIdSchema = z
   });
 
 export const UsuarioQuerySchema = z.object({
-  nome: z
+  full_name: z
     .string()
     .optional()
     .refine((val) => !val || val.trim().length > 0, {
@@ -18,11 +18,11 @@ export const UsuarioQuerySchema = z.object({
   email: z
     .union([z.string().email('Formato de email inválido'), z.undefined()])
     .optional(),
-  ativo: z
+  active: z
     .string()
     .optional()
     .refine((value) => !value || value === 'true' || value === 'false', {
-      message: "Ativo deve ser 'true' ou 'false'",
+      message: "Active deve ser 'true' ou 'false'",
     }),
   page: z
     .string()
