@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Grupo {
+class Group {
   constructor() {
-    const grupoSchema = new mongoose.Schema(
+    const groupSchema = new mongoose.Schema(
       {
         nome: { type: String, index: true, unique: true },
         descricao: { type: String, required: true },
@@ -27,7 +27,7 @@ class Grupo {
       },
     );
 
-    grupoSchema.pre('save', function (next) {
+    groupSchema.pre('save', function (next) {
       const permissions = this.permissions;
       const combinations = permissions.map((p) => `${p.route}_${p.domain}`);
       const setCombinations = new Set(combinations);
@@ -43,10 +43,10 @@ class Grupo {
       next();
     });
 
-    grupoSchema.plugin(mongoosePaginate);
+    groupSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('grupos', grupoSchema);
+    this.model = mongoose.model('grupos', groupSchema);
   }
 }
 
-export default new Grupo().model;
+export default new Group().model;

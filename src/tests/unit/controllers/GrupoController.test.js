@@ -1,22 +1,22 @@
-import GrupoController from '../../../controllers/GrupoController.js';
-import GrupoService from '../../../services/GrupoService.js';
+import GroupController from '/../controllers/GroupController.js'';
+import GroupService from '../../services/GroupService.js'';
 import {
-  GrupoSchema,
-  GrupoUpdateSchema,
-} from '../../../utils/validators/schemas/zod/GrupoSchema.js';
+  GroupSchema,
+  GroupUpdateSchema,
+} from '../../../utils/validators/schemas/zod/GroupSchema.js';
 import {
-  GrupoQuerySchema,
-  GrupoIdSchema,
-} from '../../../utils/validators/schemas/zod/querys/GrupoQuerySchema.js';
+  GroupQuerySchema,
+  GroupIdSchema,
+} from '../../../utils/validators/schemas/zod/querys/GroupQuerySchema.js';
 import {
   CommonResponse,
   CustomError,
   HttpStatusCodes,
 } from '../../../utils/helpers/index.js';
 
-jest.mock('../../../services/GrupoService.js');
-jest.mock('../../../utils/validators/schemas/zod/GrupoSchema.js');
-jest.mock('../../../utils/validators/schemas/zod/querys/GrupoQuerySchema.js');
+jest.mock('../../../services/GroupService.js');
+jest.mock('../../../utils/validators/schemas/zod/GroupSchema.js');
+jest.mock('../../../utils/validators/schemas/zod/querys/GroupQuerySchema.js');
 jest.mock('../../../utils/helpers/index.js', () => ({
   CommonResponse: {
     created: jest.fn(),
@@ -33,11 +33,11 @@ jest.mock('../../../utils/helpers/index.js', () => ({
   },
 }));
 
-describe('GrupoController', () => {
+describe('GroupController', () => {
   let controller, req, res, serviceMock;
 
   beforeEach(() => {
-    controller = new GrupoController();
+    controller = new GroupController();
     req = {
       body: {},
       params: {},
@@ -45,7 +45,7 @@ describe('GrupoController', () => {
       user: { _id: 'user123', nome: 'Usuario Teste' },
     };
     res = {};
-    serviceMock = GrupoService.mock.instances[0];
+    serviceMock = GroupService.mock.instances[0];
     jest.clearAllMocks();
   });
 
@@ -59,19 +59,19 @@ describe('GrupoController', () => {
       };
 
       req.body = grupoData;
-      GrupoSchema.parse.mockReturnValue(grupoData);
+      GroupSchema.parse.mockReturnValue(grupoData);
       serviceMock.criar.mockResolvedValue(grupoRetornado);
 
       await controller.criar(req, res);
 
-      expect(GrupoSchema.parse).toHaveBeenCalledWith(req.body);
+      expect(GroupSchema.parse).toHaveBeenCalledWith(req.body);
       expect(serviceMock.criar).toHaveBeenCalledWith(grupoData);
       expect(CommonResponse.created).toHaveBeenCalledWith(res, grupoRetornado);
     });
 
     it('deve retornar erro 400 para dados inválidos', async () => {
       req.body = { nome: '', descricao: '' };
-      GrupoSchema.parse.mockImplementation(() => {
+      GroupSchema.parse.mockImplementation(() => {
         throw { name: 'ZodError', message: 'Dados inválidos' };
       });
 
@@ -84,7 +84,7 @@ describe('GrupoController', () => {
       const grupoData = { nome: 'Teste', descricao: 'Teste' };
       req.body = grupoData;
 
-      GrupoSchema.parse.mockReturnValue(grupoData);
+      GroupSchema.parse.mockReturnValue(grupoData);
       serviceMock.criar.mockRejectedValue(new Error('Erro interno'));
 
       await expect(controller.criar(req, res)).rejects.toThrow('Erro interno');
@@ -115,12 +115,12 @@ describe('GrupoController', () => {
       };
 
       req.params.id = grupoId;
-      GrupoIdSchema.parse.mockReturnValue(grupoId);
+      GroupIdSchema.parse.mockReturnValue(grupoId);
       serviceMock.listar.mockResolvedValue(grupo);
 
       await controller.listar(req, res);
 
-      expect(GrupoIdSchema.parse).toHaveBeenCalledWith(grupoId);
+      expect(GroupIdSchema.parse).toHaveBeenCalledWith(grupoId);
       expect(serviceMock.listar).toHaveBeenCalledWith(req);
       expect(CommonResponse.success).toHaveBeenCalledWith(res, grupo);
     });
@@ -130,19 +130,19 @@ describe('GrupoController', () => {
       const grupos = [{ _id: 'grupo1', nome: 'Administradores' }];
 
       req.query = query;
-      GrupoQuerySchema.parse.mockReturnValue(query);
+      GroupQuerySchema.parse.mockReturnValue(query);
       serviceMock.listar.mockResolvedValue(grupos);
 
       await controller.listar(req, res);
 
-      expect(GrupoQuerySchema.parse).toHaveBeenCalledWith(req.query);
+      expect(GroupQuerySchema.parse).toHaveBeenCalledWith(req.query);
       expect(serviceMock.listar).toHaveBeenCalledWith(req);
       expect(CommonResponse.success).toHaveBeenCalledWith(res, grupos);
     });
 
     it('deve retornar erro para ID inválido', async () => {
       req.params.id = 'id_invalido';
-      GrupoIdSchema.parse.mockImplementation(() => {
+      GroupIdSchema.parse.mockImplementation(() => {
         throw { name: 'ZodError', message: 'ID inválido' };
       });
 
@@ -153,7 +153,7 @@ describe('GrupoController', () => {
 
     it('deve retornar erro para query inválida', async () => {
       req.query = { page: '-1' };
-      GrupoQuerySchema.parse.mockImplementation(() => {
+      GroupQuerySchema.parse.mockImplementation(() => {
         throw { name: 'ZodError', message: 'Page deve ser positiva' };
       });
 
@@ -170,7 +170,7 @@ describe('GrupoController', () => {
 
       await controller.listar(req, res);
 
-      expect(GrupoQuerySchema.parse).not.toHaveBeenCalled();
+      expect(GroupQuerySchema.parse).not.toHaveBeenCalled();
       expect(serviceMock.listar).toHaveBeenCalledWith(req);
     });
 
@@ -195,14 +195,14 @@ describe('GrupoController', () => {
       req.params.id = grupoId;
       req.body = dadosAtualizacao;
 
-      GrupoIdSchema.parse.mockReturnValue(grupoId);
-      GrupoUpdateSchema.parse.mockReturnValue(dadosAtualizacao);
+      GroupIdSchema.parse.mockReturnValue(grupoId);
+      GroupUpdateSchema.parse.mockReturnValue(dadosAtualizacao);
       serviceMock.atualizar.mockResolvedValue(grupoAtualizado);
 
       await controller.atualizar(req, res);
 
-      expect(GrupoIdSchema.parse).toHaveBeenCalledWith(grupoId);
-      expect(GrupoUpdateSchema.parse).toHaveBeenCalledWith(req.body);
+      expect(GroupIdSchema.parse).toHaveBeenCalledWith(grupoId);
+      expect(GroupUpdateSchema.parse).toHaveBeenCalledWith(req.body);
       expect(serviceMock.atualizar).toHaveBeenCalledWith(
         dadosAtualizacao,
         grupoId,
@@ -215,7 +215,7 @@ describe('GrupoController', () => {
       req.params.id = 'id_invalido';
       req.body = { nome: 'Teste' };
 
-      GrupoIdSchema.parse.mockImplementation(() => {
+      GroupIdSchema.parse.mockImplementation(() => {
         throw { name: 'ZodError', message: 'ID inválido' };
       });
 
@@ -229,8 +229,8 @@ describe('GrupoController', () => {
       req.params.id = grupoId;
       req.body = { nome: '' };
 
-      GrupoIdSchema.parse.mockReturnValue(grupoId);
-      GrupoUpdateSchema.parse.mockImplementation(() => {
+      GroupIdSchema.parse.mockReturnValue(grupoId);
+      GroupUpdateSchema.parse.mockImplementation(() => {
         throw { name: 'ZodError', message: 'Nome inválido' };
       });
 
@@ -246,8 +246,8 @@ describe('GrupoController', () => {
       req.params.id = grupoId;
       req.body = dadosAtualizacao;
 
-      GrupoIdSchema.parse.mockReturnValue(grupoId);
-      GrupoUpdateSchema.parse.mockReturnValue(dadosAtualizacao);
+      GroupIdSchema.parse.mockReturnValue(grupoId);
+      GroupUpdateSchema.parse.mockReturnValue(dadosAtualizacao);
       serviceMock.atualizar.mockRejectedValue(
         new Error('Grupo não encontrado'),
       );
@@ -265,12 +265,12 @@ describe('GrupoController', () => {
 
       req.params.id = grupoId;
 
-      GrupoIdSchema.parse.mockReturnValue(grupoId);
+      GroupIdSchema.parse.mockReturnValue(grupoId);
       serviceMock.deletar.mockResolvedValue(resultado);
 
       await controller.deletar(req, res);
 
-      expect(GrupoIdSchema.parse).toHaveBeenCalledWith(grupoId);
+      expect(GroupIdSchema.parse).toHaveBeenCalledWith(grupoId);
       expect(serviceMock.deletar).toHaveBeenCalledWith(grupoId, req.user);
       expect(CommonResponse.success).toHaveBeenCalledWith(
         res,
@@ -283,7 +283,7 @@ describe('GrupoController', () => {
     it('deve retornar erro para ID inválido', async () => {
       req.params.id = 'id_invalido';
 
-      GrupoIdSchema.parse.mockImplementation(() => {
+      GroupIdSchema.parse.mockImplementation(() => {
         throw { name: 'ZodError', message: 'ID inválido' };
       });
 
@@ -294,7 +294,7 @@ describe('GrupoController', () => {
 
     it('deve lançar erro se ID não fornecido', async () => {
       req.params = {};
-      GrupoIdSchema.parse.mockReturnValue(null);
+      GroupIdSchema.parse.mockReturnValue(null);
 
       await expect(controller.deletar(req, res)).rejects.toThrow(
         'ID do grupo é obrigatório para deletar.',
@@ -306,7 +306,7 @@ describe('GrupoController', () => {
 
       req.params.id = grupoId;
 
-      GrupoIdSchema.parse.mockReturnValue(grupoId);
+      GroupIdSchema.parse.mockReturnValue(grupoId);
       serviceMock.deletar.mockRejectedValue(new Error('Grupo não encontrado'));
 
       await expect(controller.deletar(req, res)).rejects.toThrow(

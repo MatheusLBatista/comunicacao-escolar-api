@@ -1,6 +1,4 @@
-// src/repositories/utils/RotaFilterBuilder.js
-
-class RotaFilterBuilder {
+class RouteFilterBuilder {
   constructor() {
     this.filtros = {};
   }
@@ -78,4 +76,4 @@ class RotaFilterBuilder {
   }
 }
 
-export default RotaFilterBuilder;
+export default RouteFilterBuilder;

@@ -1,7 +1,6 @@
-import Rota from '../models/Rota.js';
+import Rota from '../models/Route.js';
 
-export default async function seedRotas() {
-  // Remove
+export default async function seedRoutes() {
   await Rota.deleteMany();
 
   const rotas_array = [

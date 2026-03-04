@@ -1,15 +1,13 @@
-//src/utils/validators/schemas/zod/grupoSchema.js
-
 import { z } from 'zod';
-import { RotaSchema } from './RotaSchema.js';
+import { RouteSchema } from './RouteSchema.js';
 
-const GrupoSchema = z.object({
+const GroupSchema = z.object({
   nome: z.string().min(1, 'O campo nome é obrigatório.'),
   descricao: z.string().min(1, 'O campo descrição é obrigatório.'),
   ativo: z.boolean().default(true),
-  permissions: z.array(RotaSchema).default([]),
+  permissions: z.array(RouteSchema).default([]),
 });
 
-const GrupoUpdateSchema = GrupoSchema.partial();
+const GroupUpdateSchema = GroupSchema.partial();
 
-export { GrupoSchema, GrupoUpdateSchema };
+export { GroupSchema, GroupUpdateSchema };

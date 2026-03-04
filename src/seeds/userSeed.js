@@ -2,15 +2,15 @@ import User from '../models/User.js';
 import School from '../models/School.js';
 import { fakeMappings } from './globalFakeMapping.js';
 import bcrypt from 'bcrypt';
-import seedRotas from './rotasSeed.js';
-import seedGrupos from './grupoSeed.js';
+import seedRoutes from './rotasSeed.js';
+import seedGroups from './grupoSeed.js';
 
 export default async function userSeed() {
   await User.deleteMany({});
   await School.deleteMany({});
 
-  const rotasCompletas = await seedRotas();
-  const grupos = await seedGrupos(rotasCompletas);
+  const rotasCompletas = await seedRoutes();
+  const grupos = await seedGroups(rotasCompletas);
   const userGroup = grupos.find((g) => g.nome === 'User');
 
   // MOCK: Create default school

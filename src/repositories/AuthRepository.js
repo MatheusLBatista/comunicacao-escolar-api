@@ -1,9 +1,9 @@
 import UsuarioModel from '../models/User.js';
-import RotaModel from '../models/Rota.js';
+import RouteModel from '../models/Route.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class AuthRepository {
-  constructor({ usuarioModel = UsuarioModel, rotaModel = RotaModel } = {}) {
+  constructor({ usuarioModel = UsuarioModel, rotaModel = RouteModel } = {}) {
     this.model = usuarioModel;
     this.rotaModel = rotaModel;
   }

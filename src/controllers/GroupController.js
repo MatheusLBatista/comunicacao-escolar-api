@@ -1,22 +1,22 @@
-import GrupoService from '../services/GrupoService.js';
+import GroupService from '../services/GroupService.js';
 import {
   CommonResponse,
   CustomError,
   HttpStatusCodes,
 } from '../utils/helpers/index.js';
 import {
-  GrupoQuerySchema,
-  GrupoIdSchema,
-} from '../utils/validators/schemas/zod/querys/GrupoQuerySchema.js';
+  GroupQuerySchema,
+  GroupIdSchema,
+} from '../utils/validators/schemas/zod/querys/GroupQuerySchema.js';
 import {
-  GrupoSchema,
-  GrupoUpdateSchema,
-} from '../utils/validators/schemas/zod/GrupoSchema.js';
+  GroupSchema,
+  GroupUpdateSchema,
+} from '../utils/validators/schemas/zod/GroupSchema.js';
 import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 
-class GrupoController {
+class GroupController {
   constructor() {
-    this.service = new GrupoService();
+    this.service = new GroupService();
   }
 
   /**
@@ -39,13 +39,13 @@ class GrupoController {
 
     console.log('ID recebido:', id);
     if (id) {
-      GrupoIdSchema.parse(id); // Lança erro automaticamente se inválido
+      GroupIdSchema.parse(id); // Lança erro automaticamente se inválido
     }
 
     // 2º Validação estrutural - validar os demais campos passados por query
     const query = req.query || {};
     if (Object.keys(query).length !== 0) {
-      const validatedQuery = GrupoQuerySchema.parse(req.query);
+      const validatedQuery = GroupQuerySchema.parse(req.query);
     }
 
     // Chama o serviço para listar os grupos
@@ -62,7 +62,7 @@ class GrupoController {
     console.log('Estou no criar em GrupoController');
 
     // Validação dos dados de entrada usando Zod (estrutural)
-    const parsedData = GrupoSchema.parse(req.body);
+    const parsedData = GroupSchema.parse(req.body);
 
     const data = await this.service.create(parsedData);
 
@@ -79,11 +79,11 @@ class GrupoController {
     //1ª Validação estrutural - validação do ID passado por parâmetro
     const { id } = req.params || null;
     if (id) {
-      GrupoIdSchema.parse(id); // Lança erro automaticamente se inválido
+      GroupIdSchema.parse(id); // Lança erro automaticamente se inválido
     }
 
     // Validação dos dados de entrada usando Zod (estrutural)
-    const parsedData = GrupoUpdateSchema.parse(req.body);
+    const parsedData = GroupUpdateSchema.parse(req.body);
 
     // Chama o serviço para atualizar o grupo
     const data = await this.service.update(parsedData, id, req.user);
@@ -100,7 +100,7 @@ class GrupoController {
 
     // Validação estrutural - validação do ID passado por parâmetro
     const { id } = req.params || null;
-    GrupoIdSchema.parse(id);
+    GroupIdSchema.parse(id);
     if (!id) {
       throw new CustomError(
         'ID do grupo é obrigatório para deletar.',
@@ -125,7 +125,7 @@ class GrupoController {
 
     const { id } = req.params;
     const { idRota } = req.body;
-    GrupoIdSchema.parse(id);
+    GroupIdSchema.parse(id);
     ObjectIdSchema.parse(idRota);
 
     const data = await this.service.addRoute(id, idRota);
@@ -138,4 +138,4 @@ class GrupoController {
   }
 }
 
-export default GrupoController;
+export default GroupController;

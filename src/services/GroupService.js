@@ -1,17 +1,17 @@
-import GrupoRepository from '../repositories/GrupoRepository.js';
+import GroupRepository from '../repositories/GroupRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
-import RotaRepository from '../repositories/RotaRepository.js';
+import RouteRepository from '../repositories/RouteRepository.js';
 import {
   CustomError,
   HttpStatusCodes,
   messages,
 } from '../utils/helpers/index.js';
 
-class GrupoService {
+class GroupService {
   constructor() {
-    this.repository = new GrupoRepository();
+    this.repository = new GroupRepository();
     this.usuarioRepository = new UserRepository();
-    this.rotaRepository = new RotaRepository();
+    this.rotaRepository = new RouteRepository();
   }
 
   async list(req) {
@@ -92,7 +92,7 @@ class GrupoService {
       });
     }
 
-    const rota = await this.rotaRepository.getById(idRota);
+    const rota = await this.routeRepository.getById(idRota);
 
     if (!rota) {
       throw new CustomError({
@@ -122,4 +122,4 @@ class GrupoService {
   }
 }
 
-export default GrupoService;
+export default GroupService;

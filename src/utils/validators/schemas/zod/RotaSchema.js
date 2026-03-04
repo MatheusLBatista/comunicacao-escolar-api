@@ -1,8 +1,7 @@
-// src/utils/validators/schemas/zod/RotaSchema.js
 import { z } from 'zod';
-import { BaseRotaSchema } from './BaseRotaSchema.js';
+import { BaseRouteSchema } from './BaseRouteSchema.js';
 
-const RotaSchema = BaseRotaSchema.extend({
+const RouteSchema = BaseRouteSchema.extend({
   active: z.boolean().default(true),
   get: z.boolean().default(false),
   post: z.boolean().default(false),
@@ -11,6 +10,6 @@ const RotaSchema = BaseRotaSchema.extend({
   delete: z.boolean().default(false),
 });
 
-const RotaUpdateSchema = RotaSchema.partial();
+const RouteUpdateSchema = RouteSchema.partial();
 
-export { RotaSchema, RotaUpdateSchema };
+export { RouteSchema, RouteUpdateSchema };

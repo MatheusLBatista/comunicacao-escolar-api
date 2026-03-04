@@ -1,13 +1,13 @@
-import GrupoModel from '../models/Grupo.js';
+import GroupModel from '../models/Group.js';
 import UsuarioModel from '../models/User.js';
-import RotaModel from '../models/Rota.js';
+import RouteModel from '../models/Route.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
-import GrupoFilterBuilder from './filters/GrupoFilterBuilder.js';
+import GroupFilterBuilder from './filters/GrupoFilterBuilder.js';
 
-class GrupoRepository {
+class GroupRepository {
   constructor({
-    grupoModel = GrupoModel,
-    rotaModel = RotaModel,
+    grupoModel = GroupModel,
+    rotaModel = RouteModel,
     usuarioModel = UsuarioModel,
     customError = CustomError,
   } = {}) {
@@ -151,7 +151,7 @@ class GrupoRepository {
       const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
       // Usar o GrupoFilterBuilder injetado para construir os filtros
-      const filterBuilder = new GrupoFilterBuilder()
+      const filterBuilder = new GroupFilterBuilder()
         .comNome(nome || '')
         .comDescricao(descricao || '')
         .comAtivo(ativo || '');
@@ -327,4 +327,4 @@ class GrupoRepository {
   }
 }
 
-export default GrupoRepository;
+export default GroupRepository;

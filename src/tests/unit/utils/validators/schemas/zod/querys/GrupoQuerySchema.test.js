@@ -1,28 +1,28 @@
 import {
-  GrupoIdSchema,
-  GrupoQuerySchema,
-} from '../../../../../../../utils/validators/schemas/zod/querys/GrupoQuerySchema.js';
+  GroupIdSchema,
+  GroupQuerySchema,
+} from '../../../../../../../utils/validators/schemas/zod/querys/GroupQuerySchema.js';
 import mongoose from 'mongoose';
 
-describe('GrupoIdSchema', () => {
+describe('GroupIdSchema', () => {
   it('deve validar um ObjectId correto', () => {
     const idValido = new mongoose.Types.ObjectId().toString();
-    expect(() => GrupoIdSchema.parse(idValido)).not.toThrow();
+    expect(() => GroupIdSchema.parse(idValido)).not.toThrow();
   });
 
   it('deve invalidar um ObjectId incorreto', () => {
     const idInvalido = '12345';
-    expect(() => GrupoIdSchema.parse(idInvalido)).toThrow('ID inválido');
+    expect(() => GroupIdSchema.parse(idInvalido)).toThrow('ID inválido');
   });
 
   it('deve invalidar valores inválidos', () => {
-    expect(() => GrupoIdSchema.parse('')).toThrow('ID inválido');
-    expect(() => GrupoIdSchema.parse(null)).toThrow();
-    expect(() => GrupoIdSchema.parse(undefined)).toThrow();
+    expect(() => GroupIdSchema.parse('')).toThrow('ID inválido');
+    expect(() => GroupIdSchema.parse(null)).toThrow();
+    expect(() => GroupIdSchema.parse(undefined)).toThrow();
   });
 });
 
-describe('GrupoQuerySchema', () => {
+describe('GroupQuerySchema', () => {
   const consultaValida = {
     nome: 'Administradores',
     descricao: 'Grupo administrativo',
@@ -32,88 +32,88 @@ describe('GrupoQuerySchema', () => {
   };
 
   it('deve validar um objeto de consulta correto', () => {
-    expect(() => GrupoQuerySchema.parse(consultaValida)).not.toThrow();
+    expect(() => GroupQuerySchema.parse(consultaValida)).not.toThrow();
   });
 
   it('deve permitir campos opcionais ausentes', () => {
-    expect(() => GrupoQuerySchema.parse({})).not.toThrow();
+    expect(() => GroupQuerySchema.parse({})).not.toThrow();
   });
 
   it('deve remover espaços do nome e aceitar', () => {
     const consulta = { ...consultaValida, nome: '   Usuários   ' };
-    const resultado = GrupoQuerySchema.parse(consulta);
+    const resultado = GroupQuerySchema.parse(consulta);
     expect(resultado.nome).toBe('Usuários');
   });
 
   it('deve invalidar nome vazio', () => {
     const consulta = { ...consultaValida, nome: '   ' };
-    expect(() => GrupoQuerySchema.parse(consulta)).toThrow(
+    expect(() => GroupQuerySchema.parse(consulta)).toThrow(
       'Nome não pode ser vazio',
     );
   });
 
   it('deve remover espaços da descrição e aceitar', () => {
     const consulta = { ...consultaValida, descricao: '   Grupo de teste   ' };
-    const resultado = GrupoQuerySchema.parse(consulta);
+    const resultado = GroupQuerySchema.parse(consulta);
     expect(resultado.descricao).toBe('Grupo de teste');
   });
 
   it('deve invalidar descrição vazia', () => {
     const consulta = { ...consultaValida, descricao: '   ' };
-    expect(() => GrupoQuerySchema.parse(consulta)).toThrow(
+    expect(() => GroupQuerySchema.parse(consulta)).toThrow(
       'Descrição não pode ser vazio',
     );
   });
 
   it('deve processar ativo como string', () => {
     const consulta1 = { ...consultaValida, ativo: 'true' };
-    const resultado1 = GrupoQuerySchema.parse(consulta1);
+    const resultado1 = GroupQuerySchema.parse(consulta1);
     expect(resultado1.ativo).toBe('true');
 
     const consulta2 = { ...consultaValida, ativo: 'false' };
-    const resultado2 = GrupoQuerySchema.parse(consulta2);
+    const resultado2 = GroupQuerySchema.parse(consulta2);
     expect(resultado2.ativo).toBe('false');
   });
 
   it('deve rejeitar ativo como boolean', () => {
     expect(() =>
-      GrupoQuerySchema.parse({ ...consultaValida, ativo: true }),
+      GroupQuerySchema.parse({ ...consultaValida, ativo: true }),
     ).toThrow();
     expect(() =>
-      GrupoQuerySchema.parse({ ...consultaValida, ativo: false }),
+      GroupQuerySchema.parse({ ...consultaValida, ativo: false }),
     ).toThrow();
   });
 
   it('deve invalidar ativo com valor inválido', () => {
     const consulta = { ...consultaValida, ativo: 'maybe' };
-    expect(() => GrupoQuerySchema.parse(consulta)).toThrow();
+    expect(() => GroupQuerySchema.parse(consulta)).toThrow();
   });
 
   it('deve validar paginação', () => {
     const consulta = { ...consultaValida, page: '5', limite: '25' };
-    const resultado = GrupoQuerySchema.parse(consulta);
+    const resultado = GroupQuerySchema.parse(consulta);
     expect(resultado.page).toBe(5);
     expect(resultado.limite).toBe(25);
   });
 
   it('deve usar defaults de paginação', () => {
-    const resultado = GrupoQuerySchema.parse({});
+    const resultado = GroupQuerySchema.parse({});
     expect(resultado.page).toBe(1);
     expect(resultado.limite).toBe(10);
   });
 
   it('deve invalidar paginação inválida', () => {
-    expect(() => GrupoQuerySchema.parse({ page: '0' })).toThrow();
-    expect(() => GrupoQuerySchema.parse({ page: '-1' })).toThrow();
-    expect(() => GrupoQuerySchema.parse({ limite: '0' })).toThrow();
-    expect(() => GrupoQuerySchema.parse({ limite: '-5' })).toThrow();
-    expect(() => GrupoQuerySchema.parse({ page: 'abc' })).toThrow();
-    expect(() => GrupoQuerySchema.parse({ limite: 'xyz' })).toThrow();
+    expect(() => GroupQuerySchema.parse({ page: '0' })).toThrow();
+    expect(() => GroupQuerySchema.parse({ page: '-1' })).toThrow();
+    expect(() => GroupQuerySchema.parse({ limite: '0' })).toThrow();
+    expect(() => GroupQuerySchema.parse({ limite: '-5' })).toThrow();
+    expect(() => GroupQuerySchema.parse({ page: 'abc' })).toThrow();
+    expect(() => GroupQuerySchema.parse({ limite: 'xyz' })).toThrow();
   });
 
   it('deve processar consultas específicas', () => {
     const consulta1 = { nome: 'Operadores' };
-    const resultado1 = GrupoQuerySchema.parse(consulta1);
+    const resultado1 = GroupQuerySchema.parse(consulta1);
     expect(resultado1.nome).toBe('Operadores');
     expect(resultado1.page).toBe(1);
     expect(resultado1.limite).toBe(10);
@@ -125,7 +125,7 @@ describe('GrupoQuerySchema', () => {
       page: '3',
       limite: '25',
     };
-    const resultado2 = GrupoQuerySchema.parse(consulta2);
+    const resultado2 = GroupQuerySchema.parse(consulta2);
     expect(resultado2).toEqual({
       nome: 'Supervisores',
       descricao: 'Grupo de supervisão',

@@ -1,13 +1,13 @@
-import RotaRepository from '../repositories/RotaRepository.js';
+import RouteRepository from '../repositories/RouteRepository.js';
 import {
   CustomError,
   HttpStatusCodes,
   messages,
 } from '../utils/helpers/index.js';
 
-class RotaService {
+class RouteService {
   constructor() {
-    this.repository = new RotaRepository();
+    this.repository = new RouteRepository();
   }
 
   async list(req) {
@@ -79,4 +79,4 @@ class RotaService {
     return data;
   }
 }
-export default RotaService;
+export default RouteService;

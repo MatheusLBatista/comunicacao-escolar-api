@@ -1,6 +1,6 @@
 import Usuario from '../models/User.js';
-import Grupo from '../models/Grupo.js';
-import Rota from '../models/Rota.js';
+import Grupo from '../models/Group.js';
+import Rota from '../models/Route.js';
 import UserRepository from '../repositories/UserRepository.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 

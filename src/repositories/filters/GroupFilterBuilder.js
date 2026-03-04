@@ -1,4 +1,4 @@
-class GrupoFilterBuilder {
+class GroupFilterBuilder {
   constructor() {
     this.filtros = {};
   }
@@ -25,8 +25,7 @@ class GrupoFilterBuilder {
     } else if (active === 'false') {
       this.filtros.ativo = false;
     } else {
-      // Ação executável mínima para cobertura
-      this.filtros.ativo = this.filtros.ativo; // No-op
+      this.filtros.ativo = this.filtros.ativo;
     }
     return this;
   }
@@ -40,4 +39,4 @@ class GrupoFilterBuilder {
   }
 }
 
-export default GrupoFilterBuilder;
+export default GroupFilterBuilder;

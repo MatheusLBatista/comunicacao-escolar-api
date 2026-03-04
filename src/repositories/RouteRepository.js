@@ -1,11 +1,9 @@
-// src/repositories/RotaRepository.js
-
-import RotaModel from '../models/Rota.js';
-import RotaFilterBuilder from './filters/RotaFilterBuilder.js';
+import RouteModel from '../models/Route.js';
+import RouteFilterBuilder from './filters/RotaFilterBuilder.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
-class RotaRepository {
-  constructor({ rotaModel = RotaModel } = {}) {
+class RouteRepository {
+  constructor({ rotaModel = RouteModel } = {}) {
     this.model = rotaModel;
   }
 
@@ -66,7 +64,7 @@ class RotaRepository {
     const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
     // Construir os filtros
-    const filterBuilder = new RotaFilterBuilder()
+    const filterBuilder = new RouteFilterBuilder()
       .comRota(route || '')
       .comDominio(domain || '')
       .comAtivo(active || '')
@@ -156,4 +154,4 @@ class RotaRepository {
   }
 }
 
-export default RotaRepository;
+export default RouteRepository;

@@ -1,9 +1,9 @@
-import GrupoService from '../../../services/GrupoService.js';
-import GrupoRepository from '../../../repositories/GrupoRepository.js';
+import GroupService from '../../services/GroupService.js'';
+import GroupRepository from '../../repositories/GroupRepository.js'';
 import UsuarioRepository from '../../../repositories/UsuarioRepository.js';
 import { CustomError, HttpStatusCodes } from '../../../utils/helpers/index.js';
 
-jest.mock('../../../repositories/GrupoRepository.js');
+jest.mock('../../../repositories/GroupRepository.js');
 jest.mock('../../../repositories/UsuarioRepository.js');
 
 const makeGrupo = (props = {}) => ({
@@ -27,11 +27,11 @@ const makeUser = (props = {}) => ({
   ...props,
 });
 
-describe('GrupoService', () => {
+describe('GroupService', () => {
   let service, repositoryMock, usuarioRepositoryMock;
 
   beforeEach(() => {
-    GrupoRepository.mockClear();
+    GroupRepository.mockClear();
     UsuarioRepository.mockClear();
 
     repositoryMock = {
@@ -47,10 +47,10 @@ describe('GrupoService', () => {
       buscarPorId: jest.fn(),
     };
 
-    GrupoRepository.mockImplementation(() => repositoryMock);
+    GroupRepository.mockImplementation(() => repositoryMock);
     UsuarioRepository.mockImplementation(() => usuarioRepositoryMock);
 
-    service = new GrupoService();
+    service = new GroupService();
     jest.clearAllMocks();
   });
 

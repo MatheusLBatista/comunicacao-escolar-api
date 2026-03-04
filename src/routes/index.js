@@ -5,8 +5,8 @@ import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
 import users from './userRoutes.js';
-import grupos from './grupoRoutes.js';
-import rotas from './rotaRoutes.js';
+import grupos from './groupRoutes.js';
+import rotas from './routeRoutes.js';
 
 import dotenv from 'dotenv';
 
