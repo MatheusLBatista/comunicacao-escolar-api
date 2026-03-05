@@ -64,6 +64,18 @@ export const fakeMappings = {
     password_recovery_code_exp: () => null,
   },
 
+  School: {
+    name: () => fakebr.company.companyName(),
+    tax_id: () => fakebr.br.cnpj(),
+    address: () => ({
+      street: fakebr.address.streetAddress(),
+      city: fakebr.address.city(),
+      state: fakebr.address.state(),
+      zip_code: fakebr.address.zipCode(),
+    }),
+    active: () => fakebr.random.boolean(),
+  },
+
   Chat: {
     participants: () => [
       new mongoose.Types.ObjectId(),
@@ -96,16 +108,6 @@ export const fakeMappings = {
         options: ['Feliz', 'Neutro', 'Triste'],
       },
     ],
-  },
-
-  School: {
-    cnpj: () => fakebr.br.cnpj(),
-    endereco: () => ({
-      logradouro: fakebr.address.streetAddress(),
-      cidade: fakebr.address.city(),
-      estado: fakebr.address.state(),
-      cep: fakebr.address.zipCode(),
-    }),
   },
 
   Like: {

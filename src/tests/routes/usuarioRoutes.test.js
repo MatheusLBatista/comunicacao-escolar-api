@@ -72,6 +72,10 @@ describe('Usuários', () => {
         full_name: faker.name.firstName(),
         email: faker.internet.email(),
       })
+      .send({
+        full_name: faker.name.firstName(),
+        email: faker.internet.email(),
+      })
       .expect(400);
   });
 
@@ -89,6 +93,11 @@ describe('Usuários', () => {
     if (res1.status === 201) {
       await request(BASE_URL)
         .post('/signup')
+        .send({
+          full_name: faker.name.firstName(),
+          email,
+          password: 'Senha1234!',
+        })
         .send({
           full_name: faker.name.firstName(),
           email,
@@ -259,6 +268,9 @@ describe('Usuários', () => {
     expect([200, 500]).toContain(res.status);
 
     if (res.status === 200 && resSignup.status === 201) {
+      expect(res.body.data.docs.some((u) => u.full_name === nomeFiltro)).toBe(
+        true,
+      );
       expect(res.body.data.docs.some((u) => u.full_name === nomeFiltro)).toBe(
         true,
       );

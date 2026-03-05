@@ -5,23 +5,23 @@ class School {
   constructor() {
     const schoolSchema = new mongoose.Schema(
       {
-        nome: {
+        name: {
           type: String,
           required: true,
           index: true,
         },
-        cnpj: {
+        tax_id: {
           type: String,
           unique: true,
           required: true,
         },
-        endereco: {
-          logradouro: { type: String },
-          cidade: { type: String },
-          estado: { type: String },
-          cep: { type: String },
+        address: {
+          street: { type: String },
+          city: { type: String },
+          state: { type: String },
+          zip_code: { type: String },
         },
-        ativo: {
+        active: {
           type: Boolean,
           default: true,
         },
