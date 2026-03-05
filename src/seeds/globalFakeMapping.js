@@ -77,7 +77,10 @@ export const fakeMappings = {
   },
 
   Chat: {
-    participants: () => [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()],
+    participants: () => [
+      new mongoose.Types.ObjectId(),
+      new mongoose.Types.ObjectId(),
+    ],
     type: () => fakebr.random.arrayElement(['private', 'daily_log_reply']),
     last_message_at: () => null,
   },
@@ -86,7 +89,10 @@ export const fakeMappings = {
     teacher_id: () => new mongoose.Types.ObjectId(),
     is_present: () => fakebr.random.boolean(),
     entries: () => [
-      { field_key: 'mood_status', value: fakebr.random.arrayElement(['happy', 'neutral', 'sad']) },
+      {
+        field_key: 'mood_status',
+        value: fakebr.random.arrayElement(['happy', 'neutral', 'sad']),
+      },
     ],
     attachments: () => [],
     read_at: () => null,

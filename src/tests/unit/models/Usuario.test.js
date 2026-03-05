@@ -76,12 +76,18 @@ describe('Model de Usuário', () => {
   });
 
   it('por padrão, o campo senha não deve ser retornado em queries', async () => {
-    const userData = { full_name: 'SemSenha', email: 'sem@a.com', password: '123' };
+    const userData = {
+      full_name: 'SemSenha',
+      email: 'sem@a.com',
+      password: '123',
+    };
     const user = new Usuario(userData);
     await user.save();
     const found = await Usuario.findById(user._id);
     expect(found.password).toBeUndefined();
-    const foundWithPassword = await Usuario.findById(user._id).select('+password');
+    const foundWithPassword = await Usuario.findById(user._id).select(
+      '+password',
+    );
     expect(foundWithPassword.password).toBeDefined();
   });
 });

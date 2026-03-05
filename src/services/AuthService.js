@@ -87,7 +87,10 @@ class AuthService {
     }
 
     // Validar a senha
-    const senhaValida = await bcrypt.compare(body.password, userEncontrado.password);
+    const senhaValida = await bcrypt.compare(
+      body.password,
+      userEncontrado.password,
+    );
     if (!senhaValida) {
       throw new CustomError({
         statusCode: 401,
