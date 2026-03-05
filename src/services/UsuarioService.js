@@ -21,12 +21,12 @@ class UsuarioService {
     const userId = req?.user_id || null;
     await this.validateEmail(parsedData.email, null, userId);
 
-    if (parsedData.senha) {
+    if (parsedData.password) {
       const saltRounds = 10;
-      parsedData.senha = await bcrypt.hash(parsedData.senha, saltRounds);
+      parsedData.password = await bcrypt.hash(parsedData.password, saltRounds);
     }
 
-    if (!parsedData.permissoes || parsedData.permissoes.length === 0) {
+    if (!parsedData.permissions || parsedData.permissions.length === 0) {
       try {
         const grupoUsuario = await this.grupoRepository.buscarPorNome(
           'Usuario',
@@ -34,7 +34,7 @@ class UsuarioService {
           userId,
         );
         if (grupoUsuario) {
-          parsedData.permissoes = grupoUsuario.permissoes || [];
+          parsedData.permissions = grupoUsuario.permissions || [];
         }
       } catch (error) {
         console.warn(
@@ -57,7 +57,7 @@ class UsuarioService {
   }
 
   async atualizar(id, parsedData, req) {
-    delete parsedData.senha;
+    delete parsedData.password;
     delete parsedData.email;
 
     await this.ensureUserExists(id, req.user_id);
@@ -178,19 +178,19 @@ class UsuarioService {
   async convidarUsuario(nome, email) {
     await this.validateEmail(email, null, null);
 
-    const tokenConvite = await tokenUtil.generateInviteToken(email);
-    const convidadoEm = new Date();
+    const invite_token = await tokenUtil.generateInviteToken(email);
+    const invited_at = new Date();
 
     const novoUsuario = await this.repository.criar({
-      nome,
+      full_name: nome,
       email,
-      tokenConvite,
-      convidadoEm,
-      ativo: false,
+      invite_token,
+      invited_at,
+      active: false,
     });
 
     try {
-      await EmailService.enviarEmailConvite(nome, email, tokenConvite);
+      await EmailService.enviarEmailConvite(nome, email, invite_token);
     } catch (error) {
       await this.repository.deletar(novoUsuario._id);
       throw error;
@@ -200,9 +200,9 @@ class UsuarioService {
       message: 'Convite enviado com sucesso!',
       usuario: {
         id: novoUsuario._id,
-        nome: novoUsuario.nome,
+        full_name: novoUsuario.full_name,
         email: novoUsuario.email,
-        convidadoEm: novoUsuario.convidadoEm,
+        invited_at: novoUsuario.invited_at,
       },
     };
   }
@@ -234,7 +234,7 @@ class UsuarioService {
       });
     }
 
-    if (usuario.ativo && usuario.ativadoEm) {
+    if (usuario.active && usuario.activated_at) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'accountAlreadyActivated',
@@ -245,7 +245,7 @@ class UsuarioService {
       });
     }
 
-    if (!usuario.convidadoEm) {
+    if (!usuario.invited_at) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'invalidInvitation',
@@ -257,7 +257,7 @@ class UsuarioService {
     }
 
     const minutosDesdeConvite =
-      (new Date() - new Date(usuario.convidadoEm)) / (1000 * 60);
+      (new Date() - new Date(usuario.invited_at)) / (1000 * 60);
     if (minutosDesdeConvite > 5) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
@@ -272,7 +272,7 @@ class UsuarioService {
     const saltRounds = 10;
     const senhaHash = await bcrypt.hash(senha, saltRounds);
 
-    let permissoes = [];
+    let permissions = [];
     try {
       const grupoUsuario = await this.grupoRepository.buscarPorNome(
         'Usuario',
@@ -280,7 +280,7 @@ class UsuarioService {
         null,
       );
       if (grupoUsuario) {
-        permissoes = grupoUsuario.permissoes || [];
+        permissions = grupoUsuario.permissions || [];
       }
     } catch (error) {
       console.warn(
@@ -290,19 +290,19 @@ class UsuarioService {
     }
 
     const usuarioAtualizado = await this.repository.atualizar(usuario._id, {
-      senha: senhaHash,
-      ativo: true,
-      ativadoEm: new Date(),
-      tokenConvite: null,
-      convidadoEm: null,
-      permissoes,
+      password: senhaHash,
+      active: true,
+      activated_at: new Date(),
+      invite_token: null,
+      invited_at: null,
+      permissions,
     });
 
     return {
       message: 'Conta ativada com sucesso! Você já pode fazer login.',
       usuario: {
         id: usuarioAtualizado._id,
-        nome: usuarioAtualizado.nome,
+        full_name: usuarioAtualizado.full_name,
         email: usuarioAtualizado.email,
       },
     };
@@ -321,7 +321,7 @@ class UsuarioService {
       });
     }
 
-    if (usuario.ativo && usuario.ativadoEm) {
+    if (usuario.active && usuario.activated_at) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'validationError',
@@ -331,18 +331,18 @@ class UsuarioService {
       });
     }
 
-    const tokenConvite = await tokenUtil.generateInviteToken(usuario.email);
-    const convidadoEm = new Date();
+    const invite_token = await tokenUtil.generateInviteToken(usuario.email);
+    const invited_at = new Date();
 
     await this.repository.atualizar(usuario._id, {
-      tokenConvite,
-      convidadoEm,
+      invite_token,
+      invited_at,
     });
 
     await EmailService.enviarEmailConvite(
-      usuario.nome,
+      usuario.full_name,
       usuario.email,
-      tokenConvite,
+      invite_token,
     );
 
     return {

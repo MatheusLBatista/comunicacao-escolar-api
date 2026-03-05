@@ -51,14 +51,14 @@ class RotaRepository {
 
     // Extrair os filtros da query
     const {
-      rota,
-      dominio,
-      ativo,
-      buscar,
-      enviar,
-      substituir,
-      modificar,
-      excluir,
+      route,
+      domain,
+      active,
+      get: getParam,
+      post: postParam,
+      put: putParam,
+      patch: patchParam,
+      delete: deleteParam,
       page = 1,
     } = req.query;
 
@@ -67,14 +67,14 @@ class RotaRepository {
 
     // Construir os filtros
     const filterBuilder = new RotaFilterBuilder()
-      .comRota(rota || '')
-      .comDominio(dominio || '')
-      .comAtivo(ativo || '')
-      .comGet(buscar || '')
-      .comPost(enviar || '')
-      .comPut(substituir || '')
-      .comPatch(modificar || '')
-      .comDelete(excluir || '');
+      .comRota(route || '')
+      .comDominio(domain || '')
+      .comAtivo(active || '')
+      .comGet(getParam || '')
+      .comPost(postParam || '')
+      .comPut(putParam || '')
+      .comPatch(patchParam || '')
+      .comDelete(deleteParam || '');
 
     // Validação do filtro de unidade para evitar erro de cast
     if (typeof filterBuilder.build !== 'function') {
@@ -146,8 +146,8 @@ class RotaRepository {
     }
     return data;
   }
-  async buscarRotaPorNome(rota, idIgnorado = null) {
-    const filtro = { rota: rota };
+  async buscarRotaPorNome(route, idIgnorado = null) {
+    const filtro = { route: route };
     if (idIgnorado) {
       filtro._id = { $ne: idIgnorado };
     }

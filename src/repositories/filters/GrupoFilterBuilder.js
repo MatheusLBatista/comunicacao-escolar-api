@@ -19,10 +19,10 @@ class GrupoFilterBuilder {
     return this;
   }
 
-  comAtivo(ativo) {
-    if (ativo === 'true') {
+  comAtivo(active) {
+    if (active === 'true') {
       this.filtros.ativo = true;
-    } else if (ativo === 'false') {
+    } else if (active === 'false') {
       this.filtros.ativo = false;
     } else {
       // Ação executável mínima para cobertura

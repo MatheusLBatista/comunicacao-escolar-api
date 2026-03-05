@@ -24,7 +24,7 @@ export default function (query, defaultSort) {
       continue;
     }
     //Campo do usuario
-    if (key === 'ativo') {
+    if (key === 'active') {
       filtros[key] = value === '1';
       continue;
     }

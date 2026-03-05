@@ -8,10 +8,10 @@ jest.mock('../../../models/Notificacao.js');
 
 const makeFakeUser = (overrides = {}) => ({
   _id: 'user123',
-  nome: 'Usuário Teste',
+  full_name: 'Usuário Teste',
   email: 'teste@email.com',
-  senha: 'senha123',
-  ativo: false,
+  password: 'senha123',
+  active: false,
   ...overrides,
   toObject: function () {
     return { ...this };
@@ -53,7 +53,13 @@ describe('UsuarioRepository', () => {
     it('deve listar usuários com filtros', async () => {
       const req = {
         params: {},
-        query: { nome: 'Usuário', email: '', ativo: '', page: 1, limite: 10 },
+        query: {
+          full_name: 'Usuário',
+          email: '',
+          active: '',
+          page: 1,
+          limite: 10,
+        },
       };
       UsuarioModel.paginate = jest
         .fn()
@@ -81,7 +87,7 @@ describe('UsuarioRepository', () => {
       });
       const req = {
         params: {},
-        query: { nome: 'X', email: '', ativo: '', page: 1, limite: 10 },
+        query: { full_name: 'X', email: '', active: '', page: 1, limite: 10 },
       };
       await expect(repoMocked.listar(req)).rejects.toThrow(
         'Erro interno no servidor ao processar Usuário.',
@@ -94,17 +100,19 @@ describe('UsuarioRepository', () => {
     it('deve atualizar usuário existente', async () => {
       const leanMock = jest
         .fn()
-        .mockResolvedValue({ ...makeFakeUser(), nome: 'Novo Nome' });
+        .mockResolvedValue({ ...makeFakeUser(), full_name: 'Novo Nome' });
       UsuarioModel.findByIdAndUpdate = jest.fn(() => ({ lean: leanMock }));
-      const result = await repo.atualizar('user123', { nome: 'Novo Nome' });
-      expect(result.nome).toBe('Novo Nome');
+      const result = await repo.atualizar('user123', {
+        full_name: 'Novo Nome',
+      });
+      expect(result.full_name).toBe('Novo Nome');
     });
     it('deve lançar erro 404 se usuário não encontrado', async () => {
       const leanMock = jest.fn().mockResolvedValue(null);
       UsuarioModel.findByIdAndUpdate = jest.fn(() => ({ lean: leanMock }));
-      await expect(repo.atualizar('notfound', { nome: 'X' })).rejects.toThrow(
-        CustomError,
-      );
+      await expect(
+        repo.atualizar('notfound', { full_name: 'X' }),
+      ).rejects.toThrow(CustomError);
     });
   });
 
@@ -145,7 +153,7 @@ describe('UsuarioRepository', () => {
       await repo.buscarPorEmail('teste@email.com', 'ignoreid');
       expect(UsuarioModel.findOne).toHaveBeenCalledWith(
         { email: 'teste@email.com', _id: { $ne: 'ignoreid' } },
-        '+senha',
+        '+password',
       );
     });
   });

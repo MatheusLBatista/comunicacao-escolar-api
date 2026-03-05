@@ -56,7 +56,7 @@ class AuthController {
    */
   async atualizarSenhaToken(req, res, next) {
     const tokenRecuperacao = req.query.token || req.params.token || null; // token de recuperação passado na URL
-    const senha = req.body.senha || null; // nova senha passada no body
+    const senha = req.body.password || null; // nova senha passada no body
 
     // 1) Verifica se veio o token de recuperação
     if (!tokenRecuperacao) {
@@ -71,7 +71,7 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UsuarioUpdateSchema.parse({ senha: senha });
+    const senhaSchema = UsuarioUpdateSchema.parse({ password: senha });
 
     // atualiza a senha
     await this.service.atualizarSenhaToken(tokenRecuperacao, senhaSchema);
@@ -86,14 +86,14 @@ class AuthController {
   }
 
   async atualizarSenhaCodigo(req, res, next) {
-    const codigo_recupera_senha = req.body.codigo_recupera_senha || null; // código de recuperação passado no body
-    const senha = req.body.senha || null; // nova senha passada no body
+    const password_recovery_code = req.body.password_recovery_code || null; // código de recuperação passado no body
+    const senha = req.body.password || null; // nova senha passada no body
 
-    console.log('codigo_recupera_senha:', codigo_recupera_senha);
+    console.log('password_recovery_code:', password_recovery_code);
     console.log('senha:', senha);
 
     // 1) Verifica se veio o código de recuperação
-    if (!codigo_recupera_senha) {
+    if (!password_recovery_code) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
         errorType: 'unauthorized',
@@ -105,10 +105,13 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UsuarioUpdateSchema.parse({ senha });
+    const senhaSchema = UsuarioUpdateSchema.parse({ password: senha });
 
     // atualiza a senha
-    await this.service.atualizarSenhaCodigo(codigo_recupera_senha, senhaSchema);
+    await this.service.atualizarSenhaCodigo(
+      password_recovery_code,
+      senhaSchema,
+    );
 
     return CommonResponse.success(
       res,
@@ -244,7 +247,7 @@ class AuthController {
     const decoded =
       /** @type {{ id: string, exp?: number, iat?: number, nbf?: number, client_id?: string, aud?: string }} */ (
         await promisify(jwt.verify)(
-          validatedBody.accesstoken,
+          validatedBody.access_token,
           process.env.JWT_SECRET_ACCESS_TOKEN,
         )
       );

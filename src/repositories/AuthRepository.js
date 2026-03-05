@@ -20,8 +20,8 @@ class AuthRepository {
       });
     }
 
-    documento.accesstoken = accesstoken;
-    documento.refreshtoken = refreshtoken;
+    documento.access_token = accesstoken;
+    documento.refresh_token = refreshtoken;
 
     const data = await documento.save();
     return data;
@@ -29,8 +29,8 @@ class AuthRepository {
 
   async removeToken(id) {
     const parsedData = {
-      accesstoken: null,
-      refreshtoken: null,
+      access_token: null,
+      refresh_token: null,
     };
 
     const usuario = await this.model

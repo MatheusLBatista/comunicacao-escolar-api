@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Conversa {
+class Chat {
   constructor() {
-    const conversaSchema = new mongoose.Schema(
+    const chatSchema = new mongoose.Schema(
       {
         school_id: {
           type: mongoose.Schema.Types.ObjectId,
@@ -34,10 +34,10 @@ class Conversa {
       { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
     );
 
-    conversaSchema.plugin(mongoosePaginate);
+    chatSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('conversas', conversaSchema);
+    this.model = mongoose.model('Conversations', chatSchema);
   }
 }
 
-export default new Conversa().model;
+export default new Chat().model;

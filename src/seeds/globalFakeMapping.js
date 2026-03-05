@@ -13,42 +13,124 @@ export const fakeMappings = {
     rota: () => fakebr.lorem.word(10),
     dominio: () => fakebr.internet.url(),
     ativo: () => fakebr.random.boolean(),
-    buscar: () => fakebr.random.boolean(),
-    enviar: () => fakebr.random.boolean(),
-    substituir: () => fakebr.random.boolean(),
-    modificar: () => fakebr.random.boolean(),
-    excluir: () => fakebr.random.boolean(),
-    permissoes: () => [
+    route: () => fakebr.lorem.word(10),
+    domain: () => fakebr.internet.url(),
+    active: () => fakebr.random.boolean(),
+    get: () => fakebr.random.boolean(),
+    post: () => fakebr.random.boolean(),
+    put: () => fakebr.random.boolean(),
+    patch: () => fakebr.random.boolean(),
+    delete: () => fakebr.random.boolean(),
+    permissions: () => [
       {
-        rota: fakebr.lorem.word(),
-        dominio: fakebr.internet.url(),
-        ativo: fakebr.random.boolean(),
-        buscar: fakebr.random.boolean(),
-        enviar: fakebr.random.boolean(),
-        substituir: fakebr.random.boolean(),
-        modificar: fakebr.random.boolean(),
-        excluir: fakebr.random.boolean(),
+        route: fakebr.lorem.word(),
+        domain: fakebr.internet.url(),
+        active: fakebr.random.boolean(),
+        get: fakebr.random.boolean(),
+        post: fakebr.random.boolean(),
+        put: fakebr.random.boolean(),
+        patch: fakebr.random.boolean(),
+        delete: fakebr.random.boolean(),
+      },
+    ],
+    created_at: () => new Date().toISOString(),
+    updated_at: () => new Date().toISOString(),
+    school_id: () => new mongoose.Types.ObjectId(),
+    student_id: () => new mongoose.Types.ObjectId(),
+    user_id: () => new mongoose.Types.ObjectId(),
+  },
+
+  User: {
+    full_name: () =>
+      `${fakebr.name.firstName()} ${fakebr.name.lastName()} ${fakebr.name.lastName()}`,
+    email: () => fakebr.internet.email(),
+    password: () => fakebr.internet.password(),
+    active: () => fakebr.random.boolean(),
+    groups: () => [],
+    permissions: () => [],
+    fcm_tokens: () => [],
+    memberships: () => [],
+    class_id: () => new mongoose.Types.ObjectId(),
+    unique_token: () =>
+      TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
+    refresh_token: () =>
+      TokenUtil.generateRefreshToken(new mongoose.Types.ObjectId().toString()),
+    access_token: () =>
+      TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
+    invite_token: () => uuid(),
+    invited_at: () => null,
+    activated_at: () => null,
+    password_recovery_code: () => null,
+    password_recovery_code_exp: () => null,
+  },
+
+  School: {
+    name: () => fakebr.company.companyName(),
+    tax_id: () => fakebr.br.cnpj(),
+    address: () => ({
+      street: fakebr.address.streetAddress(),
+      city: fakebr.address.city(),
+      state: fakebr.address.state(),
+      zip_code: fakebr.address.zipCode(),
+    }),
+    active: () => fakebr.random.boolean(),
+  },
+
+  Chat: {
+    participants: () => [
+      new mongoose.Types.ObjectId(),
+      new mongoose.Types.ObjectId(),
+    ],
+    type: () => fakebr.random.arrayElement(['private', 'daily_log_reply']),
+    last_message_at: () => null,
+  },
+
+  DailyLog: {
+    teacher_id: () => new mongoose.Types.ObjectId(),
+    is_present: () => fakebr.random.boolean(),
+    entries: () => [
+      {
+        field_key: 'mood_status',
+        value: fakebr.random.arrayElement(['happy', 'neutral', 'sad']),
+      },
+    ],
+    attachments: () => [],
+    read_at: () => null,
+    date: () => new Date().toISOString(),
+  },
+
+  DailyLogTemplate: {
+    fields: () => [
+      {
+        key: 'mood_status',
+        label: 'Disposição',
+        type: 'select',
+        options: ['Feliz', 'Neutro', 'Triste'],
       },
     ],
   },
 
-  Usuario: {
-    nome: () =>
-      `${fakebr.name.firstName()} ${fakebr.name.lastName()} ${fakebr.name.lastName()}`,
-    email: () => fakebr.internet.email(),
-    senha: () => fakebr.internet.password(),
-    ativo: () => fakebr.random.boolean(),
-    grupos: () => [],
-    tokenUnico: () =>
-      TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
-    refreshtoken: () =>
-      TokenUtil.generateRefreshToken(new mongoose.Types.ObjectId().toString()),
-    accesstoken: () =>
-      TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
-    fotoPerfil: () => '',
-    tokenConvite: () => uuid(),
-    convidadoEm: () => null,
-    ativadoEm: () => null,
+  Like: {
+    post_id: () => new mongoose.Types.ObjectId(),
+  },
+
+  Message: {
+    conversation_id: () => new mongoose.Types.ObjectId(),
+    sender_id: () => new mongoose.Types.ObjectId(),
+    texto: () => fakebr.lorem.sentence(),
+    read_by: () => [],
+    sent_at: () => new Date().toISOString(),
+  },
+
+  Post: {
+    author_id: () => new mongoose.Types.ObjectId(),
+    titulo: () => fakebr.lorem.sentence(),
+    conteudo: () => fakebr.lorem.paragraphs(2),
+    target: () => ({
+      scope: 'all',
+      target_id: null,
+    }),
+    attachments: () => [],
   },
 };
 

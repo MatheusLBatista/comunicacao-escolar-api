@@ -1,27 +1,27 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Escola {
+class School {
   constructor() {
-    const escolaSchema = new mongoose.Schema(
+    const schoolSchema = new mongoose.Schema(
       {
-        nome: {
+        name: {
           type: String,
           required: true,
           index: true,
         },
-        cnpj: {
+        tax_id: {
           type: String,
           unique: true,
           required: true,
         },
-        endereco: {
-          logradouro: { type: String },
-          cidade: { type: String },
-          estado: { type: String },
-          cep: { type: String },
+        address: {
+          street: { type: String },
+          city: { type: String },
+          state: { type: String },
+          zip_code: { type: String },
         },
-        ativo: {
+        active: {
           type: Boolean,
           default: true,
         },
@@ -29,10 +29,10 @@ class Escola {
       { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
     );
 
-    escolaSchema.plugin(mongoosePaginate);
+    schoolSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('escolas', escolaSchema);
+    this.model = mongoose.model('Schools', schoolSchema);
   }
 }
 
-export default new Escola().model;
+export default new School().model;

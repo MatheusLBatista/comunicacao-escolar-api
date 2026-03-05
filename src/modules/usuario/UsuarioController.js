@@ -23,7 +23,7 @@ class UsuarioController {
     const data = await this.service.criar(parsedData);
 
     const usuarioLimpo = data.toObject();
-    delete usuarioLimpo.senha;
+    delete usuarioLimpo.password;
 
     return CommonResponse.created(res, usuarioLimpo);
   }
@@ -60,7 +60,7 @@ class UsuarioController {
     const parsedData = UsuarioUpdateSchema.parse(req.body);
     const data = await this.service.atualizar(id, parsedData, req);
 
-    delete data.senha;
+    delete data.password;
 
     return CommonResponse.success(
       res,
@@ -105,28 +105,28 @@ class UsuarioController {
   }
 
   async convidarUsuario(req, res) {
-    const { nome, email } = req.body;
+    const { full_name, email } = req.body;
 
-    if (!nome || !email) {
+    if (!full_name || !email) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'validationError',
-        field: 'nome, email',
+        field: 'full_name, email',
         details: [
-          { path: 'nome', message: 'Nome é obrigatório' },
+          { path: 'full_name', message: 'Nome é obrigatório' },
           { path: 'email', message: 'E-mail é obrigatório' },
         ],
         customMessage: 'Nome e e-mail são obrigatórios.',
       });
     }
 
-    const data = await this.service.convidarUsuario(nome, email);
+    const data = await this.service.convidarUsuario(full_name, email);
     return CommonResponse.created(res, data);
   }
 
   async ativarConta(req, res) {
     const { token } = req.query;
-    const { senha } = req.body;
+    const { password } = req.body;
 
     if (!token) {
       throw new CustomError({
@@ -138,19 +138,19 @@ class UsuarioController {
       });
     }
 
-    if (!senha) {
+    if (!password) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'validationError',
-        field: 'senha',
-        details: [{ path: 'senha', message: 'Senha é obrigatória' }],
+        field: 'password',
+        details: [{ path: 'password', message: 'Senha é obrigatória' }],
         customMessage: 'Senha é obrigatória.',
       });
     }
 
-    const senhaValidada = UsuarioUpdateSchema.parse({ senha });
+    const senhaValidada = UsuarioUpdateSchema.parse({ password });
 
-    const data = await this.service.ativarConta(token, senhaValidada.senha);
+    const data = await this.service.ativarConta(token, senhaValidada.password);
     return CommonResponse.success(res, data, 200, data.message);
   }
 

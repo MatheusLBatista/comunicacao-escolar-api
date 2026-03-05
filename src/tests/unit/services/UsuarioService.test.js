@@ -42,20 +42,20 @@ describe('UsuarioService', () => {
       bcrypt.hash.mockResolvedValue('senha_criptografada');
       repositoryMock.criar.mockResolvedValue({
         _id: '1',
-        nome: 'Teste',
+        full_name: 'Teste',
         email: 'a@a.com',
-        senha: 'senha_criptografada',
-        ativo: false,
+        password: 'senha_criptografada',
+        active: false,
       });
 
       const data = await service.criar(
-        { nome: 'Teste', email: 'a@a.com', senha: '123' },
+        { full_name: 'Teste', email: 'a@a.com', password: '123' },
         req,
       );
 
       expect(bcrypt.hash).toHaveBeenCalledWith('123', 10);
-      expect(data.senha).toBe('senha_criptografada');
-      expect(data.ativo).toBe(false);
+      expect(data.password).toBe('senha_criptografada');
+      expect(data.active).toBe(false);
     });
 
     it('deve criar usuário sem senha quando não fornecida', async () => {
@@ -64,21 +64,21 @@ describe('UsuarioService', () => {
       grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
       repositoryMock.criar.mockResolvedValue({
         _id: '1',
-        nome: 'Teste',
+        full_name: 'Teste',
         email: 'a@a.com',
-        ativo: false,
+        active: false,
       });
 
       // Limpa mocks do bcrypt para não interferir de outros testes
       bcrypt.hash.mockClear();
 
       const data = await service.criar(
-        { nome: 'Teste', email: 'a@a.com' },
+        { full_name: 'Teste', email: 'a@a.com' },
         req,
       );
 
       expect(bcrypt.hash).not.toHaveBeenCalled();
-      expect(data).not.toHaveProperty('senha');
+      expect(data).not.toHaveProperty('password');
     });
 
     it('deve criar usuário quando senha é undefined', async () => {
@@ -87,14 +87,14 @@ describe('UsuarioService', () => {
       grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
       repositoryMock.criar.mockResolvedValue({
         _id: '1',
-        nome: 'Teste',
+        full_name: 'Teste',
         email: 'a@a.com',
-        ativo: false,
+        active: false,
       });
 
       bcrypt.hash.mockClear();
 
-      const userData = { nome: 'Teste', email: 'a@a.com' };
+      const userData = { full_name: 'Teste', email: 'a@a.com' };
       const data = await service.criar(userData, req);
       expect(bcrypt.hash).not.toHaveBeenCalled();
       expect(data).toHaveProperty('_id');
@@ -108,7 +108,10 @@ describe('UsuarioService', () => {
       });
       grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
       await expect(
-        service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req),
+        service.criar(
+          { full_name: 'Teste', email: 'a@a.com', password: '123' },
+          req,
+        ),
       ).rejects.toThrow('Email já está em uso.');
     });
 
@@ -118,16 +121,21 @@ describe('UsuarioService', () => {
       grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
       bcrypt.hash.mockRejectedValue(new Error('bcrypt error'));
       await expect(
-        service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req),
+        service.criar(
+          { full_name: 'Teste', email: 'a@a.com', password: '123' },
+          req,
+        ),
       ).rejects.toThrow('bcrypt error');
     });
   });
 
   describe('listar', () => {
     it('deve retornar todos os usuários', async () => {
-      repositoryMock.listar.mockResolvedValue([{ _id: '1', nome: 'Teste' }]);
+      repositoryMock.listar.mockResolvedValue([
+        { _id: '1', full_name: 'Teste' },
+      ]);
       const data = await service.listar({});
-      expect(data).toEqual([{ _id: '1', nome: 'Teste' }]);
+      expect(data).toEqual([{ _id: '1', full_name: 'Teste' }]);
     });
   });
 
@@ -136,27 +144,27 @@ describe('UsuarioService', () => {
       const req = { user_id: 'user123' };
       repositoryMock.buscarPorId.mockResolvedValue({
         _id: '1',
-        nome: 'Teste',
+        full_name: 'Teste',
         email: 'a@a.com',
-        senha: '123',
+        password: '123',
       });
       repositoryMock.atualizar.mockResolvedValue({
         _id: '1',
-        nome: 'Novo Nome',
+        full_name: 'Novo Nome',
         email: 'a@a.com',
-        senha: '123',
+        password: '123',
       });
       const data = await service.atualizar(
         '1',
-        { nome: 'Novo Nome', email: 'novo@a.com', senha: 'nova' },
+        { full_name: 'Novo Nome', email: 'novo@a.com', password: 'nova' },
         req,
       );
       expect(repositoryMock.atualizar).toHaveBeenCalledWith(
         '1',
-        { nome: 'Novo Nome' },
+        { full_name: 'Novo Nome' },
         'user123',
       );
-      expect(data.nome).toBe('Novo Nome');
+      expect(data.full_name).toBe('Novo Nome');
       expect(data.email).toBe('a@a.com');
     });
 
@@ -164,7 +172,7 @@ describe('UsuarioService', () => {
       const req = { user_id: 'user123' };
       repositoryMock.buscarPorId.mockResolvedValue(null);
       await expect(
-        service.atualizar('1', { nome: 'Novo' }, req),
+        service.atualizar('1', { full_name: 'Novo' }, req),
       ).rejects.toThrow('Usuário não encontrado(a).');
     });
   });
@@ -215,9 +223,12 @@ describe('UsuarioService', () => {
       );
     });
     it('deve retornar usuário se existir', async () => {
-      repositoryMock.buscarPorId.mockResolvedValue({ _id: '1', nome: 'Teste' });
+      repositoryMock.buscarPorId.mockResolvedValue({
+        _id: '1',
+        full_name: 'Teste',
+      });
       const user = await service.ensureUserExists('1');
-      expect(user).toEqual({ _id: '1', nome: 'Teste' });
+      expect(user).toEqual({ _id: '1', full_name: 'Teste' });
     });
   });
 
@@ -231,17 +242,20 @@ describe('UsuarioService', () => {
       bcrypt.hash.mockResolvedValue('senha_criptografada');
       repositoryMock.criar.mockResolvedValue({
         _id: '1',
-        nome: 'Teste',
+        full_name: 'Teste',
         email: 'a@a.com',
-        senha: 'senha_criptografada',
-        ativo: false,
+        password: 'senha_criptografada',
+        active: false,
       });
       await service.criar(
-        { nome: 'Teste', email: 'a@a.com', senha: '123' },
+        { full_name: 'Teste', email: 'a@a.com', password: '123' },
         req,
       );
       await expect(
-        service.criar({ nome: 'Outro', email: 'a@a.com', senha: '456' }, req),
+        service.criar(
+          { full_name: 'Outro', email: 'a@a.com', password: '456' },
+          req,
+        ),
       ).rejects.toThrow('Email já está em uso.');
     });
   });
@@ -251,28 +265,28 @@ describe('UsuarioService', () => {
       const req = { user_id: 'user123' };
       repositoryMock.buscarPorId.mockResolvedValue({
         _id: '1',
-        nome: 'Teste',
+        full_name: 'Teste',
         email: 'a@a.com',
-        senha: '123',
+        password: '123',
       });
       repositoryMock.atualizar.mockResolvedValue({
         _id: '1',
-        nome: 'Novo Nome',
+        full_name: 'Novo Nome',
         email: 'a@a.com',
-        senha: '123',
+        password: '123',
       });
       const data = await service.atualizar(
         '1',
-        { nome: 'Novo Nome', email: 'novo@a.com', senha: 'nova' },
+        { full_name: 'Novo Nome', email: 'novo@a.com', password: 'nova' },
         req,
       );
       expect(repositoryMock.atualizar).toHaveBeenCalledWith(
         '1',
-        { nome: 'Novo Nome' },
+        { full_name: 'Novo Nome' },
         'user123',
       );
       expect(data.email).toBe('a@a.com');
-      expect(data.senha).toBe('123');
+      expect(data.password).toBe('123');
     });
   });
 
@@ -281,7 +295,10 @@ describe('UsuarioService', () => {
       const req = { user_id: 'user123' };
       repositoryMock.buscarPorEmail.mockRejectedValue(new Error('erro repo'));
       await expect(
-        service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req),
+        service.criar(
+          { full_name: 'Teste', email: 'a@a.com', password: '123' },
+          req,
+        ),
       ).rejects.toThrow('erro repo');
     });
   });
