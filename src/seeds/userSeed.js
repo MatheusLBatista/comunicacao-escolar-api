@@ -2,8 +2,8 @@ import User from '../models/User.js';
 import School from '../models/School.js';
 import { fakeMappings } from './globalFakeMapping.js';
 import bcrypt from 'bcrypt';
-import seedRoutes from './rotasSeed.js';
-import seedGroups from './grupoSeed.js';
+import seedRoutes from './routesSeed.js';
+import seedGroups from './groupSeed.js';
 
 export default async function userSeed() {
   await User.deleteMany({});

@@ -1,0 +1,767 @@
+{
+  "info": {
+    "name": "comunicacao-escolar-api",
+    "description": "Collection completa para testar todas as rotas da API de Comunicação Escolar.\n\n## Fluxo de uso:\n1. Execute **Login** para obter os tokens\n2. `access_token`, `refresh_token` e `user_id` são salvos automaticamente\n3. Use as demais rotas normalmente\n\n## Variáveis de ambiente:\n- `base_url`: URL base da API (padrão: http://localhost:5000)\n- `access_token`: Token JWT de acesso (preenchido automaticamente pelo login)\n- `refresh_token`: Token JWT de refresh (preenchido automaticamente pelo login)\n- `school_id`: ID da escola para operações vinculadas\n- `user_id`: ID do usuário para operações individuais\n- `group_id`: ID do grupo para operações individuais\n- `route_id`: ID da rota/permissão para operações individuais",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "school_id",
+      "value": "000000000000000000000001",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "group_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "route_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Rotas de autenticação: login, logout, refresh, revogação, recuperação e redefinição de senha.",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.user) {",
+                  "    const user = res.data.user;",
+                  "    if (user.access_token)  pm.collectionVariables.set('access_token',  user.access_token);",
+                  "    if (user.refresh_token) pm.collectionVariables.set('refresh_token', user.refresh_token);",
+                  "    if (user._id)           pm.collectionVariables.set('user_id',       user._id);",
+                  "    console.log('Tokens e user_id salvos com sucesso!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@escola.com\",\n  \"password\": \"Senha@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Autentica o usuário e salva automaticamente `access_token`, `refresh_token` e `user_id` nas variáveis da collection."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.access_token) {",
+                  "    pm.collectionVariables.set('access_token', res.data.access_token);",
+                  "    console.log('access_token renovado!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["refresh"]
+            },
+            "description": "Renova o `access_token` usando o `refresh_token`. O novo token é salvo automaticamente."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"access_token\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            },
+            "description": "Invalida o `access_token`. Pode receber o token pelo body (`access_token`) ou pelo header Authorization."
+          }
+        },
+        {
+          "name": "Revogar Token (Revoke)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/revoke",
+              "host": ["{{base_url}}"],
+              "path": ["revoke"]
+            },
+            "description": "Revoga todos os tokens de um usuário pelo ID. Útil para forçar logout remoto."
+          }
+        },
+        {
+          "name": "Introspect (Validar Token)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/introspect",
+              "host": ["{{base_url}}"],
+              "path": ["introspect"]
+            },
+            "description": "Valida o `access_token` enviado no header Authorization e retorna as informações do token."
+          }
+        },
+        {
+          "name": "Recuperar Senha",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@escola.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/recover",
+              "host": ["{{base_url}}"],
+              "path": ["recover"]
+            },
+            "description": "Envia e-mail com código/link de recuperação de senha para o endereço informado."
+          }
+        },
+        {
+          "name": "Redefinir Senha (por Token na URL)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NovaSenha@456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/redefinir-senha?token=SEU_TOKEN_DE_RECUPERACAO",
+              "host": ["{{base_url}}"],
+              "path": ["redefinir-senha"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "SEU_TOKEN_DE_RECUPERACAO",
+                  "description": "JWT de recuperação de senha recebido por e-mail"
+                }
+              ]
+            },
+            "description": "Redefine a senha usando o token JWT recebido por e-mail (query string `?token=`) e a nova senha no body."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - Admin Global",
+      "description": "Criação de administradores globais sem vínculo a escola.",
+      "item": [
+        {
+          "name": "Criar Admin Global",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Administrador Geral\",\n  \"email\": \"novo.admin@escola.com\",\n  \"password\": \"Senha@123\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Cria um usuário administrador global (sem vínculo a escola). Requer permissão POST na rota 'users'."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - Por Escola",
+      "description": "Criação e listagem de usuários vinculados a uma escola específica.",
+      "item": [
+        {
+          "name": "Criar Professor na Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (professor) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Maria da Silva\",\n  \"email\": \"maria.teacher@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"teacher\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um professor vinculado a uma escola. Se o e-mail já existir no sistema, adiciona o membership à escola."
+          }
+        },
+        {
+          "name": "Criar Aluno na Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (aluno) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"João Aluno\",\n  \"email\": \"joao.aluno@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"student\",\n  \"class_id\": null,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um aluno vinculado a uma escola. O campo `class_id` pode ser informado para associar a uma turma."
+          }
+        },
+        {
+          "name": "Criar Responsável na Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (responsavel) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Ana Responsável\",\n  \"email\": \"ana.parent@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"parent\",\n  \"associated_students\": [],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um responsável vinculado a uma escola. `associated_students` aceita um array de IDs de alunos."
+          }
+        },
+        {
+          "name": "Criar Admin da Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (admin escola) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Carlos Admin Escola\",\n  \"email\": \"carlos.admin@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"admin\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um administrador vinculado a uma escola específica."
+          }
+        },
+        {
+          "name": "Listar Usuários da Escola",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                { "key": "page",      "value": "1",       "description": "Página (padrão: 1)" },
+                { "key": "limit",     "value": "10",      "description": "Itens por página (padrão: 10, máx: 100)" },
+                { "key": "full_name", "value": "",        "description": "Filtro por nome (parcial, case-insensitive)", "disabled": true },
+                { "key": "email",     "value": "",        "description": "Filtro por e-mail", "disabled": true },
+                { "key": "role",      "value": "teacher", "description": "Filtro por role: admin | teacher | parent | student", "disabled": true },
+                { "key": "active",    "value": "true",    "description": "Filtro por status ativo: true | false", "disabled": true }
+              ]
+            },
+            "description": "Lista usuários vinculados a uma escola com paginação e filtros opcionais."
+          }
+        },
+        {
+          "name": "Listar por Escola - Filtro por Role",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?role=teacher&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                { "key": "role",  "value": "teacher" },
+                { "key": "page",  "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Lista apenas professores de uma escola específica."
+          }
+        },
+        {
+          "name": "Listar por Escola - Filtro por Nome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?full_name=Maria&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                { "key": "full_name", "value": "Maria" },
+                { "key": "page",      "value": "1" },
+                { "key": "limit",     "value": "10" }
+              ]
+            },
+            "description": "Busca usuários por nome (parcial, case-insensitive) dentro de uma escola."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - Operações Individuais",
+      "description": "Buscar, atualizar e desativar usuários por ID.",
+      "item": [
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Busca um usuário pelo ID. Usuários podem acessar seu próprio perfil sem permissão extra."
+          }
+        },
+        {
+          "name": "Atualizar Usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Nome Atualizado\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Atualiza dados do usuário. Campos permitidos: `full_name`, `active`, `memberships`. E-mail e senha NÃO podem ser alterados por esta rota."
+          }
+        },
+        {
+          "name": "Atualizar Memberships do Usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"memberships\": [\n    {\n      \"school_id\": \"{{school_id}}\",\n      \"role\": \"teacher\",\n      \"class_id\": null,\n      \"associated_students\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Atualiza os vínculos (memberships) de um usuário com escolas. Roles aceitas: admin | teacher | parent | student."
+          }
+        },
+        {
+          "name": "Desativar Usuário (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Desativa o usuário (soft delete — define `active = false`). O registro permanece no banco."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Grupos",
+      "description": "Gerenciamento de grupos de permissão. Grupos agregam permissões de rotas e são associados a usuários.",
+      "item": [
+        {
+          "name": "Listar Grupos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/grupos?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["grupos"],
+              "query": [
+                { "key": "page",  "value": "1",  "description": "Página (padrão: 1)" },
+                { "key": "limit", "value": "10", "description": "Itens por página (padrão: 10)" },
+                { "key": "name",  "value": "",   "description": "Filtro por nome do grupo", "disabled": true }
+              ]
+            },
+            "description": "Lista todos os grupos com suporte a filtros e paginação."
+          }
+        },
+        {
+          "name": "Buscar Grupo por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Retorna os dados de um grupo específico pelo ID."
+          }
+        },
+        {
+          "name": "Criar Grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('group_id', res.data._id);",
+                  "    console.log('group_id salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grupo Professores\",\n  \"description\": \"Grupo com permissões para professores\",\n  \"active\": true,\n  \"permissions\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos",
+              "host": ["{{base_url}}"],
+              "path": ["grupos"]
+            },
+            "description": "Cria um novo grupo de permissões. O `group_id` é salvo automaticamente."
+          }
+        },
+        {
+          "name": "Adicionar Rota ao Grupo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idRota\": \"{{route_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}/rotas",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}", "rotas"]
+            },
+            "description": "Associa uma rota (permissão) a um grupo existente. Recebe `idRota` no body."
+          }
+        },
+        {
+          "name": "Atualizar Grupo (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grupo Atualizado\",\n  \"description\": \"Descrição atualizada\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Atualiza parcialmente um grupo existente."
+          }
+        },
+        {
+          "name": "Atualizar Grupo (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grupo Atualizado Completo\",\n  \"description\": \"Substituição completa dos dados\",\n  \"active\": true,\n  \"permissions\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Substitui completamente os dados de um grupo existente."
+          }
+        },
+        {
+          "name": "Deletar Grupo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Remove um grupo pelo ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rotas (Permissões)",
+      "description": "Gerenciamento das rotas de permissão do sistema. Cada rota define quais métodos HTTP são permitidos em um determinado endpoint e domínio.",
+      "item": [
+        {
+          "name": "Listar Rotas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/rotas?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["rotas"],
+              "query": [
+                { "key": "page",   "value": "1",         "description": "Página (padrão: 1)" },
+                { "key": "limit",  "value": "10",        "description": "Itens por página (padrão: 10)" },
+                { "key": "route",  "value": "",          "description": "Filtro por nome da rota", "disabled": true },
+                { "key": "domain", "value": "localhost", "description": "Filtro por domínio", "disabled": true },
+                { "key": "active", "value": "true",      "description": "Filtro por status ativo: true | false", "disabled": true }
+              ]
+            },
+            "description": "Lista todas as rotas de permissão cadastradas com suporte a filtros e paginação."
+          }
+        },
+        {
+          "name": "Buscar Rota por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Retorna os dados de uma rota de permissão específica pelo ID."
+          }
+        },
+        {
+          "name": "Criar Rota",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('route_id', res.data._id);",
+                  "    console.log('route_id salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"route\": \"schools\",\n  \"domain\": \"localhost\",\n  \"active\": true,\n  \"get\": true,\n  \"post\": true,\n  \"put\": true,\n  \"patch\": true,\n  \"delete\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rotas",
+              "host": ["{{base_url}}"],
+              "path": ["rotas"]
+            },
+            "description": "Cadastra uma nova rota de permissão no sistema. O `route_id` é salvo automaticamente."
+          }
+        },
+        {
+          "name": "Atualizar Rota (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"active\": true,\n  \"get\": true,\n  \"post\": false,\n  \"put\": false,\n  \"patch\": true,\n  \"delete\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Atualiza parcialmente uma rota de permissão existente."
+          }
+        },
+        {
+          "name": "Atualizar Rota (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"route\": \"schools\",\n  \"domain\": \"localhost\",\n  \"active\": true,\n  \"get\": true,\n  \"post\": true,\n  \"put\": true,\n  \"patch\": true,\n  \"delete\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Substitui completamente os dados de uma rota de permissão."
+          }
+        },
+        {
+          "name": "Deletar Rota",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Remove uma rota de permissão pelo ID."
+          }
+        }
+      ]
+    }
+  ]
+}
