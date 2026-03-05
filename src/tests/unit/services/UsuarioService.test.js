@@ -108,7 +108,10 @@ describe('UsuarioService', () => {
       });
       grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
       await expect(
-        service.criar({ full_name: 'Teste', email: 'a@a.com', password: '123' }, req),
+        service.criar(
+          { full_name: 'Teste', email: 'a@a.com', password: '123' },
+          req,
+        ),
       ).rejects.toThrow('Email já está em uso.');
     });
 
@@ -118,14 +121,19 @@ describe('UsuarioService', () => {
       grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
       bcrypt.hash.mockRejectedValue(new Error('bcrypt error'));
       await expect(
-        service.criar({ full_name: 'Teste', email: 'a@a.com', password: '123' }, req),
+        service.criar(
+          { full_name: 'Teste', email: 'a@a.com', password: '123' },
+          req,
+        ),
       ).rejects.toThrow('bcrypt error');
     });
   });
 
   describe('listar', () => {
     it('deve retornar todos os usuários', async () => {
-      repositoryMock.listar.mockResolvedValue([{ _id: '1', full_name: 'Teste' }]);
+      repositoryMock.listar.mockResolvedValue([
+        { _id: '1', full_name: 'Teste' },
+      ]);
       const data = await service.listar({});
       expect(data).toEqual([{ _id: '1', full_name: 'Teste' }]);
     });
@@ -215,7 +223,10 @@ describe('UsuarioService', () => {
       );
     });
     it('deve retornar usuário se existir', async () => {
-      repositoryMock.buscarPorId.mockResolvedValue({ _id: '1', full_name: 'Teste' });
+      repositoryMock.buscarPorId.mockResolvedValue({
+        _id: '1',
+        full_name: 'Teste',
+      });
       const user = await service.ensureUserExists('1');
       expect(user).toEqual({ _id: '1', full_name: 'Teste' });
     });
@@ -241,7 +252,10 @@ describe('UsuarioService', () => {
         req,
       );
       await expect(
-        service.criar({ full_name: 'Outro', email: 'a@a.com', password: '456' }, req),
+        service.criar(
+          { full_name: 'Outro', email: 'a@a.com', password: '456' },
+          req,
+        ),
       ).rejects.toThrow('Email já está em uso.');
     });
   });
@@ -281,7 +295,10 @@ describe('UsuarioService', () => {
       const req = { user_id: 'user123' };
       repositoryMock.buscarPorEmail.mockRejectedValue(new Error('erro repo'));
       await expect(
-        service.criar({ full_name: 'Teste', email: 'a@a.com', password: '123' }, req),
+        service.criar(
+          { full_name: 'Teste', email: 'a@a.com', password: '123' },
+          req,
+        ),
       ).rejects.toThrow('erro repo');
     });
   });

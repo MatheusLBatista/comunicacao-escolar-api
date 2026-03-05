@@ -108,7 +108,10 @@ class AuthController {
     const senhaSchema = UsuarioUpdateSchema.parse({ password: senha });
 
     // atualiza a senha
-    await this.service.atualizarSenhaCodigo(password_recovery_code, senhaSchema);
+    await this.service.atualizarSenhaCodigo(
+      password_recovery_code,
+      senhaSchema,
+    );
 
     return CommonResponse.success(
       res,

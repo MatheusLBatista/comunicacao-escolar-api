@@ -64,8 +64,23 @@ export const fakeMappings = {
     password_recovery_code_exp: () => null,
   },
 
+  School: {
+    name: () => fakebr.company.companyName(),
+    tax_id: () => fakebr.br.cnpj(),
+    address: () => ({
+      street: fakebr.address.streetAddress(),
+      city: fakebr.address.city(),
+      state: fakebr.address.state(),
+      zip_code: fakebr.address.zipCode(),
+    }),
+    active: () => fakebr.random.boolean(),
+  },
+
   Chat: {
-    participants: () => [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()],
+    participants: () => [
+      new mongoose.Types.ObjectId(),
+      new mongoose.Types.ObjectId(),
+    ],
     type: () => fakebr.random.arrayElement(['private', 'daily_log_reply']),
     last_message_at: () => null,
   },
@@ -74,7 +89,10 @@ export const fakeMappings = {
     teacher_id: () => new mongoose.Types.ObjectId(),
     is_present: () => fakebr.random.boolean(),
     entries: () => [
-      { field_key: 'mood_status', value: fakebr.random.arrayElement(['happy', 'neutral', 'sad']) },
+      {
+        field_key: 'mood_status',
+        value: fakebr.random.arrayElement(['happy', 'neutral', 'sad']),
+      },
     ],
     attachments: () => [],
     read_at: () => null,
@@ -90,16 +108,6 @@ export const fakeMappings = {
         options: ['Feliz', 'Neutro', 'Triste'],
       },
     ],
-  },
-
-  School: {
-    cnpj: () => fakebr.br.cnpj(),
-    endereco: () => ({
-      logradouro: fakebr.address.streetAddress(),
-      cidade: fakebr.address.city(),
-      estado: fakebr.address.state(),
-      cep: fakebr.address.zipCode(),
-    }),
   },
 
   Like: {

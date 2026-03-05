@@ -103,7 +103,9 @@ class GrupoService {
         customMessage: messages.error.resourceNotFound('Rotas'),
       });
     }
-    const existRota = grupo.permissions.find((item) => item.route === rota.route);
+    const existRota = grupo.permissions.find(
+      (item) => item.route === rota.route,
+    );
     if (existRota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
