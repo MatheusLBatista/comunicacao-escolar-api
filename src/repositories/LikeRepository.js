@@ -1,8 +1,8 @@
-import LikeModel from   '../models/Like.js'
+import LikeModel from '../models/Like.js';
 
 class LikeRepository {
     constructor({likeModel = LikeModel} ){
-        this.model = likeModel()
+        this.model = likeModel();
     }
     async toglleLike(user, post){
         
