@@ -1,5 +1,5 @@
 import RouteModel from '../models/Route.js';
-import RouteFilterBuilder from './filters/RotaFilterBuilder.js';
+import RouteFilterBuilder from './filters/RouteFilterBuilder.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class RouteRepository {

@@ -63,7 +63,7 @@ class AuthMiddleware {
        */
 
       if (secret === process.env.JWT_SECRET_ACCESS_TOKEN) {
-        const tokenData = await this.service.carregatokens(decoded.id);
+        const tokenData = await this.service.loadTokens(decoded.id);
 
         if (!tokenData?.data?.refresh_token) {
           throw new CustomError({

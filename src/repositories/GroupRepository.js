@@ -2,7 +2,7 @@ import GroupModel from '../models/Group.js';
 import UsuarioModel from '../models/User.js';
 import RouteModel from '../models/Route.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
-import GroupFilterBuilder from './filters/GrupoFilterBuilder.js';
+import GroupFilterBuilder from './filters/GroupFilterBuilder.js';
 
 class GroupRepository {
   constructor({

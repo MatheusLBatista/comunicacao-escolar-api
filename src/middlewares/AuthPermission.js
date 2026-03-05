@@ -58,7 +58,7 @@ class AuthPermission {
        */
       const rotaReq = req.url.split('/').filter(Boolean)[0].split('?')[0];
 
-      const dominioReq = `localhost`; // domínio foi colocado como localhost para fins de teste
+      const dominioReq = process.env.PERMISSION_DOMAIN || 'localhost';
 
       // 4. Busca a rota atual no banco de dados
       const rotaDB = await this.Rota.findOne({

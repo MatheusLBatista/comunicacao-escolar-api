@@ -13,42 +13,42 @@ router
     '/grupos',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.list.bind(grupoController)),
+    asyncWrapper(groupController.list.bind(groupController)),
   )
   .get(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.list.bind(grupoController)),
+    asyncWrapper(groupController.list.bind(groupController)),
   )
   .post(
     '/grupos',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.create.bind(grupoController)),
+    asyncWrapper(groupController.create.bind(groupController)),
   )
   .post(
     '/grupos/:id/rotas',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.addRoute.bind(grupoController)),
+    asyncWrapper(groupController.addRoute.bind(groupController)),
   )
   .patch(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.update.bind(grupoController)),
+    asyncWrapper(groupController.update.bind(groupController)),
   )
   .put(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.update.bind(grupoController)),
+    asyncWrapper(groupController.update.bind(groupController)),
   )
   .delete(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(groupController.delete.bind(grupoController)),
+    asyncWrapper(groupController.delete.bind(groupController)),
   );
 export default router;

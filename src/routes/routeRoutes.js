@@ -13,37 +13,37 @@ router
     '/rotas',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(routeController.list.bind(rotaController)),
+    asyncWrapper(routeController.list.bind(routeController)),
   )
   .get(
     '/rotas/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(routeController.list.bind(rotaController)),
+    asyncWrapper(routeController.list.bind(routeController)),
   )
   .post(
     '/rotas',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(routeController.create.bind(rotaController)),
+    asyncWrapper(routeController.create.bind(routeController)),
   )
   .patch(
     '/rotas/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(routeController.update.bind(rotaController)),
+    asyncWrapper(routeController.update.bind(routeController)),
   )
   .put(
     '/rotas/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(routeController.update.bind(rotaController)),
+    asyncWrapper(routeController.update.bind(routeController)),
   )
   .delete(
     '/rotas/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(routeController.delete.bind(rotaController)),
+    asyncWrapper(routeController.delete.bind(routeController)),
   );
 
 export default router;

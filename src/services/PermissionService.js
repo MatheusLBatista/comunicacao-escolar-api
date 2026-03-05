@@ -22,9 +22,7 @@ class PermissionService {
     httpMethod = '',
   ) {
     try {
-      const usuario = await this.repository.getById(userId, {
-        groups: true,
-      });
+      const usuario = await this.repository.getById(userId);
       if (!usuario) {
         throw new CustomError({
           statusCode: 404,
@@ -35,7 +33,11 @@ class PermissionService {
         });
       }
 
-      if (route === 'usuarios' && params.id && params.id === userId) {
+      if (Array.isArray(usuario.groups) && usuario.groups.length > 0) {
+        await usuario.populate({ path: 'groups', select: 'permissions' });
+      }
+
+      if (route === 'users' && params.id && params.id === userId) {
         const metodosPermitidos = ['GET', 'PATCH', 'PUT', 'DELETE'];
         if (metodosPermitidos.includes(httpMethod)) {
           return true;
