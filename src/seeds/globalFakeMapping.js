@@ -110,16 +110,6 @@ export const fakeMappings = {
     ],
   },
 
-  School: {
-    cnpj: () => fakebr.br.cnpj(),
-    endereco: () => ({
-      logradouro: fakebr.address.streetAddress(),
-      cidade: fakebr.address.city(),
-      estado: fakebr.address.state(),
-      cep: fakebr.address.zipCode(),
-    }),
-  },
-
   Like: {
     post_id: () => new mongoose.Types.ObjectId(),
   },

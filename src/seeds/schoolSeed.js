@@ -1,5 +1,5 @@
-import School from '../models/School';
-import { fakeMappings } from './globalFakeMapping';
+import School from '../models/School.js';
+import { fakeMappings } from './globalFakeMapping.js';
 import seedRotas from './rotasSeed.js';
 import seedGrupos from './grupoSeed.js';
 
@@ -15,12 +15,7 @@ export default async function schoolSeed() {
     schools.push({
       name: fakeMappings.School.name(),
       tax_id: fakeMappings.School.tax_id(),
-      address: {
-        street: fakeMappings.School.address.street(),
-        city: fakeMappings.School.address.city(),
-        state: fakeMappings.School.address.state(),
-        zip_code: fakeMappings.School.address.zip_code(),
-      },
+      address: fakeMappings.School.address(),
       active: true,
     });
   }

@@ -9,7 +9,7 @@ try {
     `[${new Date().toLocaleString()}] - Iniciando criação das seeds...`,
   );
 
-  // await userSeed();
+  await userSeed();
   await schoolSeed();
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
