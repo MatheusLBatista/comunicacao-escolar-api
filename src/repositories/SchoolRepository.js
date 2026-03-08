@@ -1,6 +1,7 @@
 import School from '../models/School.js';
 import mongoose from 'mongoose';
 import { CustomError, messages } from '../utils/helpers/index.js';
+import SchoolFilterBuilder from './filters/SchoolFilterBuilder.js';
 
 class SchoolRepository {
   constructor(SchoolModel = School) {
@@ -28,15 +29,53 @@ class SchoolRepository {
         });
       }
 
-      const dataWithStats = {
+      return {
         ...data.toObject(),
       };
-
-      return dataWithStats;
     }
 
-    const data = await this.model.find();
-    return data;
+    const {
+      name,
+      tax_id,
+      active,
+      city,
+      state,
+      zipCode,
+      address,
+      page = 1,
+    } = req.query;
+
+    const limit = Math.min(parseInt(req.query.limit, 10) || 10, 100);
+
+    const filterBuilder = new SchoolFilterBuilder()
+      .withName(name || '')
+      .withTaxId(tax_id || '')
+      .withActive(active)
+      .withCity(city || '')
+      .withState(state || '')
+      .withZipCode(zipCode || '')
+      .withAddress(address || '');
+
+    const filters = filterBuilder.build();
+
+    const options = {
+      page: parseInt(page, 10),
+      limit,
+      sort: { name: 1 },
+    };
+
+    const result = await this.model.paginate(filters, options);
+
+    result.docs = result.docs.map((doc) => {
+      const schoolObj =
+        typeof doc.toObject === 'function' ? doc.toObject() : doc;
+
+      return {
+        ...schoolObj,
+      };
+    });
+
+    return result;
   }
 
   async update(id, parsedData) {
