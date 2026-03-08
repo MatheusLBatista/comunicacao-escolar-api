@@ -43,6 +43,17 @@ class SchoolRepository {
 
     return document;
   }
+
+  async findByTaxId(tax_id, ignoredId=null) {
+    const filter = { tax_id };
+
+    if(ignoredId) {
+      filter._id = { $ne: ignoredId };
+    }
+    const document = await this.model.findOne(filter);
+
+    return document;
+  }
 }
 
 export default SchoolRepository;

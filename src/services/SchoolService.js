@@ -11,6 +11,9 @@ class SchoolService {
   }
 
   async create(parsedData) {
+    await this.validateName(parsedData.name);
+    await this.validateTaxId(parsedData.tax_id);
+
     const data = await this.repository.create(parsedData);
 
     return data;
@@ -32,6 +35,20 @@ class SchoolService {
         field: 'name',
         details: [{ path: 'name', message: 'Name already exists.' }],
         customMessage: 'Name already exists.',
+      });
+    }
+  }
+
+  async validateTaxId(tax_id, id = null) {
+    const existentTaxId = await this.repository.findByName(tax_id);
+
+    if (existentTaxId) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: 'validationError',
+        field: 'tax_id',
+        details: [{ path: 'tax_id', message: 'Tax ID already exists.' }],
+        customMessage: 'Tax ID already exists.',
       });
     }
   }
