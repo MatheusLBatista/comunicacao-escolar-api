@@ -13,7 +13,7 @@ class SchoolRepository {
   }
 
   async list(req) {
-    const { id } = req.params || null;
+    const id = req?.params?.id;
 
     if (id) {
       const data = await this.model.findById(id);
