@@ -69,6 +69,7 @@ export const fakeMappings = {
     tax_id: () => fakebr.br.cnpj(),
     address: () => ({
       street: fakebr.address.streetAddress(),
+      number: fakebr.random.number({ min: 1, max: 1000 }).toString(),
       city: fakebr.address.city(),
       state: fakebr.address.state(),
       zip_code: fakebr.address.zipCode(),
