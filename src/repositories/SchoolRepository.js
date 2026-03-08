@@ -3,7 +3,7 @@ import { CustomError, messages } from '../utils/helpers/index.js';
 
 class SchoolRepository {
   constructor(SchoolModel = School) {
-    this.model = SchoolModel
+    this.model = SchoolModel;
   }
 
   async create(schoolData) {
@@ -14,17 +14,17 @@ class SchoolRepository {
   async list(req) {
     const { id } = req.params || null;
 
-    if(id) {
+    if (id) {
       const data = await this.model.findById(id);
 
-      if(!data) {
+      if (!data) {
         throw new CustomError({
           statusCode: 404,
           errorType: 'resourceNotFound',
-          field:'School',
+          field: 'School',
           details: [],
-          customMessage: messages.error.resourceNotFound('School')
-        })
+          customMessage: messages.error.resourceNotFound('School'),
+        });
       }
 
       const dataWithStats = {
@@ -38,10 +38,10 @@ class SchoolRepository {
     return data;
   }
 
-  async findByName(name, ignoredId=null) {
+  async findByName(name, ignoredId = null) {
     const filter = { name };
 
-    if(ignoredId) {
+    if (ignoredId) {
       filter._id = { $ne: ignoredId };
     }
     const document = await this.model.findOne(filter);
@@ -49,15 +49,39 @@ class SchoolRepository {
     return document;
   }
 
-  async findByTaxId(tax_id, ignoredId=null) {
+  async findByTaxId(tax_id, ignoredId = null) {
     const filter = { tax_id };
 
-    if(ignoredId) {
+    if (ignoredId) {
       filter._id = { $ne: ignoredId };
     }
     const document = await this.model.findOne(filter);
 
     return document;
+  }
+
+  async findById(id, includeTokens = false) {
+    let query = this.model.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+
+    if (includeTokens) {
+      query = query.select('+refreshtoken +accesstoken');
+    }
+
+    const School = await query;
+
+    if (!School) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'School',
+        details: [],
+        customMessage: messages.error.resourceNotFound('School'),
+      });
+    }
+
+    return School;
   }
 }
 

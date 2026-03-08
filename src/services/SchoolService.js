@@ -25,6 +25,10 @@ class SchoolService {
     return data;
   }
 
+  async update(id, parsedData) {
+
+  }
+
   async validateName(name, id = null) {
     const existentName = await this.repository.findByName(name);
 
@@ -52,6 +56,21 @@ class SchoolService {
       });
     }
   }
+
+  async ensureSchoolExists(id){
+        const existentSchool = await this.repository.findById(id);
+        if (!existentSchool) {
+            throw new CustomError({
+                statusCode: 404,
+                errorType: 'resourceNotFound',
+                field: 'School',
+                details: [],
+                customMessage: messages.error.resourceNotFound('School'),
+            });
+        }
+
+        return existentSchool;
+    }
 }
 
 export default SchoolService;
