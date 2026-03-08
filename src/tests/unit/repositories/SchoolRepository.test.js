@@ -15,6 +15,7 @@ describe('SchoolRepository', () => {
       findByIdAndUpdate: jest.fn(),
       findByIdAndDelete: jest.fn(),
       findOne: jest.fn(),
+      paginate: jest.fn(),
     };
 
     repository = new SchoolRepository(mockModel);
@@ -42,14 +43,39 @@ describe('SchoolRepository', () => {
 
   describe('list', () => {
     it('should list all schools', async () => {
-      const schools = [{ name: 'School 1' }];
+      const docData = { name: 'School 1' };
+      const mockDoc = { toObject: jest.fn().mockReturnValue(docData) };
+      const paginateResult = {
+        docs: [mockDoc],
+        totalDocs: 1,
+        page: 1,
+        limit: 10,
+      };
 
-      mockModel.find.mockResolvedValue(schools);
+      mockModel.paginate.mockResolvedValue(paginateResult);
+
+      const result = await repository.list({ params: {}, query: {} });
+
+      expect(mockModel.paginate).toHaveBeenCalled();
+      expect(result.docs).toEqual([docData]);
+    });
+
+    it('should handle missing query parameters gracefully', async () => {
+      const docData = { name: 'School 1' };
+      const mockDoc = { name: 'School 1' };
+      const paginateResult = {
+        docs: [mockDoc],
+        totalDocs: 1,
+        page: 1,
+        limit: 10,
+      };
+
+      mockModel.paginate.mockResolvedValue(paginateResult);
 
       const result = await repository.list({ params: {} });
 
-      expect(mockModel.find).toHaveBeenCalled();
-      expect(result).toEqual(schools);
+      expect(mockModel.paginate).toHaveBeenCalled();
+      expect(result.docs).toEqual([docData]);
     });
 
     it('should return a school by id', async () => {
@@ -110,6 +136,12 @@ describe('SchoolRepository', () => {
 
       expect(mockModel.findByIdAndDelete).toHaveBeenCalledWith('1');
       expect(result).toEqual(deletedSchool);
+    });
+
+    it('should throw error if school not found during delete', async () => {
+      mockModel.findByIdAndDelete.mockResolvedValue(null);
+
+      await expect(repository.delete('1')).rejects.toThrow(CustomError);
     });
   });
 

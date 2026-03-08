@@ -43,9 +43,9 @@ class SchoolRepository {
       zip_code,
       address,
       page = 1,
-    } = req.query;
+    } = req?.query || {};
 
-    const limit = Math.min(parseInt(req.query.limit, 10) || 10, 100);
+    const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
 
     const filterBuilder = new SchoolFilterBuilder()
       .withName(name || '')
@@ -98,6 +98,17 @@ class SchoolRepository {
 
   async delete(id) {
     const data = await this.model.findByIdAndDelete(id);
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'School',
+        details: [],
+        customMessage: messages.error.resourceNotFound('School'),
+      });
+    }
+
     return data;
   }
 
