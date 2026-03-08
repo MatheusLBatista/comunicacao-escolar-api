@@ -7,7 +7,7 @@ import auth from './authRoutes.js';
 import usuarios from './usuarioRoutes.js';
 import grupos from './grupoRoutes.js';
 import rotas from './rotaRoutes.js';
-import school from './schoolRoutes.js';
+// import school from './schoolRoutes.js';
 
 import dotenv from 'dotenv';
 
@@ -28,7 +28,7 @@ const routes = (app) => {
     swaggerUI.setup(swaggerDocs)(req, res, next);
   });
 
-  app.use(express.json(), auth, usuarios, grupos, rotas, school);
+  app.use(express.json(), auth, usuarios, grupos, rotas);
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Rota não encontrada' });

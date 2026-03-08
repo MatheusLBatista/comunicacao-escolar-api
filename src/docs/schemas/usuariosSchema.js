@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 import mongooseSchemaJsonSchema from 'mongoose-schema-jsonschema';
 import removeFieldsRecursively from '../../utils/swagger_utils/removeFields.js';
-import Usuario from '../../models/Usuario.js';
+import User from '../../models/User.js';
 import { deepCopy, generateExample } from '../utils/schemaGenerate.js';
 
 mongooseSchemaJsonSchema(mongoose);
 
-const usuarioJsonSchema = Usuario.schema.jsonSchema();
+const usuarioJsonSchema = User.schema.jsonSchema();
 delete usuarioJsonSchema.properties.__v;
 
 const usuariosSchemas = {
@@ -158,7 +158,7 @@ Object.entries(removalMapping).forEach(([schemaKey, fields]) => {
   }
 });
 
-const usuarioMongooseSchema = Usuario.schema;
+const usuarioMongooseSchema = User.schema;
 
 usuariosSchemas.UsuarioItem.example = await generateExample(
   usuariosSchemas.UsuarioItem,

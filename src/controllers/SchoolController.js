@@ -1,4 +1,4 @@
-import School from '../services/SchoolService.js';
+// import School from '../services/SchoolService.js';
 import {
   SchoolSchema,
   SchoolUpdateSchema,
@@ -7,14 +7,11 @@ import {
   SchoolQuerySchema,
   SchoolIdSchema,
 } from '../utils/validators/schemas/zod/querys/SchoolQuerySchema.js';
-import {
-  CommonResponse,
-  HttpStatusCodes,
-} from '../utils/helpers/index.js';
+import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class SchoolController {
   constructor() {
-    this.service = new School();
+    // this.service = new School();
   }
 
   async create(req, res) {
@@ -47,7 +44,12 @@ class SchoolController {
     const parsedData = SchoolUpdateSchema.parse(req.body);
     const data = await this.service.update(id, parsedData, req);
 
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'School updated successfully.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'School updated successfully.',
+    );
   }
 
   async delete(req, res) {
@@ -56,6 +58,13 @@ class SchoolController {
 
     const data = await this.service.delete(id, req);
 
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'School deleted successfully.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'School deleted successfully.',
+    );
   }
 }
+
+export default SchoolController;
