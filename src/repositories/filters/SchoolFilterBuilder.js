@@ -14,9 +14,9 @@ class SchoolFilterBuilder {
     return this;
   }
 
-  withTaxId(taxId) {
-    if (taxId) {
-      this.filters.tax_id = { $regex: taxId, $options: "i" };
+  withTaxId(tax_id) {
+    if (tax_id) {
+      this.filters.tax_id = { $regex: tax_id, $options: "i" };
     }
 
     return this;
@@ -46,9 +46,9 @@ class SchoolFilterBuilder {
     return this;
   }
 
-  withZipCode(zipCode) {
-    if (zipCode) {
-      this.filters["address.zip_code"] = { $regex: zipCode, $options: "i" };
+  withZipCode(zip_code) {
+    if (zip_code) {
+      this.filters["address.zip_code"] = { $regex: zip_code, $options: "i" };
     }
 
     return this;

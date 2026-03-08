@@ -40,7 +40,7 @@ class SchoolRepository {
       active,
       city,
       state,
-      zipCode,
+      zip_code,
       address,
       page = 1,
     } = req.query;
@@ -53,7 +53,7 @@ class SchoolRepository {
       .withActive(active)
       .withCity(city || '')
       .withState(state || '')
-      .withZipCode(zipCode || '')
+      .withZipCode(zip_code || '')
       .withAddress(address || '');
 
     const filters = filterBuilder.build();
