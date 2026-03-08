@@ -18,7 +18,9 @@ class SchoolController {
     const parsedData = SchoolSchema.parse(req.body);
     const data = await this.service.create(parsedData, req);
 
-    return CommonResponse.created(res, data);
+    let cleanSchool = data.toObject();
+
+    return CommonResponse.created(res, cleanSchool);
   }
 
   async list(req, res) {

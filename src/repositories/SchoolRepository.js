@@ -32,6 +32,17 @@ class SchoolRepository {
     const data = await this.model.find();
     return data;
   }
+
+  async findByName(name, ignoredId=null) {
+    const filter = { name };
+
+    if(ignoredId) {
+      filter._id = { $ne: ignoredId };
+    }
+    const document = await this.model.findOne(filter);
+
+    return document;
+  }
 }
 
 export default SchoolRepository;
