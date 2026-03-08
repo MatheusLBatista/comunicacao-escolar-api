@@ -6,6 +6,11 @@ class SchoolRepository {
     this.model = SchoolModel
   }
 
+  async create(schoolData) {
+    const school = new this.model(schoolData);
+    return await school.save();
+  }
+
   async list(req) {
     const { id } = req.params || null;
 

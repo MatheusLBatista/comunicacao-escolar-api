@@ -40,7 +40,7 @@ class SchoolService {
   }
 
   async validateTaxId(tax_id, id = null) {
-    const existentTaxId = await this.repository.findByName(tax_id);
+    const existentTaxId = await this.repository.findByTaxId(tax_id);
 
     if (existentTaxId) {
       throw new CustomError({
