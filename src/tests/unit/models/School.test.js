@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import School from '../../../models/School.js';
 
 describe('School Model', () => {
-
   it('should create a school document correctly', () => {
     const school = new School({
       name: 'Test School',
@@ -12,8 +11,8 @@ describe('School Model', () => {
         number: '100',
         city: 'Test City',
         state: 'TS',
-        zip_code: '12345'
-      }
+        zip_code: '12345',
+      },
     });
 
     expect(school.name).toBe('Test School');
@@ -25,7 +24,7 @@ describe('School Model', () => {
   it('should have active default as true', () => {
     const school = new School({
       name: 'Test School',
-      tax_id: '123456789'
+      tax_id: '123456789',
     });
 
     expect(school.active).toBe(true);
@@ -56,5 +55,4 @@ describe('School Model', () => {
   it('should have mongoosePaginate plugin applied', () => {
     expect(typeof School.paginate).toBe('function');
   });
-
 });
