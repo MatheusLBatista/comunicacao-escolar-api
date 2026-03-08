@@ -26,11 +26,20 @@ class SchoolService {
   }
 
   async update(id, parsedData) {
+    await this.ensureSchoolExists(id);
 
+    if (parsedData.name) {
+      await this.validateName(parsedData.name, id);
+    }
+
+    delete parsedData.tax_id;
+
+    const data = await this.repository.update(id, parsedData);
+    return data;
   }
 
   async validateName(name, id = null) {
-    const existentName = await this.repository.findByName(name);
+    const existentName = await this.repository.findByName(name, id);
 
     if (existentName) {
       throw new CustomError({
@@ -57,20 +66,20 @@ class SchoolService {
     }
   }
 
-  async ensureSchoolExists(id){
-        const existentSchool = await this.repository.findById(id);
-        if (!existentSchool) {
-            throw new CustomError({
-                statusCode: 404,
-                errorType: 'resourceNotFound',
-                field: 'School',
-                details: [],
-                customMessage: messages.error.resourceNotFound('School'),
-            });
-        }
-
-        return existentSchool;
+  async ensureSchoolExists(id) {
+    const existentSchool = await this.repository.findById(id);
+    if (!existentSchool) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'School',
+        details: [],
+        customMessage: messages.error.resourceNotFound('School'),
+      });
     }
+
+    return existentSchool;
+  }
 }
 
 export default SchoolService;

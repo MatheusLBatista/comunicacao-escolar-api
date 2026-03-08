@@ -1,4 +1,5 @@
 import School from '../models/School.js';
+import mongoose from 'mongoose';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class SchoolRepository {
@@ -36,6 +37,24 @@ class SchoolRepository {
 
     const data = await this.model.find();
     return data;
+  }
+
+  async update(id, parsedData) {
+    const School = await this.model.findByIdAndUpdate(id, parsedData, {
+      new: true,
+    });
+
+    if (!School) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'School',
+        details: [],
+        customMessage: messages.error.resourceNotFound('School'),
+      });
+    }
+
+    return School;
   }
 
   async findByName(name, ignoredId = null) {
