@@ -1,6 +1,4 @@
 import express from 'express';
-import AuthMiddleware from '../middlewares/AuthMiddleware.js';
-import AuthPermission from '../middlewares/AuthPermission.js';
 import SchoolController from '../controllers/SchoolController.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
 
@@ -11,38 +9,38 @@ const schoolController = new SchoolController();
 router
   .get(
     '/schools',
-    AuthMiddleware,
-    AuthPermission,
+    // AuthMiddleware,
+    // AuthPermission,
     asyncWrapper(schoolController.list.bind(schoolController)),
   )
   .get(
     '/schools/:id',
-    AuthMiddleware,
-    AuthPermission,
+    // AuthMiddleware,
+    // AuthPermission,
     asyncWrapper(schoolController.list.bind(schoolController)),
   )
   .post(
     '/schools',
-    AuthMiddleware,
-    AuthPermission,
+    // AuthMiddleware,
+    // AuthPermission,
     asyncWrapper(schoolController.create.bind(schoolController)),
   )
   .patch(
     '/schools/:id',
-    AuthMiddleware,
-    AuthPermission,
+    // AuthMiddleware,
+    // AuthPermission,
     asyncWrapper(schoolController.update.bind(schoolController)),
   )
   .put(
     '/schools/:id',
-    AuthMiddleware,
-    AuthPermission,
+    // AuthMiddleware,
+    // AuthPermission,
     asyncWrapper(schoolController.update.bind(schoolController)),
   )
   .delete(
     '/schools/:id',
-    AuthMiddleware,
-    AuthPermission,
+    // AuthMiddleware,
+    // AuthPermission,
     asyncWrapper(schoolController.delete.bind(schoolController)),
   );
 
