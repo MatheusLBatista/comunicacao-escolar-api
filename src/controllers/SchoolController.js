@@ -40,4 +40,22 @@ class SchoolController {
     return CommonResponse.success(res, data);
   }
 
+  async update(req, res) {
+    const { id } = req.params;
+    SchoolIdSchema.parse(id);
+
+    const parsedData = SchoolUpdateSchema.parse(req.body);
+    const data = await this.service.update(id, parsedData, req);
+
+    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'School updated successfully.');
+  }
+
+  async delete(req, res) {
+    const { id } = req.params || {};
+    SchoolIdSchema.parse(id);
+
+    const data = await this.service.delete(id, req);
+
+    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'School deleted successfully.');
+  }
 }
