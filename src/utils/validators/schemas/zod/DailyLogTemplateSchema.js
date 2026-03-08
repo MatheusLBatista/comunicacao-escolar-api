@@ -14,7 +14,8 @@ const TemplateFieldSchema = z
       if (!Array.isArray(val.options) || val.options.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Campo options é obrigatório para campos do tipo select e deve conter pelo menos 1 opção.',
+          message:
+            'Campo options é obrigatório para campos do tipo select e deve conter pelo menos 1 opção.',
           path: ['options'],
         });
       }
@@ -24,7 +25,9 @@ const TemplateFieldSchema = z
 const DailyLogTemplateSchema = z.object({
   school_id: ObjectIdSchema,
   student_id: z.union([ObjectIdSchema, z.null()]).optional(),
-  fields: z.array(TemplateFieldSchema).min(1, 'O template precisa ter ao menos 1 campo.'),
+  fields: z
+    .array(TemplateFieldSchema)
+    .min(1, 'O template precisa ter ao menos 1 campo.'),
   active: z.boolean().optional().default(true),
 });
 

@@ -38,6 +38,13 @@ class SchoolService {
     return data;
   }
 
+  async delete(id) {
+    await this.ensureSchoolExists(id);
+
+    const data = await this.repository.delete(id);
+    return data;
+  }
+
   async validateName(name, id = null) {
     const existentName = await this.repository.findByName(name, id);
 

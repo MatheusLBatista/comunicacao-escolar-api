@@ -18,7 +18,7 @@ class SchoolController {
     const parsedData = SchoolSchema.parse(req.body);
     const data = await this.service.create(parsedData, req);
 
-    let cleanSchool = data.toObject();
+    const cleanSchool = data.toObject();
 
     return CommonResponse.created(res, cleanSchool);
   }

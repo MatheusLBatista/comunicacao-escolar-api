@@ -7,10 +7,7 @@ import {
   DailyLogQuerySchema,
   DailyLogIdSchema,
 } from '../utils/validators/schemas/zod/querys/DailyLogQuerySchema.js';
-import {
-  CommonResponse,
-  HttpStatusCodes,
-} from '../utils/helpers/index.js';
+import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class DailyLogController {
   constructor() {
@@ -47,7 +44,12 @@ class DailyLogController {
     const parsedData = DailyLogUpdateSchema.parse(req.body);
     const data = await this.service.update(id, parsedData, req);
 
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Daily log updated successfully.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Daily log updated successfully.',
+    );
   }
 
   async delete(req, res) {
@@ -56,7 +58,12 @@ class DailyLogController {
 
     const data = await this.service.delete(id, req);
 
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Daily log deleted successfully.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Daily log deleted successfully.',
+    );
   }
 
   async markAsRead(req, res) {
@@ -64,7 +71,12 @@ class DailyLogController {
     DailyLogIdSchema.parse(id);
 
     const data = await this.service.markAsRead(id, req);
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Daily log marked as read.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Daily log marked as read.',
+    );
   }
 }
 

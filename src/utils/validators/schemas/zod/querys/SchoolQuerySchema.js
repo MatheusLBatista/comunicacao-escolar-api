@@ -7,6 +7,4 @@ export const SchoolIdSchema = z
     message: 'ID inválido',
   });
 
-export const SchoolQuerySchema = z.object({
-  
-});
+export const SchoolQuerySchema = z.object({});

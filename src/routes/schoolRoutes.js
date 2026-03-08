@@ -1,6 +1,4 @@
 import express from 'express';
-import AuthMiddleware from '../middlewares/AuthMiddleware.js';
-import AuthPermission from '../middlewares/AuthPermission.js';
 import SchoolController from '../controllers/SchoolController.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
 

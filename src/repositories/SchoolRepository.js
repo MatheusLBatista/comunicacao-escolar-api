@@ -40,11 +40,11 @@ class SchoolRepository {
   }
 
   async update(id, parsedData) {
-    const School = await this.model.findByIdAndUpdate(id, parsedData, {
+    const data = await this.model.findByIdAndUpdate(id, parsedData, {
       new: true,
     });
 
-    if (!School) {
+    if (!data) {
       throw new CustomError({
         statusCode: 404,
         errorType: 'resourceNotFound',
@@ -54,7 +54,12 @@ class SchoolRepository {
       });
     }
 
-    return School;
+    return data;
+  }
+
+  async delete(id) {
+    const data = await this.model.findByIdAndDelete(id);
+    return data;
   }
 
   async findByName(name, ignoredId = null) {

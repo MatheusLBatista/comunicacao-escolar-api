@@ -7,10 +7,7 @@ import {
   DailyLogTemplateQuerySchema,
   DailyLogTemplateIdSchema,
 } from '../utils/validators/schemas/zod/querys/DailyLogTemplateQuerySchema.js';
-import {
-  CommonResponse,
-  HttpStatusCodes,
-} from '../utils/helpers/index.js';
+import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class DailyLogTemplateController {
   constructor() {
@@ -47,7 +44,12 @@ class DailyLogTemplateController {
     const parsedData = DailyLogTemplateUpdateSchema.parse(req.body);
     const data = await this.service.update(id, parsedData, req);
 
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Template updated successfully.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Template updated successfully.',
+    );
   }
 
   async delete(req, res) {
@@ -56,7 +58,12 @@ class DailyLogTemplateController {
 
     const data = await this.service.delete(id, req);
 
-    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Template deleted successfully.');
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Template deleted successfully.',
+    );
   }
 }
 
