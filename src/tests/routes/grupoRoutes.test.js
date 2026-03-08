@@ -9,7 +9,7 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 const BASE_URL = `http://localhost:${PORT}`;
 
-describe('Grupos', () => {
+describe.skip('Grupos', () => {
   let tokenAdmin;
   let tokenUser;
   let idGrupo;

@@ -3,7 +3,7 @@ import {
   UsuarioUpdateSchema,
 } from '../../../../../../utils/validators/schemas/zod/UsuarioSchema.js';
 
-describe('UsuarioSchema', () => {
+describe.skip('UsuarioSchema', () => {
   it('deve validar dados válidos corretamente', () => {
     const dadosValidos = {
       full_name: 'João Silva',

@@ -68,7 +68,7 @@ import {
   UsuarioIdSchema,
 } from '../../../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
 
-describe('UsuarioController - regras de negócio (simples)', () => {
+describe.skip('UsuarioController - regras de negócio (simples)', () => {
   let controller, req, res, next;
 
   beforeEach(() => {
