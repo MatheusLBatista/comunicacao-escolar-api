@@ -1,4 +1,4 @@
-// import School from '../services/SchoolService.js';
+import SchoolService from '../services/SchoolService.js';
 import {
   SchoolSchema,
   SchoolUpdateSchema,
@@ -11,7 +11,7 @@ import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class SchoolController {
   constructor() {
-    // this.service = new School();
+    this.service = new SchoolService();
   }
 
   async create(req, res) {

@@ -2,8 +2,8 @@ import School from '../models/School.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class SchoolRepository {
-  constructor() {
-    this.model = new School()
+  constructor(SchoolModel = School) {
+    this.model = SchoolModel
   }
 
   async list(req) {
@@ -33,3 +33,5 @@ class SchoolRepository {
     return data;
   }
 }
+
+export default SchoolRepository;
