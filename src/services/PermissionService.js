@@ -1,4 +1,4 @@
-import Usuario from '../models/Usuario.js';
+import User from '../models/User.js';
 import Grupo from '../models/Grupo.js';
 import Rota from '../models/Rota.js';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
@@ -7,7 +7,7 @@ import { CustomError, messages } from '../utils/helpers/index.js';
 class PermissionService {
   constructor() {
     this.repository = new UsuarioRepository();
-    this.Usuario = Usuario;
+    this.User = User;
     this.Grupo = Grupo;
     this.Rota = Rota;
     this.messages = messages;

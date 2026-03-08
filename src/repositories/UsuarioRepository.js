@@ -1,9 +1,9 @@
-import UsuarioFilterBuilder from './filters/UsuarioFilterBuilder.js';
-import UsuarioModel from '../models/Usuario.js';
+// import UsuarioFilterBuilder from './filters/UsuarioFilterBuilder.js';
+import User from '../models/User.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class UsuarioRepository {
-  constructor({ usuarioModel = UsuarioModel } = {}) {
+  constructor({ usuarioModel = User } = {}) {
     this.model = usuarioModel;
   }
 

@@ -7,6 +7,7 @@ import auth from './authRoutes.js';
 import usuarios from './usuarioRoutes.js';
 import grupos from './grupoRoutes.js';
 import rotas from './rotaRoutes.js';
+// import school from './schoolRoutes.js';
 
 import dotenv from 'dotenv';
 
