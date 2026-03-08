@@ -20,6 +20,7 @@ export const SchoolQuerySchema = z.object({
 
   active: z
     .union([z.boolean(), z.enum(['true', 'false'])])
+    .transform((val) => val === true || val === 'true')
     .optional(),
 
   city: z
@@ -42,15 +43,13 @@ export const SchoolQuerySchema = z.object({
     .min(1, 'O endereço deve conter pelo menos 1 caractere')
     .optional(),
 
-  page: z
-    .coerce
+  page: z.coerce
     .number()
     .int()
     .positive({ message: 'A página deve ser um número positivo' })
     .optional(),
 
-  limit: z
-    .coerce
+  limit: z.coerce
     .number()
     .int()
     .positive({ message: 'O limite deve ser um número positivo' })
