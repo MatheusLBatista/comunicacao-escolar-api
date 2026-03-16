@@ -17,6 +17,7 @@ class School {
         },
         address: {
           street: { type: String },
+          number: { type: String },
           city: { type: String },
           state: { type: String },
           zip_code: { type: String },

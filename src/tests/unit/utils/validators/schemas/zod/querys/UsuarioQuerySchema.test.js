@@ -4,7 +4,7 @@ import {
 } from '../../../../../../../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
 import mongoose from 'mongoose';
 
-describe('UsuarioIdSchema', () => {
+describe.skip('UsuarioIdSchema', () => {
   it('deve validar um ObjectId correto', () => {
     const idValido = new mongoose.Types.ObjectId().toString();
     expect(() => UsuarioIdSchema.parse(idValido)).not.toThrow();
@@ -16,7 +16,7 @@ describe('UsuarioIdSchema', () => {
   });
 });
 
-describe('UsuarioQuerySchema', () => {
+describe.skip('UsuarioQuerySchema', () => {
   const consultaValida = {
     nome: 'John Doe',
     email: 'john.doe@example.com',

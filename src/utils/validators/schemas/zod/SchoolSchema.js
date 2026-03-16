@@ -28,6 +28,7 @@ const SchoolSchema = z.object({
   tax_id: taxIdSchema,
   address: z.object({
     street: z.string().min(1, 'Campo rua é obrigatório.'),
+    number: z.string().min(1, 'Campo número é obrigatório.'),
     city: z.string().min(1, 'Campo cidade é obrigatório.'),
     state: z.string().min(1, 'Campo estado é obrigatório.'),
     zip_code: zipCodeSchema,

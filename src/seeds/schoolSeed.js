@@ -10,7 +10,8 @@ export default async function schoolSeed() {
     name: 'Escola Comunica Alunos',
     tax_id: '12345678000190',
     address: {
-      street: 'Rua Principal, 100',
+      street: 'Rua Principal',
+      number: '333',
       city: 'São Paulo',
       state: 'SP',
       zip_code: '01001000',
