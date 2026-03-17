@@ -1,28 +1,26 @@
-// src/repositories/GrupoRepository.js
-
-import GrupoModel from '../models/Grupo.js';
-import User from '../models/User.js';
-import RotaModel from '../models/Rota.js';
+import GroupModel from '../models/Group.js';
+import UserModel from '../models/User.js';
+import RouteModel from '../models/Route.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
-import GrupoFilterBuilder from './filters/GrupoFilterBuilder.js';
+import GroupFilterBuilder from './filters/GroupFilterBuilder.js';
 
-class GrupoRepository {
+class GroupRepository {
   constructor({
-    grupoModel = GrupoModel,
-    rotaModel = RotaModel,
-    usuarioModel = User,
+    groupModel = GroupModel,
+    routeModel = RouteModel,
+    userModel = UserModel,
     customError = CustomError,
   } = {}) {
-    this.model = grupoModel;
-    this.rotaModel = rotaModel;
-    this.usuarioModel = usuarioModel;
+    this.model = groupModel;
+    this.routeModel = routeModel;
+    this.userModel = userModel;
     this.customError = customError;
   }
 
   /**
    * Verificar se há permissões duplicadas na requisição.
    */
-  async obterParesRotaDominioUnicos(permissions) {
+  async getUniqueDomainRoutePairs(permissions) {
     const combinations = permissions.map(
       (p) => `${p.route}_${p.domain || 'undefined'}`,
     );
@@ -36,7 +34,7 @@ class GrupoRepository {
   /**
    * Obter permissões duplicadas na requisição.
    */
-  obterPermissoesDuplicadas(permissions, combinationsReceived) {
+  getDuplicatePermissions(permissions, combinationsReceived) {
     const combinations = permissions.map(
       (permission) => `${permission.route}_${permission.domain}`,
     );
@@ -62,7 +60,7 @@ class GrupoRepository {
   /**
    * Buscar grupo por nome e, opcionalmente, por um ID diferente.
    */
-  async buscarPorNome(nome, idIgnorado = null) {
+  async getByName(nome, idIgnorado = null) {
     // Criar o filtro base
     const filtro = { nome };
 
@@ -83,7 +81,7 @@ class GrupoRepository {
    * para retornar um usuário e ser utilizado em outras funções de validação
    * cujo listar não atende por exigir req.
    */
-  async buscarPorId(id) {
+  async getById(id) {
     const group = await this.model.findById(id);
     if (!group) {
       throw new this.customError({
@@ -101,7 +99,7 @@ class GrupoRepository {
    * para saber se a permissão existe no cadastrado de rotas e domínios
    * O método deve buscar combinando rota e domínio
    */
-  async buscarPorPermissao(permissions) {
+  async findByPermission(permissions) {
     // find recursivo lendo um array de objetos de permissão,
     // Mapear as permissões para combinar route e domain
     const query = permissions.map((p) => ({
@@ -109,14 +107,14 @@ class GrupoRepository {
       domain: p.domain || null,
     }));
 
-    const rotasEncontradas = await this.rotaModel.find({ $or: query });
-    return rotasEncontradas;
+    const foundRoutes = await this.routeModel.find({ $or: query });
+    return foundRoutes;
   }
 
   /**
    * Método listar grupo tanto com filtro quanto sem filtro ou por ID, caso seja passado
    */
-  async listar(req) {
+  async list(req) {
     try {
       const id = req.params.id || null;
 
@@ -153,7 +151,7 @@ class GrupoRepository {
       const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
       // Usar o GrupoFilterBuilder injetado para construir os filtros
-      const filterBuilder = new GrupoFilterBuilder()
+      const filterBuilder = new GroupFilterBuilder()
         .comNome(nome || '')
         .comDescricao(descricao || '')
         .comAtivo(ativo || '');
@@ -213,12 +211,12 @@ class GrupoRepository {
    * @param {String} id - ID do grupo.
    * @returns {Boolean} - true se houver usuários associados, false caso contrário.
    */
-  async verificarUsuariosAssociados(id) {
+  async hasAssociatedUsers(id) {
     try {
-      const usuariosAssociados = await this.usuarioModel.findOne({
+      const associatedUsers = await this.userModel.findOne({
         groups: id,
       });
-      return usuariosAssociados; // Retorna true se houver usuários, false caso contrário
+      return associatedUsers; // Retorna true se houver usuários, false caso contrário
     } catch (error) {
       console.error('Erro ao verificar usuários associados:', error);
       throw new this.customError({
@@ -232,13 +230,13 @@ class GrupoRepository {
   }
 
   // Método criar grupo
-  async criar(parsedData) {
+  async create(parsedData) {
     const grupo = new this.model(parsedData);
     return await grupo.save();
   }
 
   // Método atualizar grupo
-  async atualizar(id, parsedData) {
+  async update(id, parsedData) {
     try {
       const grupo = await this.model.findByIdAndUpdate(id, parsedData, {
         new: true,
@@ -274,7 +272,7 @@ class GrupoRepository {
   /**
    * Método deletar grupo.
    */
-  async deletar(id) {
+  async delete(id) {
     try {
       const grupoDeletado = await this.model.findByIdAndDelete(id);
 
@@ -304,11 +302,11 @@ class GrupoRepository {
       });
     }
   }
-  async adiciotarRota(id, rota) {
+  async addRoute(id, route) {
     try {
-      const grupo = await this.model.findById(id);
-      grupo.permissions.push(rota);
-      const data = await grupo.save();
+      const group = await this.model.findById(id);
+      group.permissions.push(route);
+      const data = await group.save();
       console.log('aqui');
       return data;
     } catch (error) {
@@ -329,4 +327,4 @@ class GrupoRepository {
   }
 }
 
-export default GrupoRepository;
+export default GroupRepository;

@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
-export const GrupoIdSchema = z
+export const GroupIdSchema = z
   .string()
   .refine((id) => mongoose.Types.ObjectId.isValid(id), {
     message: 'ID inválido',
   });
 
-export const GrupoQuerySchema = z.object({
+export const GroupQuerySchema = z.object({
   nome: z
     .string()
     .optional()

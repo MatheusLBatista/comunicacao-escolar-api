@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
-export const RotaIdSchema = z
+export const RouteIdSchema = z
   .string()
   .refine((id) => mongoose.Types.ObjectId.isValid(id), {
     message: 'ID inválido',
   });
 
-export const RotaQuerySchema = z.object({
+export const RouteQuerySchema = z.object({
   rota: z
     .string()
     .optional()

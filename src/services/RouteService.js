@@ -1,23 +1,23 @@
-import RotaRepository from '../repositories/RotaRepository.js';
+import RouteRepository from '../repositories/RouteRepository.js';
 import {
   CustomError,
   HttpStatusCodes,
   messages,
 } from '../utils/helpers/index.js';
 
-class RotaService {
+class RouteService {
   constructor() {
-    this.repository = new RotaRepository();
+    this.repository = new RouteRepository();
   }
 
-  async listar(req) {
-    const data = await this.repository.listar(req);
+  async list(req) {
+    const data = await this.repository.list(req);
     return data;
   }
 
-  async criar(req) {
+  async create(req) {
     console.log('Estou no criar em RotaService');
-    const rota = await this.repository.buscarRotaPorNome(req.route);
+    const rota = await this.repository.getRouteByName(req.route);
     if (rota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
@@ -30,12 +30,12 @@ class RotaService {
         ),
       });
     }
-    const data = await this.repository.criar(req);
+    const data = await this.repository.create(req);
     return data;
   }
 
-  async atualizar(req, id) {
-    const rota = await this.repository.buscarRotaPorNome(req.route, id);
+  async update(req, id) {
+    const rota = await this.repository.getRouteByName(req.route, id);
     if (rota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
@@ -48,12 +48,12 @@ class RotaService {
         ),
       });
     }
-    const data = await this.repository.atualizar(req, id);
+    const data = await this.repository.update(req, id);
     return data;
   }
 
-  async deletar(req, id) {
-    const rota = await this.repository.buscarPorId(id);
+  async delete(req, id) {
+    const rota = await this.repository.getById(id);
     if (!rota) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
@@ -75,8 +75,8 @@ class RotaService {
         ),
       });
     }
-    const data = await this.repository.deletar(id);
+    const data = await this.repository.delete(id);
     return data;
   }
 }
-export default RotaService;
+export default RouteService;

@@ -2,7 +2,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import faker from 'faker-br';
 import dotenv from 'dotenv';
-import '../../routes/grupoRoutes.js';
+import '../../routes/groupRoutes.js';
 
 dotenv.config();
 

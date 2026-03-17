@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Rota {
+class Route {
   constructor() {
-    const rotaSchema = new mongoose.Schema(
+    const routeSchema = new mongoose.Schema(
       {
         route: { type: String, index: true, trim: true, lowercase: true },
         domain: { type: String, required: true },
@@ -17,18 +17,18 @@ class Rota {
       { timestamps: true },
     );
 
-    rotaSchema.index({ route: 1, domain: 1 }, { unique: true });
-    rotaSchema.plugin(mongoosePaginate);
+    routeSchema.index({ route: 1, domain: 1 }, { unique: true });
+    routeSchema.plugin(mongoosePaginate);
 
-    rotaSchema.pre('save', function (next) {
+    routeSchema.pre('save', function (next) {
       if (this.route) {
         this.route = this.route.toLowerCase();
       }
       next();
     });
 
-    this.model = mongoose.model('rotas', rotaSchema);
+    this.model = mongoose.model('rotas', routeSchema);
   }
 }
 
-export default new Rota().model;
+export default new Route().model;

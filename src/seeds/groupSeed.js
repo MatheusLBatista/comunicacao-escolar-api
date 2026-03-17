@@ -1,31 +1,24 @@
-import Grupo from '../models/Grupo.js';
+import Grupo from '../models/Group.js';
 
-export default async function seedGrupos(rotas) {
+export default async function seedGroups(rotas) {
   await Grupo.deleteMany();
 
-  const grupos = [];
+  const groups = [];
 
-  const grupoAdministrador = {
+  const adminGroup = {
     nome: 'Administrador',
     descricao: 'Grupo com acesso total a todas as rotas',
     ativo: true,
     permissions: rotas.map((r) => ({ ...r.toObject(), _id: r._id })),
   };
-  grupos.push(grupoAdministrador);
+  groups.push(adminGroup);
 
-  const grupoVisitante = {
-    nome: 'User',
-    descricao: 'Grupo com acesso aos visualização de pontos históricos',
+  const basicGroup = {
+    nome: 'BasicUser',
+    descricao: 'Grupo base para usuários não administradores',
     ativo: true,
     permissions: rotas.map((r) => {
-      if (
-        r.route === 'usuarios' ||
-        r.route === 'usuarios:id' ||
-        r.route === 'grupos' ||
-        r.route === 'grupos:id' ||
-        r.route === 'rotas' ||
-        r.route === 'rotas:id'
-      ) {
+      if (r.route === 'users' || r.route === 'grupos' || r.route === 'rotas') {
         return {
           ...r.toObject(),
           _id: r._id,
@@ -37,6 +30,7 @@ export default async function seedGrupos(rotas) {
           delete: false,
         };
       }
+
       return {
         ...r.toObject(),
         _id: r._id,
@@ -48,9 +42,9 @@ export default async function seedGrupos(rotas) {
       };
     }),
   };
-  grupos.push(grupoVisitante);
+  groups.push(basicGroup);
 
-  const result = await Grupo.collection.insertMany(grupos);
+  await Grupo.collection.insertMany(groups);
 
   // Retorna grupos atualizados
   return Grupo.find();

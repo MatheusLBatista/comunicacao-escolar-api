@@ -1,19 +1,17 @@
-// src/controllers/RotaController.js
-
-import RotaService from '../services/RotaService.js';
+import RouteService from '../services/RouteService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
 import {
-  RotaQuerySchema,
-  RotaIdSchema,
-} from '../utils/validators/schemas/zod/querys/RotaQuerySchema.js';
+  RouteQuerySchema,
+  RouteIdSchema,
+} from '../utils/validators/schemas/zod/querys/RouteQuerySchema.js';
 import {
-  RotaSchema,
-  RotaUpdateSchema,
-} from '../utils/validators/schemas/zod/RotaSchema.js';
+  RouteSchema,
+  RouteUpdateSchema,
+} from '../utils/validators/schemas/zod/RouteSchema.js';
 
-class RotaController {
+class RouteController {
   constructor() {
-    this.service = new RotaService();
+    this.service = new RouteService();
   }
 
   /**
@@ -25,7 +23,7 @@ class RotaController {
    * Lista grupos. Se um ID é fornecido, retorna um único objeto.
    * Caso contrário, retorna todos os objetos com suporte a filtros e paginação.
    */
-  async listar(req, res) {
+  async list(req, res) {
     console.log(
       'Estou no listar em RotaController, enviando req para RotaService',
     );
@@ -33,17 +31,17 @@ class RotaController {
     //1ª Validação estrutural - validação do ID passado por parâmetro
     const { id } = req.params || null;
     if (id) {
-      RotaIdSchema.parse(id); // Lança erro automaticamente se inválido
+      RouteIdSchema.parse(id); // Lança erro automaticamente se inválido
     }
 
     // 2º Validação estrutural - validar os demais campos passados por query
     const query = req.query || {};
     if (Object.keys(query).length !== 0) {
-      const validatedQuery = RotaQuerySchema.parse(req.query);
+      const validatedQuery = RouteQuerySchema.parse(req.query);
     }
 
     // Chama o serviço para listar as rotas
-    const data = await this.service.listar(req);
+    const data = await this.service.list(req);
 
     console.log('Estou retornando os dados em RotaController');
     return CommonResponse.success(res, data);
@@ -52,12 +50,12 @@ class RotaController {
   /**
    * Cria uma nova rota.
    */
-  async criar(req, res) {
+  async create(req, res) {
     console.log('Estou no criar em RotaController');
 
     // Validação dos dados de entrada usando Zod (estrutural)
-    const parsedData = RotaSchema.parse(req.body);
-    const data = await this.service.criar(parsedData);
+    const parsedData = RouteSchema.parse(req.body);
+    const data = await this.service.create(parsedData);
     // Se chegou até aqui, é porque deu tudo certo, retornar 201 Created
     return CommonResponse.created(res, data);
   }
@@ -65,20 +63,20 @@ class RotaController {
   /**
    *  Atualiza uma rota existente.
    */
-  async atualizar(req, res) {
+  async update(req, res) {
     console.log('Estou no atualizar em RotaController');
 
     // 1ª Validação estrutural - validação do ID passado por parâmetro
     const { id } = req.params || null;
     if (id) {
-      RotaIdSchema.parse(id); // Lança erro automaticamente se inválido
+      RouteIdSchema.parse(id); // Lança erro automaticamente se inválido
     }
 
     // 2ª Validação estrutural - validar os demais campos passados por query
-    const parsedData = RotaUpdateSchema.parse(req.body);
+    const parsedData = RouteUpdateSchema.parse(req.body);
 
     // Chama o serviço para atualizar a rota
-    const data = await this.service.atualizar(parsedData, id);
+    const data = await this.service.update(parsedData, id);
 
     // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
     return CommonResponse.success(res, data);
@@ -87,19 +85,19 @@ class RotaController {
   /**
    * Método para deletar uma rota existente.
    */
-  async deletar(req, res) {
+  async delete(req, res) {
     console.log('Estou no deletar em RotaController');
 
     // 1ª Validação estrutural - validação do ID passado por parâmetro
     const { id } = req.params || null;
     if (id) {
-      RotaIdSchema.parse(id); // Lança erro automaticamente se inválido
+      RouteIdSchema.parse(id); // Lança erro automaticamente se inválido
     }
 
     // Chama o serviço para deletar a rota
-    const data = await this.service.deletar(req, id);
+    const data = await this.service.delete(req, id);
     return CommonResponse.success(res, data);
   }
 }
 
-export default RotaController;
+export default RouteController;

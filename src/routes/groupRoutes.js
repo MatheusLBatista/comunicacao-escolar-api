@@ -1,54 +1,54 @@
 import express from 'express';
 import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import AuthPermission from '../middlewares/AuthPermission.js';
-import GrupoController from '../controllers/GrupoController.js';
+import GroupController from '../controllers/GroupController.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
 
 const router = express.Router();
 
-const grupoController = new GrupoController(); // Instância da classe
+const groupController = new GroupController(); // Instância da classe
 
 router
   .get(
     '/grupos',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.listar.bind(grupoController)),
+    asyncWrapper(groupController.list.bind(groupController)),
   )
   .get(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.listar.bind(grupoController)),
+    asyncWrapper(groupController.list.bind(groupController)),
   )
   .post(
     '/grupos',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.criar.bind(grupoController)),
+    asyncWrapper(groupController.create.bind(groupController)),
   )
   .post(
     '/grupos/:id/rotas',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.adicionarRota.bind(grupoController)),
+    asyncWrapper(groupController.addRoute.bind(groupController)),
   )
   .patch(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.atualizar.bind(grupoController)),
+    asyncWrapper(groupController.update.bind(groupController)),
   )
   .put(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.atualizar.bind(grupoController)),
+    asyncWrapper(groupController.update.bind(groupController)),
   )
   .delete(
     '/grupos/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(grupoController.deletar.bind(grupoController)),
+    asyncWrapper(groupController.delete.bind(groupController)),
   );
 export default router;
