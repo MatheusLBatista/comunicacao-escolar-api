@@ -1,19 +1,19 @@
 import GroupModel from '../models/Group.js';
-import UsuarioModel from '../models/User.js';
+import UserModel from '../models/User.js';
 import RouteModel from '../models/Route.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 import GroupFilterBuilder from './filters/GroupFilterBuilder.js';
 
 class GroupRepository {
   constructor({
-    grupoModel = GroupModel,
-    rotaModel = RouteModel,
-    usuarioModel = UsuarioModel,
+    groupModel = GroupModel,
+    routeModel = RouteModel,
+    userModel = UserModel,
     customError = CustomError,
   } = {}) {
-    this.model = grupoModel;
-    this.rotaModel = rotaModel;
-    this.usuarioModel = usuarioModel;
+    this.model = groupModel;
+    this.routeModel = routeModel;
+    this.userModel = userModel;
     this.customError = customError;
   }
 
@@ -34,7 +34,7 @@ class GroupRepository {
   /**
    * Obter permissões duplicadas na requisição.
    */
-  obterPermissoesDuplicadas(permissions, combinationsReceived) {
+  getDuplicatePermissions(permissions, combinationsReceived) {
     const combinations = permissions.map(
       (permission) => `${permission.route}_${permission.domain}`,
     );
@@ -99,7 +99,7 @@ class GroupRepository {
    * para saber se a permissão existe no cadastrado de rotas e domínios
    * O método deve buscar combinando rota e domínio
    */
-  async buscarPorPermissao(permissions) {
+  async findByPermission(permissions) {
     // find recursivo lendo um array de objetos de permissão,
     // Mapear as permissões para combinar route e domain
     const query = permissions.map((p) => ({
@@ -107,8 +107,8 @@ class GroupRepository {
       domain: p.domain || null,
     }));
 
-    const rotasEncontradas = await this.rotaModel.find({ $or: query });
-    return rotasEncontradas;
+    const foundRoutes = await this.routeModel.find({ $or: query });
+    return foundRoutes;
   }
 
   /**
@@ -211,12 +211,12 @@ class GroupRepository {
    * @param {String} id - ID do grupo.
    * @returns {Boolean} - true se houver usuários associados, false caso contrário.
    */
-  async verificarUsuariosAssociados(id) {
+  async hasAssociatedUsers(id) {
     try {
-      const usuariosAssociados = await this.usuarioModel.findOne({
+      const associatedUsers = await this.userModel.findOne({
         groups: id,
       });
-      return usuariosAssociados; // Retorna true se houver usuários, false caso contrário
+      return associatedUsers; // Retorna true se houver usuários, false caso contrário
     } catch (error) {
       console.error('Erro ao verificar usuários associados:', error);
       throw new this.customError({
@@ -302,11 +302,11 @@ class GroupRepository {
       });
     }
   }
-  async adiciotarRota(id, rota) {
+  async addRoute(id, route) {
     try {
-      const grupo = await this.model.findById(id);
-      grupo.permissions.push(rota);
-      const data = await grupo.save();
+      const group = await this.model.findById(id);
+      group.permissions.push(route);
+      const data = await group.save();
       console.log('aqui');
       return data;
     } catch (error) {

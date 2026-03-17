@@ -7,24 +7,27 @@ import seedGroups from './groupSeed.js';
 
 export default async function userSeed() {
   await User.deleteMany({});
-  await School.deleteMany({});
 
   const rotasCompletas = await seedRoutes();
   const grupos = await seedGroups(rotasCompletas);
-  const userGroup = grupos.find((g) => g.nome === 'User');
+  const userGroup = grupos.find((g) => g.nome === 'BasicUser');
 
-  // MOCK: Create default school
-  const school = await School.create({
-    nome: 'Escola ComunicaAlunos',
-    cnpj: '12.345.678/0001-90',
-    endereco: {
-      logradouro: 'Rua Principal, 100',
-      cidade: 'São Paulo',
-      estado: 'SP',
-      cep: '01001-000',
-    },
-    ativo: true,
-  });
+  let school = await School.findOne({ active: true }).sort({ created_at: 1 });
+
+  if (!school) {
+    school = await School.create({
+      name: 'Escola ComunicaAlunos',
+      tax_id: '12345678000190',
+      address: {
+        street: 'Rua Principal',
+        number: '100',
+        city: 'São Paulo',
+        state: 'SP',
+        zip_code: '01001000',
+      },
+      active: true,
+    });
+  }
 
   const defaultPassword = await bcrypt.hash(
     process.env.ADMIN_PASSWORD || 'Senha@123',
@@ -123,7 +126,7 @@ export default async function userSeed() {
     email: process.env.ADMIN_EMAIL || 'admin@admin.com',
   });
 
-  console.log(`School created: ${school.nome} (${school._id})`);
+  console.log(`School created: ${school.name} (${school._id})`);
   console.log(`Admin: ${createdAdmin.email}`);
   console.log(`${teachers.length} teachers created`);
   console.log(`${parents.length} parents created`);

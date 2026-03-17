@@ -114,6 +114,7 @@ class AuthPermission {
         metodo,
         req.params,
         req.method,
+        req.originalUrl,
       );
 
       if (!hasPermission) {

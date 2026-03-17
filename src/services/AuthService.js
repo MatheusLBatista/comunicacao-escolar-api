@@ -93,6 +93,23 @@ class AuthService {
       });
     }
 
+    const memberships = Array.isArray(userEncontrado.memberships)
+      ? userEncontrado.memberships
+      : [];
+    const hasNonStudentRole = memberships.some(
+      (membership) => membership?.role && membership.role !== 'student',
+    );
+
+    if (!hasNonStudentRole) {
+      throw new CustomError({
+        statusCode: 401,
+        errorType: 'unauthorized',
+        field: 'Role',
+        details: [],
+        customMessage: 'Este perfil não possui acesso ao aplicativo.',
+      });
+    }
+
     // Gerar novo access token utilizando a instância injetada
     const access_token = await this.TokenUtil.generateAccessToken(
       userEncontrado._id,

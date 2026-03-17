@@ -10,8 +10,8 @@ import {
 class GroupService {
   constructor() {
     this.repository = new GroupRepository();
-    this.usuarioRepository = new UserRepository();
-    this.rotaRepository = new RouteRepository();
+    this.userRepository = new UserRepository();
+    this.routeRepository = new RouteRepository();
   }
 
   async list(req) {
@@ -20,8 +20,8 @@ class GroupService {
   }
 
   async create(parsedData) {
-    const grupo = await this.repository.getByName(parsedData.nome);
-    if (grupo) {
+    const group = await this.repository.getByName(parsedData.nome);
+    if (group) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
         errorType: 'resourceConflict',
@@ -39,9 +39,9 @@ class GroupService {
 
   async update(parsedData, id, user) {
     await this.repository.getById(id);
-    const grupo = await this.repository.getByName(parsedData.nome, id);
+    const group = await this.repository.getByName(parsedData.nome, id);
     await this.checkGroup(user, id);
-    if (grupo) {
+    if (group) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
         errorType: 'resourceConflict',
@@ -53,8 +53,7 @@ class GroupService {
         ),
       });
     }
-    const usuario = await this.usuarioRepository.getById(user.id);
-    const grupoUsuario = usuario.toObject();
+    await this.userRepository.getById(user.id);
     const data = await this.repository.update(id, parsedData);
     return data;
   }
@@ -66,10 +65,10 @@ class GroupService {
   }
 
   async checkGroup(user, id) {
-    const usuario = await this.usuarioRepository.getById(user.id);
-    const grupoUsuario = usuario.toObject();
-    for (const grupo of grupoUsuario.groups) {
-      if (grupo._id.toString() === id) {
+    const userDoc = await this.userRepository.getById(user.id);
+    const userGroup = userDoc.toObject();
+    for (const group of userGroup.groups) {
+      if (group._id.toString() === id) {
         throw new CustomError({
           statusCode: HttpStatusCodes.FORBIDDEN.code,
           errorType: 'Forbidden',
@@ -80,37 +79,37 @@ class GroupService {
       }
     }
   }
-  async addRoute(idGrupo, idRota) {
-    const grupo = await this.repository.getById(idGrupo);
-    if (!grupo) {
+  async addRoute(groupId, routeId) {
+    const group = await this.repository.getById(groupId);
+    if (!group) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
-        errorType: 'resourceNotFuond',
-        filed: 'Grupos',
+        errorType: 'resourceNotFound',
+        field: 'Grupos',
         details: [],
         customMessage: messages.error.resourceNotFound('Grupos'),
       });
     }
 
-    const rota = await this.routeRepository.getById(idRota);
+    const route = await this.routeRepository.getById(routeId);
 
-    if (!rota) {
+    if (!route) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
-        errorType: 'resourceNotFuond',
-        filed: 'Rotas',
+        errorType: 'resourceNotFound',
+        field: 'Rotas',
         details: [],
         customMessage: messages.error.resourceNotFound('Rotas'),
       });
     }
-    const existRota = grupo.permissions.find(
-      (item) => item.route === rota.route,
+    const existingRoute = group.permissions.find(
+      (item) => item.route === route.route,
     );
-    if (existRota) {
+    if (existingRoute) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
         errorType: 'resourceConflict',
-        filed: 'Rotas',
+        field: 'Rotas',
         details: [],
         customMessage: messages.error.resourceConflict(
           'Grupos',
@@ -118,7 +117,7 @@ class GroupService {
         ),
       });
     }
-    const data = await this.repository.adiciotarRota(idGrupo, rota);
+    const data = await this.repository.addRoute(groupId, route);
 
     return data;
   }

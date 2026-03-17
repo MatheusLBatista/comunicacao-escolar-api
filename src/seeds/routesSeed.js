@@ -3,34 +3,20 @@ import Rota from '../models/Route.js';
 export default async function seedRoutes() {
   await Rota.deleteMany();
 
-  const rotas_array = [
-    'rotas',
-    'rotas:id',
-    'grupos',
-    'grupos:id',
-    'usuarios',
-    'usuarios:id',
-    'usuarios:id/foto',
+  const routesArray = [
     'users',
-    'users:id',
-    'escolas',
-    'escolas:id',
     'schools',
-    'schools:id',
+    'grupos',
+    'rotas',
     'posts',
-    'posts:id',
     'daily-logs',
-    'daily-logs:id',
     'daily-log-templates',
-    'daily-log-templates:id',
     'conversas',
-    'conversas:id',
     'mensagens',
-    'mensagens:id',
   ];
 
-  const rotas = rotas_array.map((rota) => ({
-    route: rota,
+  const routes = routesArray.map((route) => ({
+    route,
     domain: 'localhost',
     active: true,
     get: true,
@@ -40,7 +26,7 @@ export default async function seedRoutes() {
     delete: true,
   }));
 
-  const result = await Rota.collection.insertMany(rotas);
+  await Rota.collection.insertMany(routes);
 
   return Rota.find();
 }
