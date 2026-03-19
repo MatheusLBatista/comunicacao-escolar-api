@@ -1,0 +1,112 @@
+import DailyLog from '../models/DailyLog.js';
+import School from '../models/School.js';
+import User from '../models/User.js';
+
+function getRandomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function buildEntries(isPresent) {
+  if (!isPresent) {
+    return [
+      {
+        field_key: 'absence_reason',
+        value: 'Faltou por motivo de saúde.',
+      },
+    ];
+  }
+
+  const moods = ['feliz', 'neutro', 'cansado'];
+  const participation = ['alta', 'media', 'baixa'];
+  const meals = ['comeu bem', 'comeu pouco', 'recusou parte da refeicao'];
+
+  return [
+    {
+      field_key: 'mood_status',
+      value: getRandomItem(moods),
+    },
+    {
+      field_key: 'participation',
+      value: getRandomItem(participation),
+    },
+    {
+      field_key: 'food_intake',
+      value: getRandomItem(meals),
+    },
+  ];
+}
+
+export default async function dailyLogSeed() {
+  await DailyLog.deleteMany({});
+
+  const school = await School.findOne({ active: true }).sort({ created_at: 1 });
+
+  if (!school) {
+    console.log('Nenhuma escola ativa encontrada para seed de daily logs.');
+    return { insertedCount: 0 };
+  }
+
+  const [students, teachers] = await Promise.all([
+    User.find({
+      active: true,
+      memberships: {
+        $elemMatch: {
+          school_id: school._id,
+          role: 'student',
+        },
+      },
+    }),
+    User.find({
+      active: true,
+      memberships: {
+        $elemMatch: {
+          school_id: school._id,
+          role: 'teacher',
+        },
+      },
+    }),
+  ]);
+
+  if (!students.length || !teachers.length) {
+    console.log(
+      'Seed de daily logs ignorada: faltam alunos ou professores para a escola ativa.',
+    );
+    return { insertedCount: 0 };
+  }
+
+  const logs = [];
+  const studentsToSeed = students.slice(0, 5);
+  const daysToSeed = 5;
+
+  for (const student of studentsToSeed) {
+    for (let dayOffset = 0; dayOffset < daysToSeed; dayOffset++) {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - dayOffset);
+
+      const isPresent = Math.random() >= 0.2;
+      const teacher = getRandomItem(teachers);
+
+      logs.push({
+        school_id: school._id,
+        student_id: student._id,
+        teacher_id: teacher._id,
+        is_present: isPresent,
+        entries: buildEntries(isPresent),
+        attachments: [],
+        read_at: null,
+        date,
+        ativo: true,
+      });
+    }
+  }
+
+  const result = await DailyLog.collection.insertMany(logs);
+
+  console.log(`Seeded ${result.insertedCount} daily logs.`);
+
+  return {
+    insertedCount: result.insertedCount,
+    schoolId: school._id,
+  };
+}
