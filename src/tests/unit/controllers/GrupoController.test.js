@@ -1,5 +1,5 @@
-import GroupController from '/../controllers/GroupController.js'';
-import GroupService from '../../services/GroupService.js'';
+import GroupController from '/../controllers/GroupController.js';
+import GroupService from '../../services/GroupService.js';
 import {
   GroupSchema,
   GroupUpdateSchema,
