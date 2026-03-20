@@ -30,7 +30,7 @@ class PostService {
             if (parsedData.target?.target_id == null || parsedData.target?.target_id == "") {
                 throw new CustomError({
                     statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
-                    errorType: 'UNPROCESSABLE_ENTITY',
+                    errorType: 'unprocessableEntity',
                     field: 'anuncio',
                     details: [{ path: 'anuncio', message: 'O anuncio não possui o target_id exigido quando o scope é diferente de "all"' }],
                     customMessage: 'target_id não é válido ou está ausente.',
@@ -39,6 +39,8 @@ class PostService {
         }
         
         const data = await this.repository.createModel(parsedData)
+
+        // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
         return data
     }
 }

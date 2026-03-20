@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import DbConnect from '../config/DbConnect.js';
 import schoolSeed from './schoolSeed.js';
 import userSeed from './userSeed.js';
+import postSeed from './postSeed.js';
 
 await DbConnect.conectar();
 
@@ -10,8 +11,9 @@ try {
     `[${new Date().toLocaleString()}] - Iniciando criação das seeds...`,
   );
 
-  await schoolSeed();
-  await userSeed();
+  const schools = await schoolSeed();
+  const users = await userSeed();
+  await postSeed(schools, users)
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
 } catch (error) {
