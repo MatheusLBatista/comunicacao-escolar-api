@@ -125,8 +125,8 @@ export const fakeMappings = {
 
   Post: {
     author_id: () => new mongoose.Types.ObjectId(),
-    titulo: () => fakebr.lorem.sentence(),
-    conteudo: () => fakebr.lorem.paragraphs(2),
+    title: () => fakebr.lorem.sentence(),
+    content: () => fakebr.lorem.paragraphs(2),
     target: () => ({
       scope: 'all',
       target_id: null,

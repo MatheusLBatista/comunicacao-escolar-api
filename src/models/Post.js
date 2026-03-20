@@ -16,11 +16,11 @@ class Post {
           ref: 'usuarios',
           required: true,
         },
-        titulo: {
+        title: {
           type: String,
           required: true,
         },
-        conteudo: {
+        content: {
           type: String,
           required: true,
         },
@@ -36,7 +36,7 @@ class Post {
           },
         },
         attachments: [{ type: String }],
-        ativo: {
+        active: {
           type: Boolean,
           default: true,
         },
