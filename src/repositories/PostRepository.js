@@ -6,7 +6,8 @@ class PostRepository {
     }
 
     async createModel(parsedData) {
-        const data = await this.model.insertOne({conteudo: parsedData.conteudo})
+        const data = await this.model.insertOne(parsedData)
+        return data
     }
 }
 
