@@ -6,6 +6,8 @@ import postSeed from './postSeed.js';
 
 import dailyLogTemplateSeed from './dailyLogTemplateSeed.js';
 import dailyLogSeed from './dailyLogSeed.js';
+import conversationSeed from './conversationSeed.js';
+import messageSeed from './messageSeed.js';
 
 
 await DbConnect.conectar();
@@ -23,6 +25,8 @@ try {
   await postSeed(schools, users)
   await dailyLogTemplateSeed();
   await dailyLogSeed();
+  await conversationSeed();
+  await messageSeed();
 
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);

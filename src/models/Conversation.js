@@ -1,20 +1,21 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-class Chat {
+class Conversation {
   constructor() {
-    const chatSchema = new mongoose.Schema(
+    const conversationSchema = new mongoose.Schema(
       {
         school_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'escolas',
+          ref: 'Schools',
           required: true,
           index: true,
         },
         participants: [
           {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'usuarios',
+            ref: 'Users',
+            required: true,
           },
         ],
         type: {
@@ -26,7 +27,7 @@ class Chat {
           type: Date,
           default: null,
         },
-        ativo: {
+        active: {
           type: Boolean,
           default: true,
         },
@@ -34,10 +35,12 @@ class Chat {
       { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
     );
 
-    chatSchema.plugin(mongoosePaginate);
+    conversationSchema.index({ school_id: 1, last_message_at: -1 });
 
-    this.model = mongoose.model('Conversations', chatSchema);
+    conversationSchema.plugin(mongoosePaginate);
+
+    this.model = mongoose.model('Conversations', conversationSchema);
   }
 }
 
-export default new Chat().model;
+export default new Conversation().model;
