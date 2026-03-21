@@ -22,6 +22,11 @@ class DailyLog {
           ref: 'usuarios',
           required: true,
         },
+        dailylogtemplate_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'daily_log_templates',
+          required: true,
+        },
         is_present: {
           type: Boolean,
           required: true,
@@ -34,6 +39,10 @@ class DailyLog {
           },
         ],
         attachments: [{ type: String }],
+        observation: {
+          type: String,
+          default: '',
+        },
         read_at: {
           type: Date,
           default: null,

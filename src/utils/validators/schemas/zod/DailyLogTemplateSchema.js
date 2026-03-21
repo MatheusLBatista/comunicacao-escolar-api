@@ -28,7 +28,7 @@ const DailyLogTemplateSchema = z.object({
   fields: z
     .array(TemplateFieldSchema)
     .min(1, 'O template precisa ter ao menos 1 campo.'),
-  active: z.boolean().optional().default(true),
+  ativo: z.boolean().optional().default(true),
 });
 
 const DailyLogTemplateUpdateSchema = DailyLogTemplateSchema.partial();

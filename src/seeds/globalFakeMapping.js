@@ -88,6 +88,7 @@ export const fakeMappings = {
 
   DailyLog: {
     teacher_id: () => new mongoose.Types.ObjectId(),
+    dailylogtemplate_id: () => new mongoose.Types.ObjectId(),
     is_present: () => fakebr.random.boolean(),
     entries: () => [
       {
@@ -96,6 +97,7 @@ export const fakeMappings = {
       },
     ],
     attachments: () => [],
+    observation: () => fakebr.lorem.sentence(),
     read_at: () => null,
     date: () => new Date().toISOString(),
   },
