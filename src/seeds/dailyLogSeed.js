@@ -1,4 +1,5 @@
 import DailyLog from '../models/DailyLog.js';
+import DailyLogTemplate from '../models/DailyLogTemplate.js';
 import School from '../models/School.js';
 import User from '../models/User.js';
 
@@ -67,9 +68,14 @@ export default async function dailyLogSeed() {
     }),
   ]);
 
-  if (!students.length || !teachers.length) {
+  const templates = await DailyLogTemplate.find({
+    school_id: school._id,
+    ativo: true,
+  });
+
+  if (!students.length || !teachers.length || !templates.length) {
     console.log(
-      'Seed de daily logs ignorada: faltam alunos ou professores para a escola ativa.',
+      'Seed de daily logs ignorada: faltam alunos, professores ou templates para a escola ativa.',
     );
     return { insertedCount: 0 };
   }
@@ -86,11 +92,13 @@ export default async function dailyLogSeed() {
 
       const isPresent = Math.random() >= 0.2;
       const teacher = getRandomItem(teachers);
+      const template = getRandomItem(templates);
 
       logs.push({
         school_id: school._id,
         student_id: student._id,
         teacher_id: teacher._id,
+        dailylogtemplate_id: template._id,
         is_present: isPresent,
         entries: buildEntries(isPresent),
         attachments: [],

@@ -8,7 +8,9 @@ import users from './userRoutes.js';
 import grupos from './groupRoutes.js';
 import rotas from './routeRoutes.js';
 import school from './schoolRoutes.js';
-import post from './postRoutes.js'
+import post from './postRoutes.js';
+import dailyLog from './dailyLogRoutes.js';
+import dailyLogTemplate from './dailyLogTemplateRoutes.js';
 
 import dotenv from 'dotenv';
 
@@ -29,7 +31,17 @@ const routes = (app) => {
     swaggerUI.setup(swaggerDocs)(req, res, next);
   });
 
-  app.use(express.json(), auth, users, grupos, rotas, school, post);
+  app.use(
+    express.json(),
+    auth,
+    users,
+    grupos,
+    rotas,
+    school,
+    post,
+    dailyLog,
+    dailyLogTemplate,
+  );
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Rota não encontrada' });
