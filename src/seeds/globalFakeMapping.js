@@ -77,7 +77,7 @@ export const fakeMappings = {
     active: () => fakebr.random.boolean(),
   },
 
-  Chat: {
+  Conversation: {
     participants: () => [
       new mongoose.Types.ObjectId(),
       new mongoose.Types.ObjectId(),
@@ -118,7 +118,7 @@ export const fakeMappings = {
   Message: {
     conversation_id: () => new mongoose.Types.ObjectId(),
     sender_id: () => new mongoose.Types.ObjectId(),
-    texto: () => fakebr.lorem.sentence(),
+    text: () => fakebr.lorem.sentence(),
     read_by: () => [],
     sent_at: () => new Date().toISOString(),
   },

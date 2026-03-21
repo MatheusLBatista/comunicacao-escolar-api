@@ -7,16 +7,16 @@ class Message {
       {
         conversation_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'conversas',
+          ref: 'Conversations',
           required: true,
           index: true,
         },
         sender_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
           required: true,
         },
-        texto: {
+        text: {
           type: String,
           required: true,
         },
@@ -33,13 +33,15 @@ class Message {
           type: Date,
           default: Date.now,
         },
-        ativo: {
+        active: {
           type: Boolean,
           default: true,
         },
       },
       { timestamps: false },
     );
+
+    messageSchema.index({ conversation_id: 1, sent_at: -1 });
 
     messageSchema.plugin(mongoosePaginate);
 
