@@ -62,7 +62,7 @@ class PickupAuthorization {
 
     pickupAuthorizationSchema.plugin(mongoosePaginate);
 
-    this.model = mongoose.model('PickupAuthorizations', pickupAuthorizationSchema);
+    this.model = mongoose.model('pickup_authorizations', pickupAuthorizationSchema);
   }
 }
 
