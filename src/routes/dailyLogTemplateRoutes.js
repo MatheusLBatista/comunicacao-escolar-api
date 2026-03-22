@@ -13,37 +13,49 @@ router
     '/daily-log-templates',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(dailyLogTemplateController.list.bind(dailyLogTemplateController)),
+    asyncWrapper(
+      dailyLogTemplateController.list.bind(dailyLogTemplateController),
+    ),
   )
   .get(
     '/daily-log-templates/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(dailyLogTemplateController.list.bind(dailyLogTemplateController)),
+    asyncWrapper(
+      dailyLogTemplateController.list.bind(dailyLogTemplateController),
+    ),
   )
   .post(
     '/daily-log-templates',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(dailyLogTemplateController.create.bind(dailyLogTemplateController)),
+    asyncWrapper(
+      dailyLogTemplateController.create.bind(dailyLogTemplateController),
+    ),
   )
   .patch(
     '/daily-log-templates/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(dailyLogTemplateController.update.bind(dailyLogTemplateController)),
+    asyncWrapper(
+      dailyLogTemplateController.update.bind(dailyLogTemplateController),
+    ),
   )
   .put(
     '/daily-log-templates/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(dailyLogTemplateController.update.bind(dailyLogTemplateController)),
+    asyncWrapper(
+      dailyLogTemplateController.update.bind(dailyLogTemplateController),
+    ),
   )
   .delete(
     '/daily-log-templates/:id',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(dailyLogTemplateController.delete.bind(dailyLogTemplateController)),
+    asyncWrapper(
+      dailyLogTemplateController.delete.bind(dailyLogTemplateController),
+    ),
   );
 
 export default router;

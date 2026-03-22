@@ -19,7 +19,7 @@ class SchoolService {
         errorType: 'validationError',
         field: 'School',
         details: [],
-        customMessage: 'A school already exists in the system.',
+        customMessage: 'Uma escola já existe no sistema.',
       });
     }
 

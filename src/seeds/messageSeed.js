@@ -29,7 +29,9 @@ export default async function messageSeed() {
   });
 
   if (!conversations.length) {
-    console.log('Seed de messages ignorada: nenhuma conversation ativa encontrada.');
+    console.log(
+      'Seed de messages ignorada: nenhuma conversation ativa encontrada.',
+    );
     return { insertedCount: 0 };
   }
 
@@ -45,7 +47,9 @@ export default async function messageSeed() {
     for (let turn = 0; turn < 3; turn++) {
       const sender_id = participants[turn % participants.length];
       const receiver_id = participants[(turn + 1) % participants.length];
-      const sent_at = new Date(sentAtBase.getTime() - (2 - turn) * 5 * 60 * 1000);
+      const sent_at = new Date(
+        sentAtBase.getTime() - (2 - turn) * 5 * 60 * 1000,
+      );
 
       const read_by = [{ user_id: sender_id, at: sent_at }];
       if (turn < 2) {

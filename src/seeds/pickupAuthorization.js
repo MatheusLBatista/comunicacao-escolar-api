@@ -48,8 +48,9 @@ export default async function pickupAuthorizationSeed() {
 
   for (let i = 0; i < 10; i++) {
     const randomSchool = school;
-    const randomStudent = students[Math.floor(Math.random() * students.length)]
-    const randomResponsible = parents[Math.floor(Math.random() * parents.length)];
+    const randomStudent = students[Math.floor(Math.random() * students.length)];
+    const randomResponsible =
+      parents[Math.floor(Math.random() * parents.length)];
     const map = fakeMappings.PickupAuthorization;
 
     authorizations.push({

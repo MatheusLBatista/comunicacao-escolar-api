@@ -81,13 +81,11 @@ describe.skip('Usuários', () => {
 
   it('Não deve cadastrar usuário com email duplicado (409 ou 400)', async () => {
     const email = faker.internet.email();
-    const res1 = await request(BASE_URL)
-      .post('/signup')
-      .send({
-        full_name: faker.name.firstName(),
-        email,
-        password: 'Senha1234!',
-      });
+    const res1 = await request(BASE_URL).post('/signup').send({
+      full_name: faker.name.firstName(),
+      email,
+      password: 'Senha1234!',
+    });
     expect([201, 500]).toContain(res1.status);
 
     if (res1.status === 201) {
@@ -225,14 +223,12 @@ describe.skip('Usuários', () => {
   it('Deve deletar usuário (DELETE)', async () => {
     const email = faker.internet.email();
     const senha = 'Senha1234!';
-    const res1 = await request(BASE_URL)
-      .post('/signup')
-      .send({
-        full_name: faker.name.firstName(),
-        email,
-        password: senha,
-        active: true,
-      });
+    const res1 = await request(BASE_URL).post('/signup').send({
+      full_name: faker.name.firstName(),
+      email,
+      password: senha,
+      active: true,
+    });
     expect([201, 500]).toContain(res1.status);
 
     if (res1.status === 201) {

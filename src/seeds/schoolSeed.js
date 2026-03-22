@@ -1,10 +1,7 @@
 import School from '../models/School.js';
-import { fakeMappings } from './globalFakeMapping.js';
 
 export default async function schoolSeed() {
   await School.deleteMany({});
-
-  const schools = [];
 
   const defaultSchool = {
     name: 'Escola Comunica Alunos',
@@ -19,20 +16,7 @@ export default async function schoolSeed() {
     active: true,
   };
 
-  schools.push(defaultSchool);
+  const result = await School.collection.insertOne(defaultSchool);
 
-  for (let i = 0; i < 5; i++) {
-    schools.push({
-      name: fakeMappings.School.name(),
-      tax_id: fakeMappings.School.tax_id(),
-      address: fakeMappings.School.address(),
-      active: true,
-    });
-  }
-
-  const result = await School.collection.insertMany(schools);
-
-  console.log(`Seeded ${result.insertedCount} schools.`);
-
-  return { schools, result };
+  return { defaultSchool, result };
 }
