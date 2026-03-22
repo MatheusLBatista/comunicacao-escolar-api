@@ -112,26 +112,8 @@ class SchoolRepository {
     return data;
   }
 
-  async findByName(name, ignoredId = null) {
-    const filter = { name };
-
-    if (ignoredId) {
-      filter._id = { $ne: ignoredId };
-    }
-    const document = await this.model.findOne(filter);
-
-    return document;
-  }
-
-  async findByTaxId(tax_id, ignoredId = null) {
-    const filter = { tax_id };
-
-    if (ignoredId) {
-      filter._id = { $ne: ignoredId };
-    }
-    const document = await this.model.findOne(filter);
-
-    return document;
+  async findAny() {
+    return await this.model.findOne();
   }
 
   async findById(id, includeTokens = false) {
