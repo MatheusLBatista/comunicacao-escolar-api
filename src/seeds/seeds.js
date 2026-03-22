@@ -10,7 +10,6 @@ import conversationSeed from './conversationSeed.js';
 import messageSeed from './messageSeed.js';
 import pickupAuthorizationSeed from './pickupAuthorization.js';
 
-
 await DbConnect.conectar();
 
 try {

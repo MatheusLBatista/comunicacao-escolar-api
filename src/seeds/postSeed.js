@@ -1,123 +1,123 @@
-import Post from "../models/Post.js";
+import Post from '../models/Post.js';
 import User from '../models/User.js';
 import { fakeMappings } from './globalFakeMapping.js';
 
 export default async function postSeed(schools, users) {
-    await Post.deleteMany({});
+  await Post.deleteMany({});
 
-    const allowedRoles = ['admin', 'teacher'];
-    const postsPerSchool = Number(process.env.POSTS_PER_SCHOOL) || 3;
+  const allowedRoles = ['admin', 'teacher'];
+  const postsPerSchool = Number(process.env.POSTS_PER_SCHOOL) || 3;
 
-    const schoolIds = extractSchoolIds(schools, users);
-    const candidateUserIds = extractCandidateUserIds(users);
+  const schoolIds = extractSchoolIds(schools, users);
+  const candidateUserIds = extractCandidateUserIds(users);
 
-    if (schoolIds.length === 0) {
-        console.log('Nenhuma escola válida encontrada para criação de anúncios.');
-        return { insertedCount: 0, posts: [] };
+  if (schoolIds.length === 0) {
+    console.log('Nenhuma escola válida encontrada para criação de anúncios.');
+    return { insertedCount: 0, posts: [] };
+  }
+
+  const userQuery = {
+    memberships: {
+      $elemMatch: {
+        school_id: { $in: schoolIds },
+        role: { $in: allowedRoles },
+      },
+    },
+  };
+
+  if (candidateUserIds.length > 0) {
+    userQuery._id = { $in: candidateUserIds };
+  }
+
+  const eligibleUsers = await User.find(userQuery)
+    .select('_id memberships')
+    .lean();
+
+  const posts = [];
+
+  for (const schoolId of schoolIds) {
+    const creatorsInSchool = eligibleUsers.filter((user) =>
+      user.memberships?.some(
+        (membership) =>
+          String(membership.school_id) === String(schoolId) &&
+          allowedRoles.includes(membership.role),
+      ),
+    );
+
+    if (creatorsInSchool.length === 0) {
+      continue;
     }
 
-    const userQuery = {
-        memberships: {
-            $elemMatch: {
-                school_id: { $in: schoolIds },
-                role: { $in: allowedRoles },
-            },
-        },
-    };
+    for (let index = 0; index < postsPerSchool; index++) {
+      const author =
+        creatorsInSchool[Math.floor(Math.random() * creatorsInSchool.length)];
 
-    if (candidateUserIds.length > 0) {
-        userQuery._id = { $in: candidateUserIds };
+      posts.push({
+        school_id: schoolId,
+        author_id: author._id,
+        title: fakeMappings.Post.title(),
+        content: fakeMappings.Post.content(),
+        target: fakeMappings.Post.target(),
+        attachments: fakeMappings.Post.attachments(),
+        active: true,
+      });
     }
+  }
 
-    const eligibleUsers = await User.find(userQuery)
-        .select('_id memberships')
-        .lean();
+  if (posts.length === 0) {
+    console.log(
+      'Nenhum anúncio foi criado: não há usuários com papel admin/teacher nas escolas recebidas.',
+    );
+    return { insertedCount: 0, posts: [] };
+  }
 
-    const posts = [];
+  const result = await Post.collection.insertMany(posts);
 
-    for (const schoolId of schoolIds) {
-        const creatorsInSchool = eligibleUsers.filter((user) =>
-            user.memberships?.some(
-                (membership) =>
-                    String(membership.school_id) === String(schoolId) &&
-                    allowedRoles.includes(membership.role),
-            ),
-        );
+  console.log(`Seeded ${result.insertedCount} posts.`);
 
-        if (creatorsInSchool.length === 0) {
-            continue;
-        }
-
-        for (let index = 0; index < postsPerSchool; index++) {
-            const author =
-                creatorsInSchool[Math.floor(Math.random() * creatorsInSchool.length)];
-
-            posts.push({
-                school_id: schoolId,
-                author_id: author._id,
-                title: fakeMappings.Post.title(),
-                content: fakeMappings.Post.content(),
-                target: fakeMappings.Post.target(),
-                attachments: fakeMappings.Post.attachments(),
-                active: true,
-            });
-        }
-    }
-
-    if (posts.length === 0) {
-        console.log(
-            'Nenhum anúncio foi criado: não há usuários com papel admin/teacher nas escolas recebidas.',
-        );
-        return { insertedCount: 0, posts: [] };
-    }
-
-    const result = await Post.collection.insertMany(posts);
-
-    console.log(`Seeded ${result.insertedCount} posts.`);
-
-    return { insertedCount: result.insertedCount, posts };
+  return { insertedCount: result.insertedCount, posts };
 }
 
 function extractSchoolIds(schools, users) {
-    const ids = [];
+  const ids = [];
 
-    if (Array.isArray(schools)) {
-        ids.push(...schools.map((school) => school?._id).filter(Boolean));
-    }
+  if (Array.isArray(schools)) {
+    ids.push(...schools.map((school) => school?._id).filter(Boolean));
+  }
 
-    if (schools?.result?.insertedIds) {
-        ids.push(...Object.values(schools.result.insertedIds));
-    }
+  if (schools?.result?.insertedIds) {
+    ids.push(...Object.values(schools.result.insertedIds));
+  }
 
-    if (schools?.schools && Array.isArray(schools.schools)) {
-        ids.push(...schools.schools.map((school) => school?._id).filter(Boolean));
-    }
+  if (schools?.schools && Array.isArray(schools.schools)) {
+    ids.push(...schools.schools.map((school) => school?._id).filter(Boolean));
+  }
 
-    if (schools?.schoolId) {
-        ids.push(schools.schoolId);
-    }
+  if (schools?.schoolId) {
+    ids.push(schools.schoolId);
+  }
 
-    if (users?.schoolId) {
-        ids.push(users.schoolId);
-    }
+  if (users?.schoolId) {
+    ids.push(users.schoolId);
+  }
 
-    return [...new Set(ids.map(String))];
+  return [...new Set(ids.map(String))];
 }
 
 function extractCandidateUserIds(users) {
-    const ids = [];
+  const ids = [];
 
-    if (Array.isArray(users)) {
-        ids.push(...users.map((user) => user?._id).filter(Boolean));
-    }
+  if (Array.isArray(users)) {
+    ids.push(...users.map((user) => user?._id).filter(Boolean));
+  }
 
-    if (users?.users?.insertedIds) {
-        ids.push(...Object.values(users.users.insertedIds));
-    }
+  if (users?.users?.insertedIds) {
+    ids.push(...Object.values(users.users.insertedIds));
+  }
 
-    if (users?.adminId) {
-        ids.push(users.adminId);
-    }
+  if (users?.adminId) {
+    ids.push(users.adminId);
+  }
 
-    return [...new Set(ids.map(String))];
+  return [...new Set(ids.map(String))];
 }

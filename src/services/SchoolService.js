@@ -11,8 +11,17 @@ class SchoolService {
   }
 
   async create(parsedData) {
-    await this.validateName(parsedData.name);
-    await this.validateTaxId(parsedData.tax_id);
+    const existingSchool = await this.repository.findAny();
+
+    if (existingSchool) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.CONFLICT.code,
+        errorType: 'validationError',
+        field: 'School',
+        details: [],
+        customMessage: 'Uma escola já existe no sistema.',
+      });
+    }
 
     const data = await this.repository.create(parsedData);
 
@@ -28,10 +37,6 @@ class SchoolService {
   async update(id, parsedData) {
     await this.ensureSchoolExists(id);
 
-    if (parsedData.name) {
-      await this.validateName(parsedData.name, id);
-    }
-
     delete parsedData.tax_id;
 
     const data = await this.repository.update(id, parsedData);
@@ -43,34 +48,6 @@ class SchoolService {
 
     const data = await this.repository.delete(id);
     return data;
-  }
-
-  async validateName(name, id = null) {
-    const existentName = await this.repository.findByName(name, id);
-
-    if (existentName) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.BAD_REQUEST.code,
-        errorType: 'validationError',
-        field: 'name',
-        details: [{ path: 'name', message: 'Name already exists.' }],
-        customMessage: 'Name already exists.',
-      });
-    }
-  }
-
-  async validateTaxId(tax_id, id = null) {
-    const existentTaxId = await this.repository.findByTaxId(tax_id);
-
-    if (existentTaxId) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.BAD_REQUEST.code,
-        errorType: 'validationError',
-        field: 'tax_id',
-        details: [{ path: 'tax_id', message: 'Tax ID already exists.' }],
-        customMessage: 'Tax ID already exists.',
-      });
-    }
   }
 
   async ensureSchoolExists(id) {

@@ -105,12 +105,7 @@ const usuariosSchemas = {
 };
 
 const removalMapping = {
-  UsuarioItem: [
-    'access_token',
-    'refresh_token',
-    'unique_token',
-    'password'
-  ],
+  UsuarioItem: ['access_token', 'refresh_token', 'unique_token', 'password'],
   UsuarioDetalhes: [
     'access_token',
     'unique_token',

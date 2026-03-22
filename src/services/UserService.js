@@ -147,7 +147,8 @@ class UserService {
   }
 
   generateTempPassword() {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
+    const chars =
+      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
     let senha = '';
     for (let i = 0; i < 12; i++) {
       senha += chars.charAt(Math.floor(Math.random() * chars.length));
