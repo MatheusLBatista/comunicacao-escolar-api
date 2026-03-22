@@ -6,19 +6,19 @@ import School from '../models/School.js';
 export default async function pickupAuthorizationSeed() {
   await PickupAuthorization.deleteMany({});
 
-  const defaultSchool = await School.findOne({ active: true }).sort({
+  const school = await School.find({ active: true }).sort({
     created_at: 1,
   });
-  const defaultStudent = await User.findOne({
+  const students = await User.find({
     memberships: { $elemMatch: { role: 'student' } },
     active: true,
   }).sort({ created_at: 1 });
-  const defaultResponsible = await User.findOne({
+  const parents = await User.find({
     memberships: { $elemMatch: { role: 'parent' } },
     active: true,
   }).sort({ created_at: 1 });
 
-  if (!defaultSchool) {
+  if (!school) {
     console.log(
       'Nenhuma escola ativa encontrada para seed de autorizações de retirada.',
     );
@@ -28,9 +28,9 @@ export default async function pickupAuthorizationSeed() {
   const authorizations = [];
 
   const defaultAuthorization = {
-    school_id: defaultSchool._id,
-    student_id: defaultStudent._id,
-    authorized_by: defaultResponsible._id,
+    school_id: school._id,
+    student_id: students._id,
+    authorized_by: parents._id,
     authorized_person: {
       name: 'Maria da Silva',
       document: '123.456.789-00',
@@ -47,9 +47,9 @@ export default async function pickupAuthorizationSeed() {
   authorizations.push(defaultAuthorization);
 
   for (let i = 0; i < 10; i++) {
-    const randomSchool = defaultSchool;
-    const randomStudent = defaultStudent;
-    const randomResponsible = defaultResponsible;
+    const randomSchool = school;
+    const randomStudent = students[Math.floor(Math.random() * students.length)]
+    const randomResponsible = parents[Math.floor(Math.random() * parents.length)];
     const map = fakeMappings.PickupAuthorization;
 
     authorizations.push({
