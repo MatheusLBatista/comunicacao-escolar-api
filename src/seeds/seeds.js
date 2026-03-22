@@ -8,6 +8,7 @@ import dailyLogTemplateSeed from './dailyLogTemplateSeed.js';
 import dailyLogSeed from './dailyLogSeed.js';
 import conversationSeed from './conversationSeed.js';
 import messageSeed from './messageSeed.js';
+import pickupAuthorizationSeed from './pickupAuthorization.js';
 
 
 await DbConnect.conectar();
@@ -17,17 +18,14 @@ try {
     `[${new Date().toLocaleString()}] - Iniciando criação das seeds...`,
   );
 
-
-
-
   const schools = await schoolSeed();
   const users = await userSeed();
-  await postSeed(schools, users)
+  await postSeed(schools, users);
   await dailyLogTemplateSeed();
   await dailyLogSeed();
   await conversationSeed();
   await messageSeed();
-
+  await pickupAuthorizationSeed();
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
 } catch (error) {

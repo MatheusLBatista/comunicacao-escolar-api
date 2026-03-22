@@ -135,6 +135,35 @@ export const fakeMappings = {
     }),
     attachments: () => [],
   },
+
+  PickupAuthorization: {
+    authorized_by: () => new mongoose.Types.ObjectId(),
+    authorized_person: {
+      name: () => `${fakebr.name.firstName()} ${fakebr.name.lastName()}`,
+      document: () =>
+        fakebr.random.boolean() ? fakebr.br.cpf() : fakebr.br.rg(),
+      relationship: () =>
+        fakebr.random.arrayElement([
+          'Avó',
+          'Avô',
+          'Tio',
+          'Tia',
+          'Padrinho',
+          'Madrinha',
+          'Irmão',
+          'Irmã',
+        ]),
+    },
+    qr_code: () => uuid(),
+    valid_from: () => new Date(),
+    valid_until: () =>
+      new Date(
+        Date.now() +
+          1000 * 60 * 60 * 24 * fakebr.random.number({ min: 7, max: 90 }),
+      ),
+    used: () => false,
+    active: () => true,
+  },
 };
 
 // Retorna o mapping global, consolidando os mappings comuns e específicos.
