@@ -9,6 +9,7 @@ import dailyLogSeed from './dailyLogSeed.js';
 import conversationSeed from './conversationSeed.js';
 import messageSeed from './messageSeed.js';
 import pickupAuthorizationSeed from './pickupAuthorization.js';
+import eventSeed from './eventSeed.js';
 
 await DbConnect.conectar();
 
@@ -25,6 +26,7 @@ try {
   await conversationSeed();
   await messageSeed();
   await pickupAuthorizationSeed();
+  await eventSeed(schools, users);
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
 } catch (error) {

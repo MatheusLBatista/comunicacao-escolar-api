@@ -136,6 +136,27 @@ export const fakeMappings = {
     attachments: () => [],
   },
 
+  Event: {
+    title: () => fakebr.lorem.sentence(),
+    description: () => fakebr.lorem.paragraph(),
+    type: () =>
+      fakebr.random.arrayElement([
+        'event',
+        'meeting',
+        'commemorative',
+        'pedagogical',
+      ]),
+    start_date: () => new Date(),
+    end_date: () => new Date(Date.now() + 60 * 60 * 1000),
+    all_day: () => fakebr.random.boolean(),
+    target: () => ({
+      scope: fakebr.random.arrayElement(['all', 'class']),
+      target_id: new mongoose.Types.ObjectId(),
+    }),
+    created_by: () => new mongoose.Types.ObjectId(),
+    active: () => true,
+  },
+
   PickupAuthorization: {
     authorized_by: () => new mongoose.Types.ObjectId(),
     authorized_person: {
