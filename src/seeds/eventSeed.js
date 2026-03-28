@@ -6,7 +6,11 @@ const EVENT_TITLES = {
   event: ['Passeio pedagógico', 'Feira de ciências', 'Mostra cultural'],
   meeting: ['Reunião de pais', 'Conselho de classe', 'Alinhamento pedagógico'],
   commemorative: ['Dia das Mães', 'Festa Junina', 'Semana da Criança'],
-  pedagogical: ['Formação docente', 'Planejamento bimestral', 'Oficina didática'],
+  pedagogical: [
+    'Formação docente',
+    'Planejamento bimestral',
+    'Oficina didática',
+  ],
 };
 
 export default async function eventSeed(schools, users) {
