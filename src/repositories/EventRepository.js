@@ -7,6 +7,11 @@ class EventRepository {
     this.model = EventModel;
   }
 
+  async create(parsedData) {
+    const event = new this.model(parsedData);
+    return await event.save();
+  }
+
   async list(req) {
     const id = req?.params?.id;
 

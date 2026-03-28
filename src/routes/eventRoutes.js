@@ -9,6 +9,12 @@ const router = express.Router();
 const eventController = new EventController();
 
 router
+  .post(
+    '/events',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(eventController.create.bind(eventController)),
+  )
   .get(
     '/events',
     AuthMiddleware,

@@ -1,9 +1,24 @@
 import EventService from '../services/EventService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
+import { EventSchemaInput } from '../utils/validators/schemas/zod/EventSchema.js';
 
 class EventController {
   constructor() {
     this.service = new EventService();
+  }
+
+  async create(req, res) {
+    const parsedData = EventSchemaInput.parse(req.body);
+
+    const data = await this.service.create(
+      {
+        ...parsedData,
+        created_by: req.user_id,
+      },
+      req.body,
+    );
+
+    return CommonResponse.created(res, data);
   }
 
   async list(req, res) {
