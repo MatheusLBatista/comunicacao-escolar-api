@@ -7,7 +7,14 @@ class PostService {
     this.repository = new PostRepository();
     this.schoolRepository = new SchoolRepository();
   }
-  async createPost(parsedData) {
+
+  async list(req) {
+    const data = await this.repository.list(req)
+
+    return data
+  }
+
+  async create(parsedData) {
     const school = await this.schoolRepository.findById(parsedData.school_id);
 
     if (!school) {
@@ -45,7 +52,7 @@ class PostService {
       }
     }
 
-    const data = await this.repository.createModel(parsedData);
+    const data = await this.repository.create(parsedData);
 
     // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
     return data;

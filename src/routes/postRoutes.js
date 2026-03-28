@@ -10,7 +10,12 @@ const postController = new PostController();
 router.post(
   '/post',
   AuthMiddleware,
-  asyncWrapper(postController.createPost.bind(postController)),
+  asyncWrapper(postController.create.bind(postController)),
+);
+
+router.get('/post', 
+  AuthMiddleware,
+  asyncWrapper(postController.list.bind(postController))
 );
 
 export default router;

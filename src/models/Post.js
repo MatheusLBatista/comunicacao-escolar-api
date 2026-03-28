@@ -9,7 +9,6 @@ class Post {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'escolas',
           required: true,
-          index: true,
         },
         author_id: {
           type: mongoose.Schema.Types.ObjectId,

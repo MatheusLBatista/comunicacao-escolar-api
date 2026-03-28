@@ -1,5 +1,6 @@
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import mongoose from 'mongoose';
 import { fakeMappings } from './globalFakeMapping.js';
 
 export default async function postSeed(schools, users) {
@@ -101,7 +102,7 @@ function extractSchoolIds(schools, users) {
     ids.push(users.schoolId);
   }
 
-  return [...new Set(ids.map(String))];
+  return normalizeObjectIds(ids);
 }
 
 function extractCandidateUserIds(users) {
@@ -119,5 +120,31 @@ function extractCandidateUserIds(users) {
     ids.push(users.adminId);
   }
 
-  return [...new Set(ids.map(String))];
+  return normalizeObjectIds(ids);
+}
+
+function normalizeObjectIds(ids) {
+  const normalized = ids
+    .map((id) => {
+      if (!id) {
+        return null;
+      }
+
+      if (id instanceof mongoose.Types.ObjectId) {
+        return id;
+      }
+
+      const asString = String(id);
+
+      if (mongoose.Types.ObjectId.isValid(asString)) {
+        return new mongoose.Types.ObjectId(asString);
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
+  return Array.from(
+    new Map(normalized.map((id) => [id.toString(), id])).values(),
+  );
 }
