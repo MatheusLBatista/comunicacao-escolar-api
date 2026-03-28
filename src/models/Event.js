@@ -42,11 +42,6 @@ class Event {
             enum: ['all', 'class'],
             default: 'all',
           },
-          target_id: {
-            //class id when scope is 'class', otherwise null
-            type: mongoose.Schema.Types.ObjectId,
-            default: null,
-          },
         },
         created_by: {
           type: mongoose.Schema.Types.ObjectId,

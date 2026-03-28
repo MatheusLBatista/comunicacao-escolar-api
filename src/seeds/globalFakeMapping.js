@@ -151,7 +151,6 @@ export const fakeMappings = {
     all_day: () => fakebr.random.boolean(),
     target: () => ({
       scope: fakebr.random.arrayElement(['all', 'class']),
-      target_id: new mongoose.Types.ObjectId(),
     }),
     created_by: () => new mongoose.Types.ObjectId(),
     active: () => true,
