@@ -89,6 +89,16 @@
       "key": "parent_user_id",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "conversation_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "participant_id",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -1348,6 +1358,376 @@
             },
             "description": "Valida bloqueio de parent na rota /users/:id."
           }
+        }
+      ]
+    },
+    {
+      "name": "Conversations & Messages",
+      "description": "Rotas de conversas e mensagens entre usuários da escola.\n\n## Fluxo de teste de conversa real entre dois usuários:\n1. Execute **Login (Teacher)** e **Login (Parent)** para salvar os tokens de cada usuário\n2. Copie o `parent_user_id` para a variável `participant_id`\n3. Execute **[Teacher] Criar ou Buscar Conversa** para iniciar a conversa\n4. Execute **[Teacher] Enviar Mensagem** para o teacher enviar uma mensagem\n5. Execute **[Parent] Enviar Mensagem** para o parent responder\n6. Execute **[Teacher] Listar Mensagens** para ver o histórico\n7. Execute **[Teacher] Marcar Mensagens como Lidas** para confirmar leitura\n\n## Variáveis utilizadas:\n- `school_id`: ID da escola\n- `participant_id`: ID do outro participante da conversa (preencher com `teacher_user_id` ou `parent_user_id`)\n- `conversation_id`: preenchido automaticamente ao criar/buscar conversa",
+      "item": [
+        {
+          "name": "Configuração",
+          "description": "Logins auxiliares para simular conversa entre dois usuários. Execute antes dos testes de conversa.",
+          "item": [
+            {
+              "name": "Login (Teacher) — salva teacher_access_token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res.data && res.data.user) {",
+                      "    const user = res.data.user;",
+                      "    if (user.access_token)  pm.collectionVariables.set('teacher_access_token', user.access_token);",
+                      "    if (user._id)           pm.collectionVariables.set('teacher_user_id', user._id);",
+                      "    console.log('Teacher token e ID salvos:', user._id);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{teacher_email}}\",\n  \"password\": \"{{teacher_password}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                },
+                "description": "Faz login como Teacher e salva o token e user_id nas variáveis da collection."
+              }
+            },
+            {
+              "name": "Login (Parent) — salva parent_access_token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res.data && res.data.user) {",
+                      "    const user = res.data.user;",
+                      "    if (user.access_token)  pm.collectionVariables.set('parent_access_token', user.access_token);",
+                      "    if (user._id)           pm.collectionVariables.set('parent_user_id', user._id);",
+                      "    // Preenche participant_id para a conversa do Teacher → Parent",
+                      "    pm.collectionVariables.set('participant_id', user._id);",
+                      "    console.log('Parent token e ID salvos:', user._id);",
+                      "    console.log('participant_id atualizado para:', user._id);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{parent_email}}\",\n  \"password\": \"{{parent_password}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                },
+                "description": "Faz login como Parent e salva o token, user_id e participant_id automaticamente."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Conversas",
+          "item": [
+            {
+              "name": "[Teacher] Criar ou Buscar Conversa",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res.data && res.data._id) {",
+                      "    pm.collectionVariables.set('conversation_id', res.data._id);",
+                      "    console.log('conversation_id salvo:', res.data._id);",
+                      "    const wasCreated = pm.response.code === 201;",
+                      "    console.log(wasCreated ? 'Nova conversa criada.' : 'Conversa existente retornada.');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participant_id\": \"{{participant_id}}\",\n  \"type\": \"private\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"]
+                },
+                "description": "Cria uma nova conversa privada entre o Teacher (usuário autenticado) e o participante (`participant_id`). Se já existir, retorna a conversa existente. O `conversation_id` é salvo automaticamente.\n\n**Tipos disponíveis:** `private` | `daily_log_reply`"
+              }
+            },
+            {
+              "name": "[Teacher] Listar Conversas",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"],
+                  "query": [
+                    { "key": "type", "value": "private", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Lista todas as conversas do Teacher na escola. Filtros opcionais: `type` (private | daily_log_reply), `page`, `limit`."
+              }
+            },
+            {
+              "name": "[Parent] Listar Conversas",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{parent_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"],
+                  "query": [
+                    { "key": "type", "value": "private", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Lista todas as conversas do Parent na escola. Útil para verificar se a conversa aparece para os dois lados."
+              }
+            },
+            {
+              "name": "[Teacher] Buscar Conversa por ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}"]
+                },
+                "description": "Retorna os detalhes de uma conversa específica pelo ID. Requer que `conversation_id` esteja preenchido."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mensagens",
+          "item": [
+            {
+              "name": "[Teacher] Enviar Mensagem",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"Olá! Gostaria de conversar sobre o desempenho do seu filho nas últimas semanas.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"]
+                },
+                "description": "Teacher envia uma mensagem para a conversa. Requer `conversation_id` preenchido."
+              }
+            },
+            {
+              "name": "[Parent] Enviar Mensagem (resposta)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{parent_access_token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"Claro! Pode falar, estou à disposição.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"]
+                },
+                "description": "Parent responde à mensagem do Teacher na mesma conversa. Simula um diálogo real entre os dois usuários."
+              }
+            },
+            {
+              "name": "[Teacher] Listar Mensagens",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"],
+                  "query": [
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Lista todas as mensagens da conversa. Filtros opcionais: `page`, `limit`."
+              }
+            },
+            {
+              "name": "[Parent] Listar Mensagens",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{parent_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"],
+                  "query": [
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Parent lista as mensagens da conversa. Útil para verificar se o Parent vê as mensagens do Teacher."
+              }
+            },
+            {
+              "name": "[Teacher] Marcar Mensagens como Lidas",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages/read",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages", "read"]
+                },
+                "description": "Marca todas as mensagens não lidas da conversa como lidas para o Teacher."
+              }
+            },
+            {
+              "name": "[Parent] Marcar Mensagens como Lidas",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{parent_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages/read",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages", "read"]
+                },
+                "description": "Marca todas as mensagens não lidas da conversa como lidas para o Parent."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cenários de Erro",
+          "description": "Testes para validar comportamento com dados inválidos.",
+          "item": [
+            {
+              "name": "Criar Conversa — participant_id inválido",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participant_id\": \"id-invalido\",\n  \"type\": \"private\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"]
+                },
+                "description": "Espera: 400 Bad Request — ObjectId inválido rejeitado pelo Zod."
+              }
+            },
+            {
+              "name": "Enviar Mensagem — texto vazio",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"]
+                },
+                "description": "Espera: 400 Bad Request — texto vazio rejeitado pelo Zod."
+              }
+            },
+            {
+              "name": "Acessar Conversa sem Autenticação",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}"]
+                },
+                "description": "Espera: 401 Unauthorized — sem token JWT."
+              }
+            },
+            {
+              "name": "Listar Mensagens — conversationId inválido",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{teacher_access_token}}" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/id-invalido/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "id-invalido", "messages"]
+                },
+                "description": "Espera: 400 Bad Request — ObjectId inválido rejeitado pelo Zod."
+              }
+            }
+          ]
         }
       ]
     }
