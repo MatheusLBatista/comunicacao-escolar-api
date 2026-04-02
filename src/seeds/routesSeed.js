@@ -11,8 +11,7 @@ export default async function seedRoutes() {
     'posts',
     'daily-logs',
     'daily-log-templates',
-    'conversas',
-    'mensagens',
+    'conversations',
   ];
 
   const routes = routesArray.map((route) => ({
