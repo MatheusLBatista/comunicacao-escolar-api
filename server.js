@@ -1,8 +1,14 @@
 import 'dotenv/config';
+import { createServer } from 'http';
 import app from './src/app.js';
+import { initSocketIO } from './src/config/SocketIO.js';
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
+const httpServer = createServer(app);
+
+initSocketIO(httpServer);
+
+httpServer.listen(port, () => {
   console.log(`Servidor escutando em http://localhost:${port}`);
 });
