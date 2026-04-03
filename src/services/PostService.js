@@ -1,11 +1,13 @@
 import PostRepository from '../repositories/PostRepository.js';
 import SchoolRepository from '../repositories/SchoolRepository.js';
+import ClassRepository from '../repositories/ClassRepository.js';
 
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 class PostService {
   constructor() {
     this.repository = new PostRepository();
     this.schoolRepository = new SchoolRepository();
+    this.classRepository = new ClassRepository()
   }
 
   async list(req) {
@@ -50,6 +52,23 @@ class PostService {
           customMessage: 'target_id não é válido ou está ausente.',
         });
       }
+      const turma = await this.classRepository.findById(parsedData.target.target_id)
+      if(!turma) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
+          errorType: 'unprocessableEntity',
+          field: 'class',
+          details: [
+            {
+              path: 'class',
+              message: 'O id da class/turma informado não foi encontrado.',
+            },
+          ],
+          customMessage: 'class_id não foi encontrado.',
+        });
+      }
+      const data = await this.repository.create(parsedData)
+      return data
     }
 
     const data = await this.repository.create(parsedData);

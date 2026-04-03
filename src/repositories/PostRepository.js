@@ -34,6 +34,7 @@ class PostRepository {
       content,
       scope,
       target_id,
+      active,
       page = 1,
     } = req?.query || {};
 
@@ -45,7 +46,8 @@ class PostRepository {
       .withTitle(title || "")
       .withContent(content || "")
       .withScope(scope || "")
-      .withTargetId(target_id || "");
+      .withTargetId(target_id || "")
+      .withActive(active || "");
 
     const filters = filterBuilder.build();
 

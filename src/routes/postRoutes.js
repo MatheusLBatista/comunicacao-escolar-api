@@ -18,4 +18,9 @@ router.get('/post',
   asyncWrapper(postController.list.bind(postController))
 );
 
+router.get('/post/:id',
+  AuthMiddleware,
+  asyncWrapper(postController.list.bind(postController)),
+)
+
 export default router;

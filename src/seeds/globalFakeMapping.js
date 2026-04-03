@@ -77,6 +77,14 @@ export const fakeMappings = {
     active: () => fakebr.random.boolean(),
   },
 
+  Class: {
+    name: () => `Turma ${fakebr.random.alphaNumeric(1).toUpperCase()}`,
+    grade: () => `${fakebr.random.number({ min: 1, max: 9 })} ano`,
+    year: () => new Date().getFullYear(),
+    teacher_ids: () => [new mongoose.Types.ObjectId()],
+    metadata: () => fakebr.lorem.sentence(),
+  },
+
   Conversation: {
     participants: () => [
       new mongoose.Types.ObjectId(),
@@ -136,6 +144,27 @@ export const fakeMappings = {
     attachments: () => [],
   },
 
+  Event: {
+    title: () => fakebr.lorem.sentence(),
+    description: () => fakebr.lorem.paragraph(),
+    type: () =>
+      fakebr.random.arrayElement([
+        'event',
+        'meeting',
+        'commemorative',
+        'pedagogical',
+      ]),
+    start_date: () => new Date(),
+    end_date: () => new Date(Date.now() + 60 * 60 * 1000),
+    all_day: () => fakebr.random.boolean(),
+    target: () => ({
+      scope: fakebr.random.arrayElement(['all', 'class']),
+      target_id: new mongoose.Types.ObjectId(),
+    }),
+    created_by: () => new mongoose.Types.ObjectId(),
+    active: () => true,
+  },
+
   PickupAuthorization: {
     authorized_by: () => new mongoose.Types.ObjectId(),
     authorized_person: {
@@ -164,6 +193,7 @@ export const fakeMappings = {
     used: () => false,
     active: () => true,
   },
+
 };
 
 // Retorna o mapping global, consolidando os mappings comuns e específicos.

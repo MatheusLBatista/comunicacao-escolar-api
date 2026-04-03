@@ -11,6 +11,7 @@ import school from './schoolRoutes.js';
 import post from './postRoutes.js';
 import dailyLog from './dailyLogRoutes.js';
 import dailyLogTemplate from './dailyLogTemplateRoutes.js';
+import conversation from './conversationRoutes.js';
 
 import dotenv from 'dotenv';
 
@@ -41,6 +42,7 @@ const routes = (app) => {
     post,
     dailyLog,
     dailyLogTemplate,
+    conversation,
   );
 
   app.use((req, res) => {

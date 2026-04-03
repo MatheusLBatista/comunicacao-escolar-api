@@ -9,7 +9,7 @@ const Target = z.object({
     })
     .optional(),
   scope: z
-    .string({ message: 'O scope não é uma string válida.' })
+    .enum(["all", "class"])
     .default('all'),
 });
 

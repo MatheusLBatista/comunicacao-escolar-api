@@ -1,5 +1,6 @@
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import Class from '../models/Class.js';
 import mongoose from 'mongoose';
 import { fakeMappings } from './globalFakeMapping.js';
 
@@ -34,6 +35,25 @@ export default async function postSeed(schools, users) {
     .select('_id memberships')
     .lean();
 
+  const classes = await Class.find({
+    school_id: { $in: schoolIds },
+    active: true,
+  })
+    .select('_id school_id')
+    .lean();
+
+  const classIdsBySchool = new Map();
+
+  for (const turma of classes) {
+    const schoolKey = String(turma.school_id);
+
+    if (!classIdsBySchool.has(schoolKey)) {
+      classIdsBySchool.set(schoolKey, []);
+    }
+
+    classIdsBySchool.get(schoolKey).push(turma._id);
+  }
+
   const posts = [];
 
   for (const schoolId of schoolIds) {
@@ -49,16 +69,20 @@ export default async function postSeed(schools, users) {
       continue;
     }
 
+    const classIds = classIdsBySchool.get(String(schoolId)) || [];
+
     for (let index = 0; index < postsPerSchool; index++) {
       const author =
         creatorsInSchool[Math.floor(Math.random() * creatorsInSchool.length)];
+
+      const target = buildPostTarget(classIds);
 
       posts.push({
         school_id: schoolId,
         author_id: author._id,
         title: fakeMappings.Post.title(),
         content: fakeMappings.Post.content(),
-        target: fakeMappings.Post.target(),
+        target,
         attachments: fakeMappings.Post.attachments(),
         active: true,
       });
@@ -147,4 +171,27 @@ function normalizeObjectIds(ids) {
   return Array.from(
     new Map(normalized.map((id) => [id.toString(), id])).values(),
   );
+}
+
+function buildPostTarget(classIds) {
+  if (!classIds.length) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  const useClassScope = Math.random() >= 0.5;
+
+  if (!useClassScope) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  return {
+    scope: 'class',
+    target_id: classIds[Math.floor(Math.random() * classIds.length)],
+  };
 }

@@ -42,6 +42,21 @@ class PostFilterBuilder {
     return this
   }
 
+  withTargetId(target_id) {
+    if(target_id) {
+      this.filters = {"target.target_id": target_id}
+    }
+    return this
+  }
+
+  withActive(active) {
+    if(active === 'true') {
+      this.filters.active = true;
+    } else if (active === 'false') {
+      this.filters.active = false
+    }
+    return this
+  }
 
   build() {
     console.log(this.filters)
