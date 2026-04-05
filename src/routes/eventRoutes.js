@@ -32,6 +32,12 @@ router
     AuthMiddleware,
     AuthPermission,
     asyncWrapper(eventController.update.bind(eventController)),
+  )
+  .delete(
+    '/events/:id',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(eventController.delete.bind(eventController)),
   );
 
 export default router;

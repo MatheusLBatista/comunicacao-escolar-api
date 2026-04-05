@@ -100,6 +100,11 @@ class EventService {
     return this.repository.update(id, parsedData);
   }
 
+  async delete(id) {
+    await this.repository.getById(id);
+    return this.repository.delete(id);
+  }
+
   validateMeeting(parsedData, rawBody) {
     if (parsedData.type !== 'meeting') return;
 

@@ -1,5 +1,5 @@
 import EventService from '../services/EventService.js';
-import { CommonResponse } from '../utils/helpers/index.js';
+import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 import {
   EventSchema,
   EventUpdateSchema,
@@ -38,7 +38,26 @@ class EventController {
     const parsedData = EventUpdateSchema.parse(req.body);
     const data = await this.service.update(id, parsedData, req.body);
 
-    return CommonResponse.success(res, data);
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Event updated successfully.',
+    );
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+    objectIdSchema.parse(id);
+
+    const data = await this.service.delete(id);
+
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Event deleted successfully.',
+    );
   }
 }
 

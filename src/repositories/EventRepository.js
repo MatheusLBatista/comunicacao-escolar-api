@@ -97,6 +97,22 @@ class EventRepository {
     return data;
   }
 
+  async delete(id) {
+    const data = await this.model.findByIdAndDelete(id);
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Event',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Event'),
+      });
+    }
+
+    return data;
+  }
+
   async getById(id) {
     const data = await this.model.findById(id);
 
