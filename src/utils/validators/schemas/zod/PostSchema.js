@@ -8,9 +8,7 @@ const Target = z.object({
         'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
     })
     .optional(),
-  scope: z
-    .enum(["all", "class"])
-    .default('all'),
+  scope: z.enum(['all', 'class']).default('all'),
 });
 
 export const PostSchema = z.object({

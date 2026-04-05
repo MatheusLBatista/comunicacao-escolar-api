@@ -44,7 +44,7 @@ const routes = (app) => {
     dailyLog,
     dailyLogTemplate,
     event,
-    conversation
+    conversation,
   );
 
   app.use((req, res) => {

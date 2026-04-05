@@ -24,9 +24,7 @@ class MessageRepository {
       page: parseInt(page, 10),
       limit,
       sort: { sent_at: -1 },
-      populate: [
-        { path: 'sender_id', select: 'full_name email' },
-      ],
+      populate: [{ path: 'sender_id', select: 'full_name email' }],
     };
 
     const result = await this.model.paginate(filters, options);

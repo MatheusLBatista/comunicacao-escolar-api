@@ -32,6 +32,6 @@ router
     AuthMiddleware,
     AuthPermission,
     asyncWrapper(eventController.update.bind(eventController)),
-  )
+  );
 
 export default router;

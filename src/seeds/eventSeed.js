@@ -1,5 +1,6 @@
 import Event from '../models/Event.js';
 import User from '../models/User.js';
+import Class from '../models/Class.js';
 
 const EVENT_TYPES = ['event', 'meeting', 'commemorative', 'pedagogical'];
 const EVENT_TITLES = {
@@ -35,6 +36,26 @@ export default async function eventSeed(schools, users) {
   })
     .select('_id memberships')
     .lean();
+
+  const classes = await Class.find({
+    school_id: { $in: schoolIds },
+    active: true,
+  })
+    .select('_id school_id')
+    .lean();
+
+  const classIdsBySchool = new Map();
+
+  for (const turma of classes) {
+    const schoolKey = String(turma.school_id);
+
+    if (!classIdsBySchool.has(schoolKey)) {
+      classIdsBySchool.set(schoolKey, []);
+    }
+
+    classIdsBySchool.get(schoolKey).push(turma._id);
+  }
+
   const events = [];
 
   for (const schoolId of schoolIds) {
@@ -55,7 +76,8 @@ export default async function eventSeed(schools, users) {
       const type = randomItem(EVENT_TYPES);
       const startDate = buildStartDate(index);
       const isAllDay = type === 'commemorative' ? true : Math.random() >= 0.5;
-      const scope = Math.random() >= 0.5 ? 'class' : 'all';
+      const classIds = classIdsBySchool.get(String(schoolId)) || [];
+      const target = buildEventTarget(classIds);
 
       let endDate = null;
       if (!isAllDay) {
@@ -71,9 +93,7 @@ export default async function eventSeed(schools, users) {
         start_date: startDate,
         end_date: endDate,
         all_day: isAllDay,
-        target: {
-          scope,
-        },
+        target,
         created_by: creator._id,
         active: true,
       });
@@ -103,6 +123,29 @@ function buildStartDate(index) {
   baseDate.setHours(8, 0, 0, 0);
   baseDate.setDate(baseDate.getDate() + index + 1);
   return baseDate;
+}
+
+function buildEventTarget(classIds) {
+  if (!classIds.length) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  const useClassScope = Math.random() >= 0.5;
+
+  if (!useClassScope) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  return {
+    scope: 'class',
+    target_id: classIds[Math.floor(Math.random() * classIds.length)],
+  };
 }
 
 function extractSchoolIds(schools, users) {

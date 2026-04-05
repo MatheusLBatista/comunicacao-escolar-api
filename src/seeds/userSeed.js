@@ -77,7 +77,10 @@ export default async function userSeed() {
   const defaultTeacher = {
     full_name: process.env.TEACHER_NAME || 'Maria Teacher',
     email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
-    password: await bcrypt.hash(process.env.TEACHER_PASSWORD || 'Senha@123', 10),
+    password: await bcrypt.hash(
+      process.env.TEACHER_PASSWORD || 'Senha@123',
+      10,
+    ),
     active: true,
     permissions: userGroup?.permissions || [],
     groups: userGroup ? [userGroup._id] : [],
@@ -152,7 +155,13 @@ export default async function userSeed() {
   }
 
   // Insert all users
-  const allUsers = [admin, defaultTeacher, defaultParent, ...teachers, ...parents];
+  const allUsers = [
+    admin,
+    defaultTeacher,
+    defaultParent,
+    ...teachers,
+    ...parents,
+  ];
   const result = await User.collection.insertMany(allUsers);
 
   const createdAdmin = await User.findOne({
@@ -167,8 +176,12 @@ export default async function userSeed() {
 
   console.log(`School created: ${school.name} (${school._id})`);
   console.log(`Admin: ${createdAdmin.email}`);
-  console.log(`Default teacher: ${createdDefaultTeacher.email} (${createdDefaultTeacher._id})`);
-  console.log(`Default parent: ${createdDefaultParent.email} (${createdDefaultParent._id})`);
+  console.log(
+    `Default teacher: ${createdDefaultTeacher.email} (${createdDefaultTeacher._id})`,
+  );
+  console.log(
+    `Default parent: ${createdDefaultParent.email} (${createdDefaultParent._id})`,
+  );
   console.log(`${teachers.length} fake teachers created`);
   console.log(`${parents.length} fake parents created`);
   console.log(`${students.length} students created`);

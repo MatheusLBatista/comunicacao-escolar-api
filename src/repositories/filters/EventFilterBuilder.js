@@ -29,6 +29,14 @@ class EventFilterBuilder {
     return this;
   }
 
+  withTargetId(target_id) {
+    if (target_id) {
+      this.filters['target.target_id'] = target_id;
+    }
+
+    return this;
+  }
+
   withStartDateRange(start_date, end_date) {
     if (start_date || end_date) {
       this.filters.start_date = {};

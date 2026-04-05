@@ -42,6 +42,11 @@ class Event {
             enum: ['all', 'class'],
             default: 'all',
           },
+          target_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'class',
+            default: null,
+          },
         },
         created_by: {
           type: mongoose.Schema.Types.ObjectId,

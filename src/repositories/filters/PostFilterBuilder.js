@@ -7,59 +7,58 @@ class PostFilterBuilder {
   }
 
   withSchoolId(school_id) {
-
-    if(school_id) {
-        this.filters.school_id = school_id;
+    if (school_id) {
+      this.filters.school_id = school_id;
     }
-    return this
+    return this;
   }
 
   withAuthorId(author_id) {
-    if(author_id) {
-        this.filters.author_id = author_id
+    if (author_id) {
+      this.filters.author_id = author_id;
     }
-    return this
+    return this;
   }
 
   withTitle(title) {
-    if(title) {
-        this.filters.title = { $regex: title, $options: 'i' }
+    if (title) {
+      this.filters.title = { $regex: title, $options: 'i' };
     }
-    return this
+    return this;
   }
 
   withContent(content) {
-    if(content) {
-        this.filters.content = { $regex: content, $options: 'i'}
+    if (content) {
+      this.filters.content = { $regex: content, $options: 'i' };
     }
-    return this
+    return this;
   }
 
   withScope(scope) {
-    if(scope) {
-        this.filters = {"target.scope":{ $regex:scope, $options: 'i'}}
+    if (scope) {
+      this.filters = { 'target.scope': { $regex: scope, $options: 'i' } };
     }
-    return this
+    return this;
   }
 
   withTargetId(target_id) {
-    if(target_id) {
-      this.filters = {"target.target_id": target_id}
+    if (target_id) {
+      this.filters = { 'target.target_id': target_id };
     }
-    return this
+    return this;
   }
 
   withActive(active) {
-    if(active === 'true') {
+    if (active === 'true') {
       this.filters.active = true;
     } else if (active === 'false') {
-      this.filters.active = false
+      this.filters.active = false;
     }
-    return this
+    return this;
   }
 
   build() {
-    console.log(this.filters)
+    console.log(this.filters);
     return this.filters;
   }
 }

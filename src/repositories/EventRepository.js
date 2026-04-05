@@ -7,45 +7,6 @@ class EventRepository {
     this.model = EventModel;
   }
 
-  async getById(id) {
-    const data = await this.model.findById(id);
-
-    if (!data) {
-      throw new CustomError({
-        statusCode: 404,
-        errorType: 'resourceNotFound',
-        field: 'Event',
-        details: [],
-        customMessage: messages.error.resourceNotFound('Event'),
-      });
-    }
-
-    return data;
-  }
-
-  async create(parsedData) {
-    const event = new this.model(parsedData);
-    return await event.save();
-  }
-
-  async update(id, parsedData) {
-    const data = await this.model.findByIdAndUpdate(id, parsedData, {
-      new: true,
-    });
-
-    if (!data) {
-      throw new CustomError({
-        statusCode: 404,
-        errorType: 'resourceNotFound',
-        field: 'Event',
-        details: [],
-        customMessage: messages.error.resourceNotFound('Event'),
-      });
-    }
-
-    return data;
-  }
-
   async list(req) {
     const id = req?.params?.id;
 
@@ -71,6 +32,7 @@ class EventRepository {
       type,
       active,
       scope,
+      target_id,
       start_date,
       end_date,
       page = 1,
@@ -81,6 +43,7 @@ class EventRepository {
       .withType(type || '')
       .withActive(active)
       .withScope(scope || '')
+      .withTargetId(target_id || '')
       .withStartDateRange(start_date, end_date);
 
     const filters = filterBuilder.build();
@@ -103,6 +66,45 @@ class EventRepository {
     });
 
     return result;
+  }
+
+  async create(parsedData) {
+    const event = new this.model(parsedData);
+    return await event.save();
+  }
+
+  async update(id, parsedData) {
+    const data = await this.model.findByIdAndUpdate(id, parsedData, {
+      new: true,
+    });
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Event',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Event'),
+      });
+    }
+
+    return data;
+  }
+
+  async getById(id) {
+    const data = await this.model.findById(id);
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Event',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Event'),
+      });
+    }
+
+    return data;
   }
 }
 

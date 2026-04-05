@@ -192,7 +192,6 @@ export const fakeMappings = {
     used: () => false,
     active: () => true,
   },
-
 };
 
 // Retorna o mapping global, consolidando os mappings comuns e específicos.

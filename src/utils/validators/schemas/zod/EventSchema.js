@@ -4,9 +4,17 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const TargetSchema = z.object({
   scope: z.enum(['all', 'class']).default('all'),
+  target_id: z
+    .string()
+    .regex(objectIdRegex, {
+      message:
+        'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
+    })
+    .optional()
+    .nullable(),
 });
 
-const EventSchema = z.object({
+const EventBaseSchema = z.object({
   school_id: z.string().regex(objectIdRegex, {
     message:
       'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
@@ -20,10 +28,11 @@ const EventSchema = z.object({
     .nullable()
     .optional(),
   all_day: z.boolean().optional().default(false),
-  target: TargetSchema.optional().default({ scope: 'all' }),
+  target: TargetSchema.optional().default({ scope: 'all', target_id: null }),
   active: z.boolean().optional().default(true),
 });
 
-const EventUpdateSchema = EventSchema.omit({ id: true, created_by: true, }).partial();
+const EventSchema = EventBaseSchema;
+const EventUpdateSchema = EventBaseSchema.partial();
 
 export { EventUpdateSchema, EventSchema };
