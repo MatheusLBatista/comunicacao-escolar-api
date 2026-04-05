@@ -9,9 +9,14 @@ class EventRepository {
 
   async list(req) {
     const id = req?.params?.id;
+    const populate = [
+      { path: 'school_id', select: 'name tax_id active' },
+      { path: 'created_by', select: 'full_name email active' },
+      { path: 'target.target_id', select: 'name grade year school_id active' },
+    ];
 
     if (id) {
-      const data = await this.model.findById(id);
+      const data = await this.model.findById(id).populate(populate);
 
       if (!data) {
         throw new CustomError({
@@ -52,6 +57,7 @@ class EventRepository {
       page: parseInt(page, 10),
       limit,
       sort: { start_date: 1 },
+      populate,
     };
 
     const result = await this.model.paginate(filters, options);
