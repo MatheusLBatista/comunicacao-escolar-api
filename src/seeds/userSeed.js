@@ -73,6 +73,39 @@ export default async function userSeed() {
     ],
   };
 
+  // Create default teacher
+  const defaultTeacher = {
+    full_name: process.env.TEACHER_NAME || 'Maria Teacher',
+    email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+    password: await bcrypt.hash(process.env.TEACHER_PASSWORD || 'Senha@123', 10),
+    active: true,
+    permissions: userGroup?.permissions || [],
+    groups: userGroup ? [userGroup._id] : [],
+    memberships: [
+      {
+        school_id: school._id,
+        role: 'teacher',
+      },
+    ],
+  };
+
+  // Create default parent
+  const defaultParent = {
+    full_name: process.env.PARENT_NAME || 'Ana Parent',
+    email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+    password: await bcrypt.hash(process.env.PARENT_PASSWORD || 'Senha@123', 10),
+    active: true,
+    permissions: userGroup?.permissions || [],
+    groups: userGroup ? [userGroup._id] : [],
+    memberships: [
+      {
+        school_id: school._id,
+        role: 'parent',
+        associated_students: studentIds.slice(0, 2),
+      },
+    ],
+  };
+
   // Create teachers
   const teachers = [];
   for (let i = 0; i < 3; i++) {
@@ -119,22 +152,32 @@ export default async function userSeed() {
   }
 
   // Insert all users
-  const allUsers = [admin, ...teachers, ...parents];
+  const allUsers = [admin, defaultTeacher, defaultParent, ...teachers, ...parents];
   const result = await User.collection.insertMany(allUsers);
 
   const createdAdmin = await User.findOne({
     email: process.env.ADMIN_EMAIL || 'admin@admin.com',
   });
+  const createdDefaultTeacher = await User.findOne({
+    email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+  });
+  const createdDefaultParent = await User.findOne({
+    email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+  });
 
   console.log(`School created: ${school.name} (${school._id})`);
   console.log(`Admin: ${createdAdmin.email}`);
-  console.log(`${teachers.length} teachers created`);
-  console.log(`${parents.length} parents created`);
+  console.log(`Default teacher: ${createdDefaultTeacher.email} (${createdDefaultTeacher._id})`);
+  console.log(`Default parent: ${createdDefaultParent.email} (${createdDefaultParent._id})`);
+  console.log(`${teachers.length} fake teachers created`);
+  console.log(`${parents.length} fake parents created`);
   console.log(`${students.length} students created`);
 
   return {
     adminId: createdAdmin._id,
     schoolId: school._id,
+    defaultTeacherId: createdDefaultTeacher._id,
+    defaultParentId: createdDefaultParent._id,
     users: result,
   };
 }

@@ -77,6 +77,14 @@ export const fakeMappings = {
     active: () => fakebr.random.boolean(),
   },
 
+  Class: {
+    name: () => `Turma ${fakebr.random.alphaNumeric(1).toUpperCase()}`,
+    grade: () => `${fakebr.random.number({ min: 1, max: 9 })} ano`,
+    year: () => new Date().getFullYear(),
+    teacher_ids: () => [new mongoose.Types.ObjectId()],
+    metadata: () => fakebr.lorem.sentence(),
+  },
+
   Conversation: {
     participants: () => [
       new mongoose.Types.ObjectId(),
@@ -184,6 +192,7 @@ export const fakeMappings = {
     used: () => false,
     active: () => true,
   },
+
 };
 
 // Retorna o mapping global, consolidando os mappings comuns e específicos.
