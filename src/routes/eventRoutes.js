@@ -26,6 +26,12 @@ router
     AuthMiddleware,
     AuthPermission,
     asyncWrapper(eventController.list.bind(eventController)),
-  );
+  )
+  .patch(
+    '/events/:id',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(eventController.update.bind(eventController)),
+  )
 
 export default router;

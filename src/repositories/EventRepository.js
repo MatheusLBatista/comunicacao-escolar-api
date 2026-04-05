@@ -7,9 +7,43 @@ class EventRepository {
     this.model = EventModel;
   }
 
+  async getById(id) {
+    const data = await this.model.findById(id);
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Event',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Event'),
+      });
+    }
+
+    return data;
+  }
+
   async create(parsedData) {
     const event = new this.model(parsedData);
     return await event.save();
+  }
+
+  async update(id, parsedData) {
+    const data = await this.model.findByIdAndUpdate(id, parsedData, {
+      new: true,
+    });
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Event',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Event'),
+      });
+    }
+
+    return data;
   }
 
   async list(req) {

@@ -6,11 +6,7 @@ const TargetSchema = z.object({
   scope: z.enum(['all', 'class']).default('all'),
 });
 
-export const EventSchema = z.object({
-  id: z.string().regex(objectIdRegex, {
-    message:
-      'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-  }),
+const EventSchema = z.object({
   school_id: z.string().regex(objectIdRegex, {
     message:
       'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
@@ -25,14 +21,9 @@ export const EventSchema = z.object({
     .optional(),
   all_day: z.boolean().optional().default(false),
   target: TargetSchema.optional().default({ scope: 'all' }),
-  created_by: z.string().regex(objectIdRegex, {
-    message:
-      'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-  }),
   active: z.boolean().optional().default(true),
 });
 
-export const EventSchemaInput = EventSchema.omit({
-  id: true,
-  created_by: true,
-});
+const EventUpdateSchema = EventSchema.omit({ id: true, created_by: true, }).partial();
+
+export { EventUpdateSchema, EventSchema };

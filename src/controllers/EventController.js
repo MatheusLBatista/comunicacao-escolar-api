@@ -1,6 +1,10 @@
 import EventService from '../services/EventService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
-import { EventSchemaInput } from '../utils/validators/schemas/zod/EventSchema.js';
+import {
+  EventSchema,
+  EventUpdateSchema,
+} from '../utils/validators/schemas/zod/EventSchema.js';
+import objectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 
 class EventController {
   constructor() {
@@ -8,7 +12,7 @@ class EventController {
   }
 
   async create(req, res) {
-    const parsedData = EventSchemaInput.parse(req.body);
+    const parsedData = EventSchema.parse(req.body);
 
     const data = await this.service.create(
       {
@@ -23,6 +27,16 @@ class EventController {
 
   async list(req, res) {
     const data = await this.service.list(req);
+
+    return CommonResponse.success(res, data);
+  }
+
+  async update(req, res) {
+    const { id } = req.params;
+    objectIdSchema.parse(id);
+
+    const parsedData = EventUpdateSchema.parse(req.body);
+    const data = await this.service.update(id, parsedData, req.body);
 
     return CommonResponse.success(res, data);
   }
