@@ -9,6 +9,14 @@ const router = express.Router();
 const pickupAuthorizationController = new PickupAuthorizationController();
 
 router
+  .post(
+    '/pickup-authorizations',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(
+      pickupAuthorizationController.create.bind(pickupAuthorizationController),
+    ),
+  )
   .get(
     '/pickup-authorizations',
     AuthMiddleware,

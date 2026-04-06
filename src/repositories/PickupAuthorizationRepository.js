@@ -7,6 +7,12 @@ class PickupAuthorizationRepository {
     this.model = PickupAuthorizationModel;
   }
 
+  async create(parsedData) {
+    const data = await this.model.create(parsedData);
+
+    return data;
+  }
+
   async list(req) {
     const id = req?.params?.id;
 
