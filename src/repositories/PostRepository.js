@@ -1,13 +1,13 @@
 import PostModel from '../models/Post.js';
 import PostFilterBuilder from './filters/PostFilterBuilder.js'
-
+import { CustomError, messages } from '../utils/helpers/index.js';
 class PostRepository {
   constructor() {
     this.model = PostModel;
   }
 
   async list(req) {
-        const id = req?.params?.id;
+    const id = req?.params?.id;
 
     if (id) {
       const data = await this.model.findById(id);
@@ -74,6 +74,51 @@ class PostRepository {
   async create(parsedData) {
     const data = await this.model.insertOne(parsedData);
     return data;
+  }
+
+  async update(id, parsedData, userId) {
+    if (userId) {
+      const data = await this.model.findOneAndUpdate({ id: id, author_id: userId }, parsedData, { new: true, runValidators: true })
+
+      if (!data) {
+        throw new CustomError({
+          statusCode: 404,
+          errorType: 'resourceNotFound',
+          field: 'Announcements',
+          details: [],
+          customMessage: messages.error.resourceNotFound('Announcements')
+        });
+      }
+      return data
+    }
+
+    const data = await this.model.findByIdAndUpdate(id, parsedData, {new:true})
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Announcements',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Announcements')
+      });
+    }
+    return data
+  }
+
+  async getById(id) {
+    const data = await this.model.findById(id)
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Announcements',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Announcements')
+      });
+    }
+
+    return data
   }
 }
 

@@ -1,4 +1,4 @@
-import { PostSchemaInput } from '../utils/validators/schemas/zod/PostSchema.js';
+import { PostSchemaInput, PostSchemaUpdate } from '../utils/validators/schemas/zod/PostSchema.js';
 import PostService from '../services/PostService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
@@ -12,7 +12,7 @@ class PostController {
 
   async list(req, res) {
 
-    const {id} = req.param || {}
+    const {id} = req.params || {}
 
     if(id) {
       UserIdSchema.parse(id)
@@ -38,6 +38,23 @@ class PostController {
     const data = await this.service.create(parsedData);
 
     return CommonResponse.created(res, data);
+  }
+
+  async update(req, res) {
+
+    const body = req.body;
+
+    const {id} = req.params || {}
+
+    UserIdSchema.parse(id)
+
+    const parsedData = PostSchemaUpdate.parse(body)
+
+    const userId = req.user_id
+
+    const data = await this.service.update(id, parsedData, userId)
+
+    return CommonResponse.success(res, data)
   }
 }
 
