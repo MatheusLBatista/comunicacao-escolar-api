@@ -108,6 +108,12 @@ class PickupAuthorizationService {
     return this.repository.list(req);
   }
 
+  async delete(id) {
+    await this.repository.getById(id);
+
+    return this.repository.delete(id);
+  }
+
   async validateReferences(parsedData) {
     if (parsedData.school_id) {
       await this.schoolRepository.findById(parsedData.school_id);

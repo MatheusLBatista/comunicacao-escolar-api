@@ -47,6 +47,22 @@ class PickupAuthorizationRepository {
     return data;
   }
 
+  async delete(id) {
+    const data = await this.model.findByIdAndDelete(id);
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'PickupAuthorization',
+        details: [],
+        customMessage: messages.error.resourceNotFound('PickupAuthorization'),
+      });
+    }
+
+    return data;
+  }
+
   async list(req) {
     const id = req?.params?.id;
 

@@ -40,6 +40,14 @@ router
     asyncWrapper(
       pickupAuthorizationController.update.bind(pickupAuthorizationController),
     ),
+  )
+  .delete(
+    '/pickup-authorizations/:id',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(
+      pickupAuthorizationController.delete.bind(pickupAuthorizationController),
+    ),
   );
 
 export default router;

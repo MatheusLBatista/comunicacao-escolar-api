@@ -44,6 +44,20 @@ class PickupAuthorizationController {
       'Pickup authorization updated successfully.',
     );
   }
+
+  async delete(req, res) {
+    const { id } = req.params;
+    objectIdSchema.parse(id);
+
+    const data = await this.service.delete(id);
+
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Pickup authorization deleted successfully.',
+    );
+  }
 }
 
 export default PickupAuthorizationController;
