@@ -7,8 +7,42 @@ class PickupAuthorizationRepository {
     this.model = PickupAuthorizationModel;
   }
 
+  async getById(id) {
+    const data = await this.model.findById(id);
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'PickupAuthorization',
+        details: [],
+        customMessage: messages.error.resourceNotFound('PickupAuthorization'),
+      });
+    }
+
+    return data;
+  }
+
   async create(parsedData) {
     const data = await this.model.create(parsedData);
+
+    return data;
+  }
+
+  async update(id, parsedData) {
+    const data = await this.model.findByIdAndUpdate(id, parsedData, {
+      new: true,
+    });
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'PickupAuthorization',
+        details: [],
+        customMessage: messages.error.resourceNotFound('PickupAuthorization'),
+      });
+    }
 
     return data;
   }

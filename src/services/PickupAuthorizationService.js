@@ -46,6 +46,53 @@ class PickupAuthorizationService {
     return this.repository.create(parsedData);
   }
 
+  async update(id, parsedData) {
+    const existing = await this.repository.getById(id);
+
+    const merged = {
+      ...existing.toObject(),
+      ...parsedData,
+      authorized_person: {
+        ...(existing.authorized_person || {}),
+        ...(parsedData.authorized_person || {}),
+      },
+    };
+
+    await this.validateReferences(merged);
+
+    if (merged.valid_until <= merged.valid_from) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
+        errorType: 'validationError',
+        field: 'valid_until',
+        details: [
+          {
+            path: 'valid_until',
+            message: 'valid_until deve ser maior que valid_from.',
+          },
+        ],
+        customMessage: 'O período informado é inválido.',
+      });
+    }
+
+    if (String(merged.student_id) === String(merged.authorized_by)) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
+        errorType: 'validationError',
+        field: 'authorized_by',
+        details: [
+          {
+            path: 'authorized_by',
+            message: 'authorized_by deve ser diferente de student_id.',
+          },
+        ],
+        customMessage: 'O responsável autorizado não pode ser o próprio aluno.',
+      });
+    }
+
+    return this.repository.update(id, parsedData);
+  }
+
   async list(req) {
     return this.repository.list(req);
   }

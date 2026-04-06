@@ -1,7 +1,10 @@
 import PickupAuthorizationService from '../services/PickupAuthorizationService.js';
 import objectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
-import { PickupAuthorizationSchema } from '../utils/validators/schemas/zod/PickupAuthorizationSchema.js';
-import { CommonResponse } from '../utils/helpers/index.js';
+import {
+  PickupAuthorizationSchema,
+  PickupAuthorizationUpdateSchema,
+} from '../utils/validators/schemas/zod/PickupAuthorizationSchema.js';
+import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class PickupAuthorizationController {
   constructor() {
@@ -25,6 +28,21 @@ class PickupAuthorizationController {
     const data = await this.service.list(req);
 
     return CommonResponse.success(res, data);
+  }
+
+  async update(req, res) {
+    const { id } = req.params;
+    objectIdSchema.parse(id);
+
+    const parsedData = PickupAuthorizationUpdateSchema.parse(req.body);
+    const data = await this.service.update(id, parsedData);
+
+    return CommonResponse.success(
+      res,
+      data,
+      HttpStatusCodes.OK.code,
+      'Pickup authorization updated successfully.',
+    );
   }
 }
 
