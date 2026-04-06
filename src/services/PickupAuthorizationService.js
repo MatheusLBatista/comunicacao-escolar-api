@@ -58,9 +58,13 @@ class PickupAuthorizationService {
       },
     };
 
-    await this.validateReferences(merged);
+    await this.validateReferences(parsedData);
 
-    if (merged.valid_until <= merged.valid_from) {
+    const isUpdatingDates =
+      Object.prototype.hasOwnProperty.call(parsedData, 'valid_from') ||
+      Object.prototype.hasOwnProperty.call(parsedData, 'valid_until');
+
+    if (isUpdatingDates && merged.valid_until <= merged.valid_from) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
         errorType: 'validationError',
@@ -75,7 +79,14 @@ class PickupAuthorizationService {
       });
     }
 
-    if (String(merged.student_id) === String(merged.authorized_by)) {
+    const isUpdatingPeople =
+      Object.prototype.hasOwnProperty.call(parsedData, 'student_id') ||
+      Object.prototype.hasOwnProperty.call(parsedData, 'authorized_by');
+
+    if (
+      isUpdatingPeople &&
+      String(merged.student_id) === String(merged.authorized_by)
+    ) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
         errorType: 'validationError',
