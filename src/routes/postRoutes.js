@@ -13,14 +13,16 @@ router.post(
   asyncWrapper(postController.create.bind(postController)),
 );
 
-router.get('/post', 
-  AuthMiddleware,
-  asyncWrapper(postController.list.bind(postController))
-);
-
-router.get('/post/:id',
+router.get(
+  '/post',
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController)),
-)
+);
+
+router.get(
+  '/post/:id',
+  AuthMiddleware,
+  asyncWrapper(postController.list.bind(postController)),
+);
 
 export default router;

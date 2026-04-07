@@ -22,7 +22,10 @@ class ConversationService {
 
     const participantIds = [currentUserId, participant_id];
 
-    const existing = await this.repository.findExisting(schoolId, participantIds);
+    const existing = await this.repository.findExisting(
+      schoolId,
+      participantIds,
+    );
 
     if (existing) {
       return { conversation: existing, created: false };
@@ -81,7 +84,9 @@ class ConversationService {
 
   _assertParticipant(conversation, userId) {
     const isParticipant = conversation.participants?.some(
-      (p) => p._id?.toString() === userId.toString() || p.toString() === userId.toString(),
+      (p) =>
+        p._id?.toString() === userId.toString() ||
+        p.toString() === userId.toString(),
     );
 
     if (!isParticipant) {

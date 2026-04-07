@@ -46,7 +46,9 @@ export function initSocketIO(httpServer) {
 
   io.on('connection', (socket) => {
     socket.join(`user:${socket.userId}`);
-    logger.info(`[Socket.IO] Usuário ${socket.userId} conectado. Socket: ${socket.id}`);
+    logger.info(
+      `[Socket.IO] Usuário ${socket.userId} conectado. Socket: ${socket.id}`,
+    );
 
     socket.on('join', (room) => {
       socket.join(room);
@@ -59,7 +61,9 @@ export function initSocketIO(httpServer) {
     });
 
     socket.on('disconnect', (reason) => {
-      logger.info(`[Socket.IO] Usuário ${socket.userId} desconectado. Motivo: ${reason}`);
+      logger.info(
+        `[Socket.IO] Usuário ${socket.userId} desconectado. Motivo: ${reason}`,
+      );
     });
   });
 

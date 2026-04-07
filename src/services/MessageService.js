@@ -10,7 +10,8 @@ class MessageService {
   }
 
   async send(conversationId, senderId, parsedData) {
-    const conversation = await this.conversationRepository.getById(conversationId);
+    const conversation =
+      await this.conversationRepository.getById(conversationId);
 
     this._assertParticipant(conversation, senderId);
 
@@ -32,7 +33,8 @@ class MessageService {
   }
 
   async list(conversationId, userId, query) {
-    const conversation = await this.conversationRepository.getById(conversationId);
+    const conversation =
+      await this.conversationRepository.getById(conversationId);
 
     this._assertParticipant(conversation, userId);
 
@@ -40,7 +42,8 @@ class MessageService {
   }
 
   async markAsRead(conversationId, userId) {
-    const conversation = await this.conversationRepository.getById(conversationId);
+    const conversation =
+      await this.conversationRepository.getById(conversationId);
 
     this._assertParticipant(conversation, userId);
 
@@ -53,7 +56,9 @@ class MessageService {
 
   _assertParticipant(conversation, userId) {
     const isParticipant = conversation.participants?.some(
-      (p) => p._id?.toString() === userId.toString() || p.toString() === userId.toString(),
+      (p) =>
+        p._id?.toString() === userId.toString() ||
+        p.toString() === userId.toString(),
     );
 
     if (!isParticipant) {
@@ -72,12 +77,14 @@ class MessageService {
     if (!io) return;
 
     const conversationId = conversation._id.toString();
-    const payload = typeof message.toObject === 'function' ? message.toObject() : message;
+    const payload =
+      typeof message.toObject === 'function' ? message.toObject() : message;
 
     io.to(`conversation:${conversationId}`).emit('message:new', payload);
 
     conversation.participants?.forEach((participant) => {
-      const participantId = participant._id?.toString() ?? participant.toString();
+      const participantId =
+        participant._id?.toString() ?? participant.toString();
 
       if (participantId !== senderId.toString()) {
         io.to(`user:${participantId}`).emit('message:new', payload);

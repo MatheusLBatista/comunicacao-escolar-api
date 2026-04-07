@@ -1,5 +1,5 @@
 import PostModel from '../models/Post.js';
-import PostFilterBuilder from './filters/PostFilterBuilder.js'
+import PostFilterBuilder from './filters/PostFilterBuilder.js';
 
 class PostRepository {
   constructor() {
@@ -7,7 +7,7 @@ class PostRepository {
   }
 
   async list(req) {
-        const id = req?.params?.id;
+    const id = req?.params?.id;
 
     if (id) {
       const data = await this.model.findById(id);
@@ -41,13 +41,13 @@ class PostRepository {
     const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
 
     const filterBuilder = new PostFilterBuilder()
-      .withSchoolId(school_id || "")
-      .withAuthorId(author_id || "")
-      .withTitle(title || "")
-      .withContent(content || "")
-      .withScope(scope || "")
-      .withTargetId(target_id || "")
-      .withActive(active || "");
+      .withSchoolId(school_id || '')
+      .withAuthorId(author_id || '')
+      .withTitle(title || '')
+      .withContent(content || '')
+      .withScope(scope || '')
+      .withTargetId(target_id || '')
+      .withActive(active || '');
 
     const filters = filterBuilder.build();
 

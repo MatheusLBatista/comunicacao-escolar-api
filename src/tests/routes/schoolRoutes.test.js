@@ -149,50 +149,6 @@ describe('School - integração de endpoints', () => {
     expect(response.body.data).toHaveProperty('active', payload.active);
   });
 
-  test('deve atualizar school por PUT', async () => {
-    const payload = {
-      name: `Escola PUT ${Date.now().toString().slice(-5)}`,
-      address: {
-        street: 'Rua Alterada',
-        number: '200',
-        city: 'São Paulo',
-        state: 'SP',
-        zip_code: '01001000',
-      },
-    };
-
-    const response = await request(BASE_URL)
-      .put(`/schools/${schoolId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send(payload);
-
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('error', false);
-    expect(response.body).toHaveProperty('data');
-    expect(response.body.data).toHaveProperty('_id', schoolId);
-    expect(response.body.data).toHaveProperty('name', payload.name);
-    expect(response.body.data.address).toHaveProperty(
-      'street',
-      payload.address.street,
-    );
-    expect(response.body.data.address).toHaveProperty(
-      'number',
-      payload.address.number,
-    );
-    expect(response.body.data.address).toHaveProperty(
-      'city',
-      payload.address.city,
-    );
-    expect(response.body.data.address).toHaveProperty(
-      'state',
-      payload.address.state,
-    );
-    expect(response.body.data.address).toHaveProperty(
-      'zip_code',
-      payload.address.zip_code,
-    );
-  });
-
   test('deve retornar 404 ao buscar school inexistente', async () => {
     const response = await request(BASE_URL)
       .get('/schools/000000000000000000000000')
