@@ -37,5 +37,5 @@ export const PostSchema = z.object({
   active: z.boolean().default(true),
 });
 
-export const PostSchemaInput = PostSchema.omit({ id: true });
+export const PostSchemaInput = (PostSchema.omit({ id: true })).partial({school_id:true, author_id:true});
 export const PostSchemaUpdate = PostSchema.pick({title:true, content:true, target:true, active:true}).partial()

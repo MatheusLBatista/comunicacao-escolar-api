@@ -8,12 +8,12 @@ const router = express.Router();
 const postController = new PostController();
 
 router.post(
-  '/schools/{schoolId}/post',
+  '/schools/:schoolId/post',
   AuthMiddleware,
   asyncWrapper(postController.create.bind(postController)),
 );
 
-router.get('/post', 
+router.get('/schools/:schoolId/post', 
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController))
 );

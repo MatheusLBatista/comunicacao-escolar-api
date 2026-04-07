@@ -19,8 +19,8 @@ class PostService {
     return data
   }
 
-  async create(parsedData) {
-    const school = await this.schoolRepository.findById(parsedData.school_id);
+  async create(parsedData, userId, schoolId) {
+    const school = await this.schoolRepository.findById(schoolId);
 
     if (!school) {
       throw new CustomError({
@@ -70,11 +70,11 @@ class PostService {
           customMessage: 'class_id não foi encontrado.',
         });
       }
-      const data = await this.repository.create(parsedData)
+      const data = await this.repository.create({...parsedData, author_id: userId, school_id:schoolId})
       return data
     }
 
-    const data = await this.repository.create(parsedData);
+    const data = await this.repository.create({...parsedData, author_id: userId, school_id:schoolId});
 
     // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
     return data;

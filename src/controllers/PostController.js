@@ -3,6 +3,7 @@ import PostService from '../services/PostService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { PostQuerySchema } from '../utils/validators/schemas/zod/querys/PostQuerySchema.js';
+import  ObjectIdSchema  from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 
 class PostController {
   constructor() {
@@ -14,8 +15,14 @@ class PostController {
 
     const {id} = req.params || {}
 
+    const {schoolId} = req.params || {}
+
     if(id) {
       UserIdSchema.parse(id)
+    }
+
+    if(schoolId) {
+      UserIdSchema.parse(schoolId)
     }
 
     const query = req.query || {}
@@ -30,12 +37,14 @@ class PostController {
   }
 
   async create(req, res) {
+    const { schoolId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    
     const body = req.body;
-    body.author_id = req.user_id;
-    console.log(req.user_id);
+    const userId= req.user_id;
     const parsedData = PostSchemaInput.parse(body);
 
-    const data = await this.service.create(parsedData);
+    const data = await this.service.create(parsedData, userId, schoolId);
 
     return CommonResponse.created(res, data);
   }

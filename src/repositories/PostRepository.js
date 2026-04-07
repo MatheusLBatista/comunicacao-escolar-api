@@ -27,8 +27,8 @@ class PostRepository {
       };
     }
 
+    const school_id = req.params.schoolId
     const {
-      school_id,
       author_id,
       title,
       content,
