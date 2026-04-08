@@ -206,7 +206,9 @@ describe('Post Routes - Integração', () => {
 
   describe('GET /post/:id - Buscar comunicado por ID', () => {
     test('deve retornar 401 sem token', async () => {
-      const response = await request(BASE_URL).get(`/post/${createdPostId || '507f1f77bcf86cd799439013'}`);
+      const response = await request(BASE_URL).get(
+        `/post/${createdPostId || '507f1f77bcf86cd799439013'}`,
+      );
 
       expect([401, 498]).toContain(response.status);
     });
@@ -276,7 +278,10 @@ describe('Post Routes - Integração', () => {
       expect(response.body).toHaveProperty('error', false);
       expect(response.body).toHaveProperty('data');
       expect(response.body.data).toHaveProperty('title', updatePayload.title);
-      expect(response.body.data).toHaveProperty('content', updatePayload.content);
+      expect(response.body.data).toHaveProperty(
+        'content',
+        updatePayload.content,
+      );
     });
 
     test('deve atualizar apenas alguns campos', async () => {
