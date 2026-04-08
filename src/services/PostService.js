@@ -10,7 +10,6 @@ class PostService {
     this.schoolRepository = new SchoolRepository();
     this.classRepository = new ClassRepository();
     this.userRepository = new UserRepository();
-
   }
 
   async list(req) {
@@ -74,24 +73,29 @@ class PostService {
           customMessage: 'class_id não foi encontrado.',
         });
       }
-      const data = await this.repository.create({...parsedData, author_id: userId, school_id:schoolId})
-      return data
+      const data = await this.repository.create({
+        ...parsedData,
+        author_id: userId,
+        school_id: schoolId,
+      });
+      return data;
     }
 
-    const data = await this.repository.create({...parsedData, author_id: userId, school_id:schoolId});
+    const data = await this.repository.create({
+      ...parsedData,
+      author_id: userId,
+      school_id: schoolId,
+    });
 
     // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
     return data;
   }
 
   async update(id, parsedData, userId) {
+    const user = await this.userRepository.getById(userId);
 
-    const user = await this.userRepository.getById(userId)
-
-    if (user.memberships.some(user => user.role === "admin")) {
-
-      if (parsedData.target && parsedData.target.scope != "all") {
-
+    if (user.memberships.some((user) => user.role === 'admin')) {
+      if (parsedData.target && parsedData.target.scope != 'all') {
         if (!parsedData.target.target_id) {
           throw new CustomError({
             statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -104,10 +108,12 @@ class PostService {
               },
             ],
             customMessage: 'class_id/target_id não foi encontrado.',
-          })
+          });
         }
 
-        const turma = await this.classRepository.findById(parsedData.target.target_id)
+        const turma = await this.classRepository.findById(
+          parsedData.target.target_id,
+        );
 
         if (!turma) {
           throw new CustomError({
@@ -121,24 +127,23 @@ class PostService {
               },
             ],
             customMessage: 'class_id/target_id não foi encontrado.',
-          })
+          });
         }
 
-        const data = await this.repository.update(id, parsedData)
+        const data = await this.repository.update(id, parsedData);
 
-        return data
+        return data;
       }
 
-      delete parsedData.target.target_id
-      const data = await this.repository.update(id, parsedData)
+      delete parsedData.target.target_id;
+      const data = await this.repository.update(id, parsedData);
 
-      return data
+      return data;
     }
 
-    const data = await this.repository.update(id, parsedData, userId)
+    const data = await this.repository.update(id, parsedData, userId);
 
-    return data
+    return data;
   }
-
 }
 export default PostService;

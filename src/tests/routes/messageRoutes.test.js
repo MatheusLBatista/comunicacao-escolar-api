@@ -48,7 +48,6 @@ async function getSchoolIdFromUser(token, userId) {
   return schoolId;
 }
 
-
 async function findOrCreateConversation(token, schoolId, participantId) {
   const response = await request(BASE_URL)
     .post(`/schools/${schoolId}/conversations`)
