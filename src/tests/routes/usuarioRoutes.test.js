@@ -2,7 +2,6 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import faker from 'faker-br';
 import dotenv from 'dotenv';
-import '../../../src/routes/usuarioRoutes.js';
 
 dotenv.config();
 
@@ -49,10 +48,9 @@ describe.skip('Usuários', () => {
       expect(res.body.data).toHaveProperty('_id');
       expect(res.body.data.active).toBe(true);
 
-      // Se a senha estiver presente, deve estar hashada (não pode ser a senha em texto plano)
       if (res.body.data.password) {
         expect(res.body.data.password).not.toBe('Senha1234!');
-        expect(res.body.data.password).toMatch(/^\$2[aby]\$\d+\$/); // Verifica se é um hash bcrypt
+        expect(res.body.data.password).toMatch(/^\$2[aby]\$\d+\$/);
       }
     }
   });
@@ -124,7 +122,6 @@ describe.skip('Usuários', () => {
       expect([200, 500]).toContain(res.status);
 
       if (res.status === 200) {
-        // Se a senha estiver presente, deve estar hashada (não pode ser a senha em texto plano)
         if (res.body.data.password) {
           expect(res.body.data.password).not.toBe('Senha1234!');
         }
@@ -144,7 +141,6 @@ describe.skip('Usuários', () => {
   });
 
   it('Deve retornar usuário por id (GET /usuarios/:id)', async () => {
-    // Se usuarioId não foi definido (criação falhou), pula o teste
     if (!usuarioId) {
       return;
     }
@@ -167,7 +163,6 @@ describe.skip('Usuários', () => {
   });
 
   it('Deve atualizar usuário (PUT)', async () => {
-    // Se usuarioId não foi definido (criação falhou), pula o teste
     if (!usuarioId) {
       return;
     }
@@ -283,10 +278,9 @@ describe.skip('Usuários', () => {
     const res = await request(BASE_URL).post('/signup').send(obj);
     expect([201, 500]).toContain(res.status);
 
-    // Se o usuário foi criado com sucesso e a senha estiver presente, deve estar hashada
     if (res.status === 201 && res.body.data.password) {
       expect(res.body.data.password).not.toBe('Senha1234!');
-      expect(res.body.data.password).toMatch(/^\$2[aby]\$\d+\$/); // Verifica se é um hash bcrypt
+      expect(res.body.data.password).toMatch(/^\$2[aby]\$\d+\$/);
     }
   });
 
@@ -303,7 +297,6 @@ describe.skip('Usuários', () => {
     if (res.status === 201) {
       const usuarioId = res.body.data._id;
 
-      // Buscar o usuário criado para verificar suas permissões
       const resUsuario = await request(BASE_URL)
         .get(`/usuarios/${usuarioId}`)
         .set('Authorization', `Bearer ${token}`);
@@ -312,7 +305,6 @@ describe.skip('Usuários', () => {
       if (resUsuario.status === 200) {
         const usuario = resUsuario.body.data;
 
-        // Verificar se o usuário tem o campo permissões (pode estar vazio se o grupo "Usuario" não existir)
         expect(usuario.permissions).toBeDefined();
         expect(Array.isArray(usuario.permissions)).toBe(true);
       }
