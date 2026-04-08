@@ -8,21 +8,24 @@ const router = express.Router();
 const postController = new PostController();
 
 router.post(
-  '/post',
+  '/schools/:schoolId/post',
   AuthMiddleware,
   asyncWrapper(postController.create.bind(postController)),
 );
 
-router.get(
-  '/post',
+router.get('/schools/:schoolId/post',
+  AuthMiddleware,
+  asyncWrapper(postController.list.bind(postController))
+);
+
+router.get('/post/:id',
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController)),
 );
 
-router.get(
-  '/post/:id',
+router.patch('/post/:id',
   AuthMiddleware,
-  asyncWrapper(postController.list.bind(postController)),
+  asyncWrapper(postController.update.bind(postController))
 );
 
 export default router;

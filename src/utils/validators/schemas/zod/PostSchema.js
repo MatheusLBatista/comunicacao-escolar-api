@@ -6,7 +6,7 @@ const Target = z.object({
     .regex(/^[0-9a-fA-F]{24}$/, {
       message:
         'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-    })
+    }).default(null)
     .optional(),
   scope: z.enum(['all', 'class']).default('all'),
 });
@@ -35,4 +35,5 @@ export const PostSchema = z.object({
   active: z.boolean().default(true),
 });
 
-export const PostSchemaInput = PostSchema.omit({ id: true });
+export const PostSchemaInput = (PostSchema.omit({ id: true })).partial({school_id:true, author_id:true});
+export const PostSchemaUpdate = PostSchema.pick({title:true, content:true, target:true, active:true}).partial()

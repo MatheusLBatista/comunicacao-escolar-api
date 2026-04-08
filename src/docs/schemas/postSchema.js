@@ -20,13 +20,8 @@ const postSchemas = {
 
   PostPost: {
     type: 'object',
-    required: ['school_id', 'title', 'content'],
+    required: ['title', 'content'],
     properties: {
-      school_id: {
-        type: 'string',
-        description: 'ObjectId da escola',
-        example: '000000000000000000000001',
-      },
       title: {
         type: 'string',
         description: 'Título do comunicado',
@@ -92,6 +87,31 @@ const postSchemas = {
     },
   },
 
+  PostPatch: {
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        description: 'Título do comunicado',
+        example: 'Novo título do comunicado',
+      },
+      content: {
+        type: 'string',
+        description: 'Conteúdo do comunicado',
+        example: 'Novo conteúdo do comunicado',
+      },
+      target: {
+        $ref: '#/components/schemas/PostTarget',
+      },
+      active: {
+        type: 'boolean',
+        description: 'Status do comunicado',
+        example: true,
+      },
+    },
+    additionalProperties: false,
+  },
+
   PostListagem: {
     type: 'object',
     properties: {
@@ -121,11 +141,6 @@ const postSchemas = {
   PostFiltro: {
     type: 'object',
     properties: {
-      school_id: {
-        type: 'string',
-        description: 'Filtrar por escola',
-        example: '000000000000000000000001',
-      },
       author_id: {
         type: 'string',
         description: 'Filtrar por autor',

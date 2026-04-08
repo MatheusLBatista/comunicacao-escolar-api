@@ -1,8 +1,9 @@
-import { PostSchemaInput } from '../utils/validators/schemas/zod/PostSchema.js';
+import { PostSchemaInput, PostSchemaUpdate } from '../utils/validators/schemas/zod/PostSchema.js';
 import PostService from '../services/PostService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { PostQuerySchema } from '../utils/validators/schemas/zod/querys/PostQuerySchema.js';
+import  ObjectIdSchema  from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 
 class PostController {
   constructor() {
@@ -10,13 +11,25 @@ class PostController {
   }
 
   async list(req, res) {
-    const { id } = req.param || {};
+
+    const {id} = req.params || {}
+
+    const {schoolId} = req.params || {}
+
+    if (id) {
+      UserIdSchema.parse(id);
+    }
+
+    if(schoolId) {
+      UserIdSchema.parse(schoolId)
+    }
 
     if (id) {
       UserIdSchema.parse(id);
     }
 
     const query = req.query || {};
+
 
     if (Object.keys(query).length !== 0) {
       await PostQuerySchema.safeParseAsync(query);
@@ -28,14 +41,33 @@ class PostController {
   }
 
   async create(req, res) {
+    const { schoolId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+
     const body = req.body;
-    body.author_id = req.user_id;
-    console.log(req.user_id);
+    const userId= req.user_id;
     const parsedData = PostSchemaInput.parse(body);
 
-    const data = await this.service.create(parsedData);
+    const data = await this.service.create(parsedData, userId, schoolId);
 
     return CommonResponse.created(res, data);
+  }
+
+  async update(req, res) {
+
+    const body = req.body;
+
+    const {id} = req.params || {}
+
+    UserIdSchema.parse(id)
+
+    const parsedData = PostSchemaUpdate.parse(body)
+
+    const userId = req.user_id
+
+    const data = await this.service.update(id, parsedData, userId)
+
+    return CommonResponse.success(res, data)
   }
 }
 
