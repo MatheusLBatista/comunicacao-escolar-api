@@ -79,7 +79,7 @@ class PostRepository {
 
   async update(id, parsedData, userId) {
     if (userId) {
-      const data = await this.model.findOneAndUpdate({ id: id, author_id: userId }, parsedData, { new: true, runValidators: true })
+      const data = await this.model.findOneAndUpdate({ _id: id, author_id: userId }, parsedData, { new: true, runValidators: true })
 
       if (!data) {
         throw new CustomError({
@@ -93,7 +93,7 @@ class PostRepository {
       return data
     }
 
-    const data = await this.model.findByIdAndUpdate(id, parsedData, {new:true})
+    const data = await this.model.findOneAndUpdate(id, parsedData, { new: true })
 
     if (!data) {
       throw new CustomError({
@@ -122,9 +122,35 @@ class PostRepository {
     return data
   }
 
-  async delete(id) {
-    
-    await this.model.findByIdAndDelete(id)
+  async delete(id, userId) {
+    if (userId) {
+      const data = await this.model.findOneAndDelete({ _id: id, author_id: userId })
+     
+      console.log(data)
+
+      if (!data) {
+        throw new CustomError({
+          statusCode: 404,
+          errorType: 'resourceNotFound',
+          field: 'Announcements',
+          details: [],
+          customMessage: messages.error.resourceNotFound('Announcements')
+        })
+      }
+
+      return
+    }
+
+    const data = await this.model.findByIdAndDelete(id)
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Announcements',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Announcements')
+      })
+    }
     return
   }
 }

@@ -124,13 +124,21 @@ class PostService {
             customMessage: 'class_id/target_id não foi encontrado.',
           })
         }
-        
+        if(id !== turma.school_id) {
+          throw new CustomError({
+            
+          })
+        }
+
         const data = await this.repository.update(id, parsedData)
 
         return data
       }
 
-      delete parsedData.target.target_id
+      // delete parsedData.target.target_id
+      if(parsedData.target) {
+        delete parsedData.target
+      }
       const data = await this.repository.update(id, parsedData)
 
       return data
@@ -142,9 +150,19 @@ class PostService {
   }
 
 
-  async delete(id) {
+  async delete(id, userId) {
 
-    await this.repository.delete(id)
+    const user = await this.userRepository.getById(userId)
+
+    if(user.memberships.some(user => user.role === "admin")) {
+      
+      await this.repository.delete(id)
+      
+      return 
+    }
+
+    console.log("aqui")
+    await this.repository.delete(id, userId)
 
     return
   }
