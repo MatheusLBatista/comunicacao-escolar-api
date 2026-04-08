@@ -6,7 +6,7 @@ import School from '../models/School.js';
 export default async function pickupAuthorizationSeed() {
   await PickupAuthorization.deleteMany({});
 
-  const school = await School.find({ active: true }).sort({
+  const schools = await School.find({ active: true }).sort({
     created_at: 1,
   });
   const students = await User.find({
@@ -18,19 +18,36 @@ export default async function pickupAuthorizationSeed() {
     active: true,
   }).sort({ created_at: 1 });
 
-  if (!school) {
+  if (!schools.length) {
     console.log(
       'Nenhuma escola ativa encontrada para seed de autorizações de retirada.',
     );
     return { insertedCount: 0 };
   }
 
+  if (!students.length) {
+    console.log(
+      'Nenhum aluno ativo encontrado para seed de autorizações de retirada.',
+    );
+    return { insertedCount: 0 };
+  }
+
+  if (!parents.length) {
+    console.log(
+      'Nenhum responsável ativo encontrado para seed de autorizações de retirada.',
+    );
+    return { insertedCount: 0 };
+  }
+
   const authorizations = [];
+  const defaultSchool = schools[0];
+  const defaultStudent = students[0];
+  const defaultParent = parents[0];
 
   const defaultAuthorization = {
-    school_id: school._id,
-    student_id: students._id,
-    authorized_by: parents._id,
+    school_id: defaultSchool._id,
+    student_id: defaultStudent._id,
+    authorized_by: defaultParent._id,
     authorized_person: {
       name: 'Maria da Silva',
       document: '123.456.789-00',
@@ -47,7 +64,7 @@ export default async function pickupAuthorizationSeed() {
   authorizations.push(defaultAuthorization);
 
   for (let i = 0; i < 10; i++) {
-    const randomSchool = school;
+    const randomSchool = schools[Math.floor(Math.random() * schools.length)];
     const randomStudent = students[Math.floor(Math.random() * students.length)];
     const randomResponsible =
       parents[Math.floor(Math.random() * parents.length)];
