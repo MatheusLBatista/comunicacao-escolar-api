@@ -93,7 +93,7 @@ class PostRepository {
       return data
     }
 
-    const data = await this.model.findOneAndUpdate(id, parsedData, { new: true })
+    const data = await this.model.findByIdAndUpdate(id, parsedData, { new: true })
 
     if (!data) {
       throw new CustomError({
