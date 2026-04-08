@@ -1,8 +1,8 @@
 import express from 'express';
-import LikeController from '../controllers/LikeController';
-import AuthMiddleware from '../middlewares/AuthMiddleware';
-import AuthPermission from '../middlewares/AuthPermission';
-import asyncWrapper from '../middlewares/asyncWrapper';
+import LikeController from '../controllers/LikeController.js';
+import AuthMiddleware from '../middlewares/AuthMiddleware.js';
+import AuthPermission from '../middlewares/AuthPermission.js';
+import asyncWrapper from '../middlewares/asyncWrapper.js';
 
 const router = express.Router();
 

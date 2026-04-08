@@ -1,13 +1,13 @@
-import LikeRepository from "../repositories/LikeRepository";
+import LikeRepository from "../repositories/LikeRepository.js";
 
 class LikeService {
-    constructor({likeRepository = LikeRepository}) {
-        this.repository = new likeRepository();
+    constructor() {
+        this.repository = new LikeRepository();
     }
 
     async toggleLike(user, post) {
         
-        const data = await this.repository(user, post);
+        const data = await this.repository.toglleLike(user, post);
 
         return data;
     }

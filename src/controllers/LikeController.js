@@ -1,10 +1,10 @@
-import LikeService from "../services/LikeService";
+import LikeService from "../services/LikeService.js";
 import {
   CommonResponse,
   CustomError,
   HttpStatusCodes,
 } from '../utils/helpers/index.js';
-import { UsuarioIdSchema } from "../utils/validators/schemas/zod/querys/UsuarioQuerySchema";
+import { UserIdSchema } from "../utils/validators/schemas/zod/querys/UserQuerySchema.js";
 
 class LikeController {
     constructor() {
@@ -15,7 +15,7 @@ class LikeController {
 
         const {post} = req.body;
         if(post) {
-            UsuarioIdSchema.parse(post);
+            UserIdSchema.parse(post);
         }
         const data = await this.service.toggleLike(req.user_id, post);
         CommonResponse.success(res, data);

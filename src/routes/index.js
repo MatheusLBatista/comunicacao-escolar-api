@@ -4,7 +4,6 @@ import swaggerUI from 'swagger-ui-express';
 import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
-import rotas from './rotaRoutes.js';
 import like from './likeRoutes.js'
 import users from './userRoutes.js';
 import grupos from './groupRoutes.js';
