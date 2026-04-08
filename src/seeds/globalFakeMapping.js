@@ -192,6 +192,20 @@ export const fakeMappings = {
     used: () => false,
     active: () => true,
   },
+
+  PickupLog: {
+    authorization_id: () => new mongoose.Types.ObjectId(),
+    picked_up_by: () => ({
+      user_id: null,
+      name: `${fakebr.name.firstName()} ${fakebr.name.lastName()}`,
+      document: fakebr.random.boolean() ? fakebr.br.cpf() : fakebr.br.rg(),
+    }),
+    method: () => fakebr.random.arrayElement(['qr_code', 'manual']),
+    departure_time: () => new Date(),
+    verified_by: () => new mongoose.Types.ObjectId(),
+    notes: () => fakebr.lorem.sentence(),
+    active: () => true,
+  },
 };
 
 // Retorna o mapping global, consolidando os mappings comuns e específicos.
