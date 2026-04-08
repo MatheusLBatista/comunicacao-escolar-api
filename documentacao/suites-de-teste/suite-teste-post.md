@@ -4,6 +4,14 @@ Testes E2E (endpoint) que validam os fluxos principais e regras de negócio das 
 
 Arquivo: `src/tests/routes/postRoutes.test.js`
 
+**Índice de Rotas Testadas:**
+- `POST /schools/:schoolId/post` — Criar comunicado
+- `GET /schools/:schoolId/post` — Listar comunicados da escola
+- `GET /post` — Listar todos os comunicados
+- `GET /post/:id` — Detalhe de post
+- `PATCH /post/:id` — Atualização de post
+- `DELETE /post/:id` — Exclusão de post
+
 ## Visão de Fluxo e Regras de Negócio
 
 | Regra | Comportamento Atual do Sistema | Impacto na Suite E2E |
@@ -132,10 +140,25 @@ Arquivo: `src/tests/routes/postRoutes.test.js`
 | `schoolId` com formato inválido | Deve rejeitar por validação de params. | Chamar `GET /schools/abc/post`. | Retorna `400` ou `422`. |
 | `schoolId` válido mas inexistente | Sistema pode retornar `404` ou lista vazia (`totalDocs=0`); comportamento a validar com API. | Chamar `GET /schools/000000000000000000000000/post`. | Retorna `404` ou `200` com `totalDocs=0`. |
 
+## DELETE /post/:id — Exclusão de Post
+
+| Funcionalidade | Comportamento Esperado | Verificações | Critérios de Aceite |
+| :--- | :--- | :--- | :--- |
+| **Cenários felizes** | | | |
+| Admin deleta post de qualquer autor | Deve permitir exclusão e retornar `200`. | Fazer `DELETE /post/{createdPostId}` como admin. | Retorna `200`; `error=false`; `data.message` contém "sucesso"; post não pode ser recuperado via GET /:id (retorna `404`). |
+| Autor não-admin deleta seu próprio post | Deve permitir exclusão do post próprio. | Criar post, depois `DELETE /post/{createdPostId}` como o autor. | Retorna `200`; `data.message` contém "sucesso". |
+| Exclusão retorna mensagem de sucesso | Deve indicar que post foi deletado com sucesso. | Fazer `DELETE` e validar resposta. | Retorna `200`; `data.message === "Anúncio deletado com sucesso"`. |
+| **Cenários tristes** | | | |
+| Sem token | Deve bloquear autenticação. | Chamar `DELETE /post/{id}` sem `Authorization`. | Retorna `498` ou `401`. |
+| ID com formato inválido | Deve rejeitar por validação de params. | Chamar `DELETE /post/abc`. | Retorna `400` ou `422`. |
+| ID válido mas inexistente | Deve retornar `404`. | Chamar `DELETE /post/000000000000000000000000`. | Retorna `404`; `error=true`. |
+| Autor não-admin tenta deletar post alheio | Deve negar com `403`. | Criar post com admin; tentar `DELETE` como teacher (não-dono). | Retorna `403`; `error=true`. |
+
 ## Cenários de Fluxo Integrado
 
 | Cenário | Descrição | Etapas | Critério de Sucesso |
 | :--- | :--- | :--- | :--- |
+| Criar, Listar, Detalhar, Atualizar, Deletar | Ciclo completo de CRUD com delete final | 1. POST create; 2. GET list (com filtro por author); 3. GET /:id; 4. PATCH update title; 5. DELETE /:id; 6. GET /:id (deve retornar 404). | Todos os passos até DELETE retornam `200/201`; DELETE retorna `200`; GET final retorna `404`. |
 | Criar, Listar, Detalhar, Atualizar, Desativar | Ciclo completo de CRUD com soft-delete | 1. POST create; 2. GET list (com filtro por author); 3. GET /:id; 4. PATCH update title; 5. PATCH active=false. | Todos os passos retornam `200/201`; dados persistem corretamente entre chamadas; post final fica inativo. |
 | Criar post class-scoped e validar persistência | Post com turma específica | 1. POST com `scope='class'` e `target_id` válido; 2. GET /:id e validar target; 3. PATCH com novo `scope` e verificar alteração. | POST retorna `201` com `target.scope='class'`; GET reflete dados; PATCH atualiza conforme esperado. |
 | Admin limpa `target_id` ao atualizar | Teste de remoção automática de target_id por admin | 1. POST class-scoped; 2. PATCH como admin com `scope='all'` (sem enviar target_id); 3. GET /:id | PATCH retorna `200`; GET /:id não contém `target_id`. |
