@@ -1,0 +1,175 @@
+import Event from '../models/Event.js';
+import User from '../models/User.js';
+import Class from '../models/Class.js';
+
+const EVENT_TYPES = ['event', 'meeting', 'commemorative', 'pedagogical'];
+const EVENT_TITLES = {
+  event: ['Passeio pedagógico', 'Feira de ciências', 'Mostra cultural'],
+  meeting: ['Reunião de pais', 'Conselho de classe', 'Alinhamento pedagógico'],
+  commemorative: ['Dia das Mães', 'Festa Junina', 'Semana da Criança'],
+  pedagogical: [
+    'Formação docente',
+    'Planejamento bimestral',
+    'Oficina didática',
+  ],
+};
+
+export default async function eventSeed(schools, users) {
+  await Event.deleteMany({});
+
+  const eventsPerSchool = Number(process.env.EVENTS_PER_SCHOOL) || 4;
+  const schoolIds = extractSchoolIds(schools, users);
+
+  if (schoolIds.length === 0) {
+    console.log('Nenhuma escola válida encontrada para criação de eventos.');
+    return { insertedCount: 0, events: [] };
+  }
+
+  const creators = await User.find({
+    memberships: {
+      $elemMatch: {
+        school_id: { $in: schoolIds },
+        role: { $in: ['admin', 'teacher'] },
+      },
+    },
+    active: true,
+  })
+    .select('_id memberships')
+    .lean();
+
+  const classes = await Class.find({
+    school_id: { $in: schoolIds },
+    active: true,
+  })
+    .select('_id school_id')
+    .lean();
+
+  const classIdsBySchool = new Map();
+
+  for (const turma of classes) {
+    const schoolKey = String(turma.school_id);
+
+    if (!classIdsBySchool.has(schoolKey)) {
+      classIdsBySchool.set(schoolKey, []);
+    }
+
+    classIdsBySchool.get(schoolKey).push(turma._id);
+  }
+
+  const events = [];
+
+  for (const schoolId of schoolIds) {
+    const creatorsInSchool = creators.filter((user) =>
+      user.memberships?.some(
+        (membership) =>
+          String(membership.school_id) === String(schoolId) &&
+          ['admin', 'teacher'].includes(membership.role),
+      ),
+    );
+
+    if (creatorsInSchool.length === 0) {
+      continue;
+    }
+
+    for (let index = 0; index < eventsPerSchool; index++) {
+      const creator = randomItem(creatorsInSchool);
+      const type = randomItem(EVENT_TYPES);
+      const startDate = buildStartDate(index);
+      const isAllDay = type === 'commemorative' ? true : Math.random() >= 0.5;
+      const classIds = classIdsBySchool.get(String(schoolId)) || [];
+      const target = buildEventTarget(classIds);
+
+      let endDate = null;
+      if (!isAllDay) {
+        endDate = new Date(startDate);
+        endDate.setHours(endDate.getHours() + 1);
+      }
+
+      events.push({
+        school_id: schoolId,
+        title: randomItem(EVENT_TITLES[type]),
+        description: `Evento do tipo ${type} para agenda escolar.`,
+        type,
+        start_date: startDate,
+        end_date: endDate,
+        all_day: isAllDay,
+        target,
+        created_by: creator._id,
+        active: true,
+      });
+    }
+  }
+
+  if (events.length === 0) {
+    console.log(
+      'Nenhum evento foi criado: não há usuários com papel admin/teacher nas escolas recebidas.',
+    );
+    return { insertedCount: 0, events: [] };
+  }
+
+  const result = await Event.collection.insertMany(events);
+
+  console.log(`Seeded ${result.insertedCount} events.`);
+
+  return { insertedCount: result.insertedCount, events };
+}
+
+function randomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function buildStartDate(index) {
+  const baseDate = new Date();
+  baseDate.setHours(8, 0, 0, 0);
+  baseDate.setDate(baseDate.getDate() + index + 1);
+  return baseDate;
+}
+
+function buildEventTarget(classIds) {
+  if (!classIds.length) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  const useClassScope = Math.random() >= 0.5;
+
+  if (!useClassScope) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  return {
+    scope: 'class',
+    target_id: classIds[Math.floor(Math.random() * classIds.length)],
+  };
+}
+
+function extractSchoolIds(schools, users) {
+  const ids = [];
+
+  if (Array.isArray(schools)) {
+    ids.push(...schools.map((school) => school?._id).filter(Boolean));
+  }
+
+  if (schools?.result?.insertedIds) {
+    ids.push(...Object.values(schools.result.insertedIds));
+  }
+
+  if (schools?.schools && Array.isArray(schools.schools)) {
+    ids.push(...schools.schools.map((school) => school?._id).filter(Boolean));
+  }
+
+  if (schools?.schoolId) {
+    ids.push(schools.schoolId);
+  }
+
+  if (users?.schoolId) {
+    ids.push(users.schoolId);
+  }
+
+  return [...new Set(ids.map(String))];
+}

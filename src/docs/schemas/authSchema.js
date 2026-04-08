@@ -11,14 +11,14 @@ const authSchemas = {
         description: 'Email do usuário',
         example: 'admin@admin.com',
       },
-      senha: {
+      password: {
         type: 'string',
         description: 'Senha do usuário',
         minLength: 8,
         example: 'Senha@123',
       },
     },
-    required: ['email', 'senha'],
+    required: ['email', 'password'],
     description: 'Schema para requisição de login',
   },
 
@@ -26,7 +26,7 @@ const authSchemas = {
   SignupRequest: {
     type: 'object',
     properties: {
-      nome: {
+      full_name: {
         type: 'string',
         description: 'Nome completo do usuário',
         minLength: 3,
@@ -38,7 +38,7 @@ const authSchemas = {
         description: 'Email do usuário',
         example: 'joao@email.com',
       },
-      senha: {
+      password: {
         type: 'string',
         description:
           'Senha do usuário (mínimo 8 caracteres com letras maiúsculas, minúsculas, números e caracteres especiais)',
@@ -48,7 +48,7 @@ const authSchemas = {
         example: 'MinhaSenh@123',
       },
     },
-    required: ['nome', 'email', 'senha'],
+    required: ['full_name', 'email', 'password'],
     description: 'Schema para requisição de cadastro de usuário',
   },
 
@@ -71,14 +71,14 @@ const authSchemas = {
   TokenRequest: {
     type: 'object',
     properties: {
-      refreshtoken: {
+      refresh_token: {
         type: 'string',
         description: 'Refresh token do usuário',
         example:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh_token_payload.signature',
       },
     },
-    required: ['refreshtoken'],
+    required: ['refresh_token'],
     description:
       'Schema para requisições que usam refresh token (logout, revoke, refresh)',
   },
@@ -87,14 +87,14 @@ const authSchemas = {
   IntrospectRequest: {
     type: 'object',
     properties: {
-      accesstoken: {
+      access_token: {
         type: 'string',
         description: 'Access token para verificação',
         example:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access_token_payload.signature',
       },
     },
-    required: ['accesstoken'],
+    required: ['access_token'],
     description: 'Schema para requisição de validação de token',
   },
 
@@ -110,7 +110,7 @@ const authSchemas = {
             description: 'ID do usuário',
             example: '64f234a0c781a7b30c2fe445',
           },
-          nome: {
+          full_name: {
             type: 'string',
             description: 'Nome do usuário',
             example: 'João Silva',
@@ -120,17 +120,17 @@ const authSchemas = {
             description: 'Email do usuário',
             example: 'joao@email.com',
           },
-          ativo: {
+          active: {
             type: 'boolean',
             description: 'Status do usuário',
             example: true,
           },
-          accesstoken: {
+          access_token: {
             type: 'string',
             description: 'Token de acesso JWT',
             example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
           },
-          refreshtoken: {
+          refresh_token: {
             type: 'string',
             description: 'Token de renovação',
             example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
@@ -159,7 +159,7 @@ const authSchemas = {
         description: 'ID do usuário criado',
         example: '64f234a0c781a7b30c2fe445',
       },
-      nome: {
+      full_name: {
         type: 'string',
         description: 'Nome do usuário',
         example: 'João Silva',
@@ -169,7 +169,7 @@ const authSchemas = {
         description: 'Email do usuário',
         example: 'joao@email.com',
       },
-      ativo: {
+      active: {
         type: 'boolean',
         description: 'Status do usuário',
         example: false,
@@ -191,7 +191,7 @@ const authSchemas = {
   RefreshResponse: {
     type: 'object',
     properties: {
-      accesstoken: {
+      access_token: {
         type: 'string',
         description: 'Novo token de acesso',
         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',

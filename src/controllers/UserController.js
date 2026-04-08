@@ -1,0 +1,91 @@
+import UserService from '../services/UserService.js';
+import {
+  UserQuerySchema,
+  UserIdSchema,
+} from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
+import {
+  UserSchema,
+  AdminCreateSchema,
+  UserUpdateSchema,
+} from '../utils/validators/schemas/zod/UserSchema.js';
+import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
+import { CommonResponse } from '../utils/helpers/index.js';
+
+class UserController {
+  constructor() {
+    this.service = new UserService();
+  }
+
+  async createAdmin(req, res) {
+    const parsedData = AdminCreateSchema.parse(req.body);
+    const data = await this.service.createAdmin(parsedData);
+
+    const userLimpo = data.toObject
+      ? data.toObject()
+      : { ...(data._doc || data) };
+    delete userLimpo.password;
+
+    return CommonResponse.created(res, userLimpo);
+  }
+
+  async createAtSchool(req, res) {
+    const { schoolId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+
+    const parsedData = UserSchema.parse(req.body);
+    const data = await this.service.createAtSchool(schoolId, parsedData);
+
+    const userLimpo = data.toObject
+      ? data.toObject()
+      : { ...(data._doc || data) };
+    delete userLimpo.password;
+
+    return CommonResponse.created(res, userLimpo);
+  }
+
+  async listBySchool(req, res) {
+    const { schoolId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+
+    const query = req.query || {};
+    if (Object.keys(query).length !== 0) {
+      UserQuerySchema.parse(query);
+    }
+
+    const data = await this.service.listBySchool(schoolId, query);
+    return CommonResponse.success(res, data);
+  }
+
+  async getById(req, res) {
+    const { id } = req.params;
+    UserIdSchema.parse(id);
+
+    const data = await this.service.getById(id);
+    return CommonResponse.success(res, data);
+  }
+
+  async update(req, res) {
+    const { id } = req.params;
+    UserIdSchema.parse(id);
+
+    const parsedData = UserUpdateSchema.parse(req.body);
+    const data = await this.service.update(id, parsedData);
+
+    return CommonResponse.success(res, data);
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+    UserIdSchema.parse(id);
+
+    const data = await this.service.delete(id);
+    return CommonResponse.success(
+      res,
+      data,
+      200,
+      'Usuário desativado com sucesso.',
+    );
+  }
+}
+
+export default UserController;

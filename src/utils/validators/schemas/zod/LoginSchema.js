@@ -7,13 +7,13 @@ const LoginSchema = z.object({
     .string()
     .email('Formato de email inválido.')
     .min(1, 'Campo email é obrigatório.'),
-  senha: z
+  password: z
     .string()
     .min(8, 'A senha deve ter pelo menos 8 caracteres.')
     .refine(
-      (senha) => {
-        if (!senha) return true;
-        return senhaRegex.test(senha);
+      (password) => {
+        if (!password) return true;
+        return senhaRegex.test(password);
       },
       {
         message:

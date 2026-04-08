@@ -22,7 +22,7 @@ const gruposSchemas = {
         description: 'Status do grupo',
         example: true,
       },
-      permissoes: {
+      permissions: {
         type: 'array',
         items: {
           $ref: '#/components/schemas/PermissaoSchema',
@@ -55,7 +55,7 @@ const gruposSchemas = {
         description: 'Status do grupo',
         example: true,
       },
-      permissoes: {
+      permissions: {
         type: 'array',
         items: {
           $ref: '#/components/schemas/PermissaoSchema',
@@ -89,7 +89,7 @@ const gruposSchemas = {
         description: 'Status do grupo',
         example: true,
       },
-      permissoes: {
+      permissions: {
         type: 'array',
         items: {
           $ref: '#/components/schemas/PermissaoSchema',
@@ -207,49 +207,49 @@ const gruposSchemas = {
 
   PermissaoSchema: {
     type: 'object',
-    required: ['rota', 'dominio'],
+    required: ['route', 'domain'],
     properties: {
-      rota: {
+      route: {
         type: 'string',
         description: 'Nome da rota',
         example: '/usuarios',
       },
-      dominio: {
+      domain: {
         type: 'string',
         description: 'Domínio da aplicação',
         example: 'http://localhost:3000',
       },
-      ativo: {
+      active: {
         type: 'boolean',
         default: true,
         description: 'Status da permissão',
         example: true,
       },
-      buscar: {
+      get: {
         type: 'boolean',
         default: false,
         description: 'Permissão para buscar/listar',
         example: true,
       },
-      enviar: {
+      post: {
         type: 'boolean',
         default: false,
         description: 'Permissão para criar',
         example: false,
       },
-      substituir: {
+      put: {
         type: 'boolean',
         default: false,
         description: 'Permissão para substituir (PUT)',
         example: false,
       },
-      modificar: {
+      patch: {
         type: 'boolean',
         default: false,
         description: 'Permissão para modificar (PATCH)',
         example: false,
       },
-      excluir: {
+      delete: {
         type: 'boolean',
         default: false,
         description: 'Permissão para excluir',

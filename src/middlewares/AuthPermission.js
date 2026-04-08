@@ -2,7 +2,7 @@
 
 import jwt from 'jsonwebtoken';
 import PermissionService from '../services/PermissionService.js';
-import Rota from '../models/Rota.js';
+import Rota from '../models/Route.js';
 import { CustomError, errorHandler, messages } from '../utils/helpers/index.js';
 
 // Certifique-se de que as variáveis de ambiente estejam carregadas
@@ -58,12 +58,12 @@ class AuthPermission {
        */
       const rotaReq = req.url.split('/').filter(Boolean)[0].split('?')[0];
 
-      const dominioReq = `localhost`; // domínio foi colocado como localhost para fins de teste
+      const dominioReq = process.env.PERMISSION_DOMAIN || 'localhost';
 
       // 4. Busca a rota atual no banco de dados
       const rotaDB = await this.Rota.findOne({
-        rota: rotaReq,
-        dominio: dominioReq,
+        route: rotaReq,
+        domain: dominioReq,
       });
       if (!rotaDB) {
         throw new CustomError({
@@ -77,11 +77,11 @@ class AuthPermission {
 
       // 5. Mapeia o método HTTP para o campo de permissão correspondente
       const metodoMap = {
-        GET: 'buscar',
-        POST: 'enviar',
-        PUT: 'substituir',
-        PATCH: 'modificar',
-        DELETE: 'excluir',
+        GET: 'get',
+        POST: 'post',
+        PUT: 'put',
+        PATCH: 'patch',
+        DELETE: 'delete',
       };
 
       const metodo = metodoMap[req.method];
@@ -96,7 +96,7 @@ class AuthPermission {
       }
 
       // 6. Verifica se a rota está ativa e suporta o método
-      if (!rotaDB.ativo || !rotaDB[metodo]) {
+      if (!rotaDB.active || !rotaDB[metodo]) {
         throw new CustomError({
           statusCode: 403,
           errorType: 'forbidden',
@@ -110,10 +110,11 @@ class AuthPermission {
       const hasPermission = await this.permissionService.hasPermission(
         userId,
         rotaReq.toLowerCase(),
-        rotaDB.dominio,
+        rotaDB.domain,
         metodo,
         req.params,
         req.method,
+        req.originalUrl,
       );
 
       if (!hasPermission) {

@@ -7,8 +7,8 @@ import {
   messages,
 } from '../utils/helpers/index.js';
 import { LoginSchema } from '../utils/validators/schemas/zod/LoginSchema.js';
-import { UsuarioUpdateSchema } from '../utils/validators/schemas/zod/UsuarioSchema.js';
-import { UsuarioIdSchema } from '../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
+import { UserUpdateSchema } from '../utils/validators/schemas/zod/UserSchema.js';
+import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { RequestAuthorizationSchema } from '../utils/validators/schemas/zod/querys/RequestAuthorizationSchema.js';
 import { EmailSchema } from '../utils/validators/schemas/zod/EmailSchema.js';
 
@@ -36,10 +36,10 @@ class AuthController {
   /**
    *  Metodo para recuperar a senha do usuário
    */
-  recuperaSenha = async (req, res) => {
+  recoverPassword = async (req, res) => {
     // Validar apenas o email
     const validatedBody = EmailSchema.parse(req.body);
-    const data = await this.service.recuperaSenha(validatedBody);
+    const data = await this.service.recoverPassword(validatedBody);
     return CommonResponse.success(res, data);
   };
 
@@ -54,9 +54,9 @@ class AuthController {
    *    → Busca usuário pelo campo `codigo_recupera_senha`, salva hash da nova senha (mesmo se inativo),
    *      e “zera” o campo `codigo_recupera_senha`.
    */
-  async atualizarSenhaToken(req, res, next) {
+  async updatePasswordByToken(req, res, next) {
     const tokenRecuperacao = req.query.token || req.params.token || null; // token de recuperação passado na URL
-    const senha = req.body.senha || null; // nova senha passada no body
+    const password = req.body.password || null; // nova senha passada no body
 
     // 1) Verifica se veio o token de recuperação
     if (!tokenRecuperacao) {
@@ -71,10 +71,10 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UsuarioUpdateSchema.parse({ senha: senha });
+    const passwordSchema = UserUpdateSchema.parse({ password: password });
 
     // atualiza a senha
-    await this.service.atualizarSenhaToken(tokenRecuperacao, senhaSchema);
+    await this.service.updatePasswordByToken(tokenRecuperacao, passwordSchema);
 
     return CommonResponse.success(
       res,
@@ -85,15 +85,15 @@ class AuthController {
     );
   }
 
-  async atualizarSenhaCodigo(req, res, next) {
-    const codigo_recupera_senha = req.body.codigo_recupera_senha || null; // código de recuperação passado no body
-    const senha = req.body.senha || null; // nova senha passada no body
+  async updatePasswordByCode(req, res, next) {
+    const password_recovery_code = req.body.password_recovery_code || null; // código de recuperação passado no body
+    const password = req.body.password || null; // new password passed in body
 
-    console.log('codigo_recupera_senha:', codigo_recupera_senha);
-    console.log('senha:', senha);
+    console.log('password_recovery_code:', password_recovery_code);
+    console.log('password:', password);
 
     // 1) Verifica se veio o código de recuperação
-    if (!codigo_recupera_senha) {
+    if (!password_recovery_code) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
         errorType: 'unauthorized',
@@ -105,10 +105,13 @@ class AuthController {
     }
 
     // Validar a senha com o schema
-    const senhaSchema = UsuarioUpdateSchema.parse({ senha });
+    const passwordSchema = UserUpdateSchema.parse({ password });
 
     // atualiza a senha
-    await this.service.atualizarSenhaCodigo(codigo_recupera_senha, senhaSchema);
+    await this.service.updatePasswordByCode(
+      password_recovery_code,
+      passwordSchema,
+    );
 
     return CommonResponse.success(
       res,
@@ -223,7 +226,7 @@ class AuthController {
       });
     }
     // Valida o ID do usuário
-    UsuarioIdSchema.parse(decoded.id);
+    UserIdSchema.parse(decoded.id);
 
     // Encaminha o token para o serviço de logout
     const data = await this.service.logout(decoded.id, token);
@@ -244,13 +247,13 @@ class AuthController {
     const decoded =
       /** @type {{ id: string, exp?: number, iat?: number, nbf?: number, client_id?: string, aud?: string }} */ (
         await promisify(jwt.verify)(
-          validatedBody.accesstoken,
+          validatedBody.access_token,
           process.env.JWT_SECRET_ACCESS_TOKEN,
         )
       );
 
     // 3. Valida ID de usuário
-    UsuarioIdSchema.parse(decoded.id);
+    UserIdSchema.parse(decoded.id);
 
     // 4. Prepara campos de introspecção
     const now = Math.floor(Date.now() / 1000);

@@ -1,0 +1,103 @@
+import RouteService from '../services/RouteService.js';
+import { CommonResponse } from '../utils/helpers/index.js';
+import {
+  RouteQuerySchema,
+  RouteIdSchema,
+} from '../utils/validators/schemas/zod/querys/RouteQuerySchema.js';
+import {
+  RouteSchema,
+  RouteUpdateSchema,
+} from '../utils/validators/schemas/zod/RouteSchema.js';
+
+class RouteController {
+  constructor() {
+    this.service = new RouteService();
+  }
+
+  /**
+   * Validação nesta aplicação segue o segue este artigo:
+   * https://docs.google.com/document/d/1m2Ns1rIxpUzG5kRsgkbaQFdm7od0e7HSHfaSrrwegmM/edit?usp=sharing
+   */
+
+  /**
+   * Lista grupos. Se um ID é fornecido, retorna um único objeto.
+   * Caso contrário, retorna todos os objetos com suporte a filtros e paginação.
+   */
+  async list(req, res) {
+    console.log(
+      'Estou no listar em RotaController, enviando req para RotaService',
+    );
+
+    //1ª Validação estrutural - validação do ID passado por parâmetro
+    const { id } = req.params || null;
+    if (id) {
+      RouteIdSchema.parse(id); // Lança erro automaticamente se inválido
+    }
+
+    // 2º Validação estrutural - validar os demais campos passados por query
+    const query = req.query || {};
+    if (Object.keys(query).length !== 0) {
+      const validatedQuery = RouteQuerySchema.parse(req.query);
+    }
+
+    // Chama o serviço para listar as rotas
+    const data = await this.service.list(req);
+
+    console.log('Estou retornando os dados em RotaController');
+    return CommonResponse.success(res, data);
+  }
+
+  /**
+   * Cria uma nova rota.
+   */
+  async create(req, res) {
+    console.log('Estou no criar em RotaController');
+
+    // Validação dos dados de entrada usando Zod (estrutural)
+    const parsedData = RouteSchema.parse(req.body);
+    const data = await this.service.create(parsedData);
+    // Se chegou até aqui, é porque deu tudo certo, retornar 201 Created
+    return CommonResponse.created(res, data);
+  }
+
+  /**
+   *  Atualiza uma rota existente.
+   */
+  async update(req, res) {
+    console.log('Estou no atualizar em RotaController');
+
+    // 1ª Validação estrutural - validação do ID passado por parâmetro
+    const { id } = req.params || null;
+    if (id) {
+      RouteIdSchema.parse(id); // Lança erro automaticamente se inválido
+    }
+
+    // 2ª Validação estrutural - validar os demais campos passados por query
+    const parsedData = RouteUpdateSchema.parse(req.body);
+
+    // Chama o serviço para atualizar a rota
+    const data = await this.service.update(parsedData, id);
+
+    // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
+    return CommonResponse.success(res, data);
+  }
+
+  /**
+   * Método para deletar uma rota existente.
+   */
+  async delete(req, res) {
+    console.log('Estou no deletar em RotaController');
+
+    // 1ª Validação estrutural - validação do ID passado por parâmetro
+    const { id } = req.params || null;
+    if (id) {
+      RouteIdSchema.parse(id); // Lança erro automaticamente se inválido
+    }
+
+    // Chama o serviço para deletar a rota
+    const data = await this.service.delete(req, id);
+    return CommonResponse.success(res, data);
+  }
+}
+
+export default RouteController;

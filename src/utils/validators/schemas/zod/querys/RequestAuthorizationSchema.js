@@ -15,11 +15,11 @@ import { z } from 'zod';
 
 const RequestAuthorizationSchema = z
   .object({
-    accesstoken: z
+    access_token: z
       .string()
-      .min(1, 'Accesstoken não pode ser vazio')
+      .min(1, 'Access token não pode ser vazio')
       .refine((val) => val.trim().toLowerCase() !== 'null', {
-        message: 'Accesstoken inválido',
+        message: 'Access token inválido',
       })
       .transform((val) => val.trim()),
 
