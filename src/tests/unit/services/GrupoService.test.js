@@ -1,5 +1,5 @@
-import GroupService from '../../services/GroupService.js'';
-import GroupRepository from '../../repositories/GroupRepository.js'';
+import GroupService from '../../services/GroupService.js';
+import GroupRepository from '../../repositories/GroupRepository.js';
 import UsuarioRepository from '../../../repositories/UsuarioRepository.js';
 import { CustomError, HttpStatusCodes } from '../../../utils/helpers/index.js';
 

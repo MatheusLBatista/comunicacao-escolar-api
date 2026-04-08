@@ -1,6 +1,6 @@
 import UsuarioService from '../../../services/UsuarioService.js';
 import UsuarioRepository from '../../../repositories/UsuarioRepository.js';
-import GroupRepository from '../../repositories/GroupRepository.js'';
+import GroupRepository from '../../repositories/GroupRepository.js';
 import bcrypt from 'bcrypt';
 
 jest.mock('../../../repositories/UsuarioRepository.js');
