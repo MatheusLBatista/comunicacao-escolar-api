@@ -9,6 +9,7 @@ export default async function seedRoutes() {
     'grupos',
     'rotas',
     'posts',
+    'events',
     'daily-logs',
     'daily-log-templates',
     'conversations',

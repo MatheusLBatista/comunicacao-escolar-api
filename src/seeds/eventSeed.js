@@ -1,5 +1,6 @@
 import Event from '../models/Event.js';
 import User from '../models/User.js';
+import Class from '../models/Class.js';
 
 const EVENT_TYPES = ['event', 'meeting', 'commemorative', 'pedagogical'];
 const EVENT_TITLES = {
@@ -36,19 +37,25 @@ export default async function eventSeed(schools, users) {
     .select('_id memberships')
     .lean();
 
-  const students = await User.find({
-    memberships: {
-      $elemMatch: {
-        school_id: { $in: schoolIds },
-        role: 'student',
-      },
-    },
+  const classes = await Class.find({
+    school_id: { $in: schoolIds },
     active: true,
   })
-    .select('memberships')
+    .select('_id school_id')
     .lean();
 
-  const classIdsBySchool = buildClassIdsBySchool(students);
+  const classIdsBySchool = new Map();
+
+  for (const turma of classes) {
+    const schoolKey = String(turma.school_id);
+
+    if (!classIdsBySchool.has(schoolKey)) {
+      classIdsBySchool.set(schoolKey, []);
+    }
+
+    classIdsBySchool.get(schoolKey).push(turma._id);
+  }
+
   const events = [];
 
   for (const schoolId of schoolIds) {
@@ -64,14 +71,13 @@ export default async function eventSeed(schools, users) {
       continue;
     }
 
-    const classIds = classIdsBySchool.get(String(schoolId)) || [];
-
     for (let index = 0; index < eventsPerSchool; index++) {
       const creator = randomItem(creatorsInSchool);
       const type = randomItem(EVENT_TYPES);
       const startDate = buildStartDate(index);
       const isAllDay = type === 'commemorative' ? true : Math.random() >= 0.5;
-      const hasClassTarget = classIds.length > 0 && Math.random() >= 0.5;
+      const classIds = classIdsBySchool.get(String(schoolId)) || [];
+      const target = buildEventTarget(classIds);
 
       let endDate = null;
       if (!isAllDay) {
@@ -87,10 +93,7 @@ export default async function eventSeed(schools, users) {
         start_date: startDate,
         end_date: endDate,
         all_day: isAllDay,
-        target: {
-          scope: hasClassTarget ? 'class' : 'all',
-          target_id: hasClassTarget ? randomItem(classIds) : null,
-        },
+        target,
         created_by: creator._id,
         active: true,
       });
@@ -122,29 +125,27 @@ function buildStartDate(index) {
   return baseDate;
 }
 
-function buildClassIdsBySchool(students) {
-  const map = new Map();
-
-  for (const student of students) {
-    for (const membership of student.memberships || []) {
-      if (membership.role !== 'student' || !membership.school_id) continue;
-      if (!membership.class_id) continue;
-
-      const schoolKey = String(membership.school_id);
-      const classId = membership.class_id;
-
-      if (!map.has(schoolKey)) {
-        map.set(schoolKey, []);
-      }
-
-      const existingClassIds = map.get(schoolKey);
-      if (!existingClassIds.some((id) => String(id) === String(classId))) {
-        existingClassIds.push(classId);
-      }
-    }
+function buildEventTarget(classIds) {
+  if (!classIds.length) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
   }
 
-  return map;
+  const useClassScope = Math.random() >= 0.5;
+
+  if (!useClassScope) {
+    return {
+      scope: 'all',
+      target_id: null,
+    };
+  }
+
+  return {
+    scope: 'class',
+    target_id: classIds[Math.floor(Math.random() * classIds.length)],
+  };
 }
 
 function extractSchoolIds(schools, users) {
