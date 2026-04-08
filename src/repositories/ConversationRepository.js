@@ -35,9 +35,7 @@ class ConversationRepository {
       page: parseInt(page, 10),
       limit,
       sort: { last_message_at: -1 },
-      populate: [
-        { path: 'participants', select: 'full_name email' },
-      ],
+      populate: [{ path: 'participants', select: 'full_name email' }],
     };
 
     const result = await this.model.paginate(filters, options);

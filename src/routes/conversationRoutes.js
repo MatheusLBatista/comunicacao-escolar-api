@@ -21,7 +21,9 @@ router
     '/schools/:schoolId/conversations',
     AuthMiddleware,
     AuthPermission,
-    asyncWrapper(conversationController.findOrCreate.bind(conversationController)),
+    asyncWrapper(
+      conversationController.findOrCreate.bind(conversationController),
+    ),
   )
   .get(
     '/conversations/:id',

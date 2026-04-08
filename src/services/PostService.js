@@ -7,13 +7,13 @@ class PostService {
   constructor() {
     this.repository = new PostRepository();
     this.schoolRepository = new SchoolRepository();
-    this.classRepository = new ClassRepository()
+    this.classRepository = new ClassRepository();
   }
 
   async list(req) {
-    const data = await this.repository.list(req)
+    const data = await this.repository.list(req);
 
-    return data
+    return data;
   }
 
   async create(parsedData) {
@@ -52,8 +52,10 @@ class PostService {
           customMessage: 'target_id não é válido ou está ausente.',
         });
       }
-      const turma = await this.classRepository.findById(parsedData.target.target_id)
-      if(!turma) {
+      const turma = await this.classRepository.findById(
+        parsedData.target.target_id,
+      );
+      if (!turma) {
         throw new CustomError({
           statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
           errorType: 'unprocessableEntity',
@@ -67,8 +69,8 @@ class PostService {
           customMessage: 'class_id não foi encontrado.',
         });
       }
-      const data = await this.repository.create(parsedData)
-      return data
+      const data = await this.repository.create(parsedData);
+      return data;
     }
 
     const data = await this.repository.create(parsedData);

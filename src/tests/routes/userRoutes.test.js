@@ -292,7 +292,9 @@ describe('POST /schools/:schoolId/users — Criação/Vinculação de Usuário n
     const originalMembershipCount =
       createAdminResponse.body.data.memberships.length;
 
-    const schoolPayload = createSchoolUserPayload({ email: adminPayload.email });
+    const schoolPayload = createSchoolUserPayload({
+      email: adminPayload.email,
+    });
 
     const response = await request(BASE_URL)
       .post(`/schools/${schoolId}/users`)
@@ -329,7 +331,10 @@ describe('POST /schools/:schoolId/users — Criação/Vinculação de Usuário n
 
   test('membership de student com class_id - 201, membership contém class_id', async () => {
     const classId = '000000000000000000000002';
-    const payload = createSchoolUserPayload({ role: 'student', class_id: classId });
+    const payload = createSchoolUserPayload({
+      role: 'student',
+      class_id: classId,
+    });
 
     const response = await request(BASE_URL)
       .post(`/schools/${schoolId}/users`)
@@ -647,9 +652,7 @@ describe('GET /schools/:schoolId/users — Listagem de Usuários por Escola', ()
   });
 
   test('sem token - 498', async () => {
-    const response = await request(BASE_URL).get(
-      `/schools/${schoolId}/users`,
-    );
+    const response = await request(BASE_URL).get(`/schools/${schoolId}/users`);
 
     expect(response.status).toBe(498);
   });
@@ -828,9 +831,7 @@ describe('PATCH /users/:id — Atualização de Usuário', () => {
 
   test('admin substitui memberships com novo array - 200, memberships igual ao payload', async () => {
     const schoolId = await getAdminSchoolId(adminToken);
-    const novosMemberships = [
-      { school_id: schoolId, role: 'teacher' },
-    ];
+    const novosMemberships = [{ school_id: schoolId, role: 'teacher' }];
 
     const response = await request(BASE_URL)
       .patch(`/users/${targetUserId}`)
@@ -839,7 +840,9 @@ describe('PATCH /users/:id — Atualização de Usuário', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.memberships.length).toBe(1);
-    expect(response.body.data.memberships[0].school_id.toString()).toBe(schoolId);
+    expect(response.body.data.memberships[0].school_id.toString()).toBe(
+      schoolId,
+    );
     expect(response.body.data.memberships[0]).toHaveProperty('role', 'teacher');
   });
 
