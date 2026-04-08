@@ -9,9 +9,11 @@ export default async function seedRoutes() {
     'grupos',
     'rotas',
     'posts',
+    'events',
     'daily-logs',
     'daily-log-templates',
     'conversations',
+    'pickup-authorizations',
   ];
 
   const routes = routesArray.map((route) => ({

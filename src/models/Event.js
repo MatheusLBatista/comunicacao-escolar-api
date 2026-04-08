@@ -43,8 +43,8 @@ class Event {
             default: 'all',
           },
           target_id: {
-            //class id when scope is 'class', otherwise null
             type: mongoose.Schema.Types.ObjectId,
+            ref: 'class',
             default: null,
           },
         },

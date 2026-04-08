@@ -4,12 +4,18 @@ import gruposSchemas from '../schemas/grupoSchema.js';
 import rotasSchemas from '../schemas/rotaSchema.js';
 import conversationSchemas from '../schemas/conversationSchema.js';
 import postSchemas from '../schemas/postSchema.js';
+import eventSchemas from '../schemas/eventSchema.js';
+import schoolSchemas from '../schemas/schoolSchema.js';
+import pickupAuthorizationSchemas from '../schemas/pickupAuthorizationSchema.js';
 import usuariosPaths from '../paths/usuarios.js';
 import authPaths from '../paths/auth.js';
 import gruposPaths from '../paths/grupo.js';
 import rotasPaths from '../paths/rota.js';
 import conversationPaths from '../paths/conversation.js';
 import postPaths from '../paths/post.js';
+import pickupAuthorizationPaths from '../paths/pickupAuthorization.js';
+import eventPaths from '../paths/event.js';
+import schoolPaths from '../paths/school.js';
 
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
@@ -71,6 +77,10 @@ const getSwaggerOptions = () => {
           name: 'Conversas',
           description: 'Rotas para chat entre usuários',
         },
+        {
+          name: 'Eventos',
+          description: 'Rotas para gestão de eventos escolares',
+        },
       ],
       paths: {
         ...authPaths,
@@ -79,6 +89,9 @@ const getSwaggerOptions = () => {
         ...rotasPaths,
         ...conversationPaths,
         ...postPaths,
+        ...pickupAuthorizationPaths,
+        ...eventPaths,
+        ...schoolPaths,
       },
       components: {
         securitySchemes: {
@@ -95,6 +108,9 @@ const getSwaggerOptions = () => {
           ...rotasSchemas,
           ...conversationSchemas,
           ...postSchemas,
+          ...pickupAuthorizationSchemas,
+          ...eventSchemas,
+          ...schoolSchemas,
         },
       },
       security: [

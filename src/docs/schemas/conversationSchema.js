@@ -28,11 +28,28 @@ const conversationSchemas = {
         items: { type: 'string' },
         example: ['664f1b2c3a9d4e0012345679', '664f1b2c3a9d4e001234567a'],
       },
-      type: { type: 'string', enum: ['private', 'daily_log_reply'], example: 'private' },
-      last_message_at: { type: 'string', format: 'date-time', nullable: true, example: '2024-06-01T10:00:00.000Z' },
+      type: {
+        type: 'string',
+        enum: ['private', 'daily_log_reply'],
+        example: 'private',
+      },
+      last_message_at: {
+        type: 'string',
+        format: 'date-time',
+        nullable: true,
+        example: '2024-06-01T10:00:00.000Z',
+      },
       active: { type: 'boolean', example: true },
-      created_at: { type: 'string', format: 'date-time', example: '2024-06-01T09:00:00.000Z' },
-      updated_at: { type: 'string', format: 'date-time', example: '2024-06-01T10:00:00.000Z' },
+      created_at: {
+        type: 'string',
+        format: 'date-time',
+        example: '2024-06-01T09:00:00.000Z',
+      },
+      updated_at: {
+        type: 'string',
+        format: 'date-time',
+        example: '2024-06-01T10:00:00.000Z',
+      },
     },
   },
 
@@ -73,18 +90,29 @@ const conversationSchemas = {
       _id: { type: 'string', example: '664f1b2c3a9d4e0012345680' },
       conversation_id: { type: 'string', example: '664f1b2c3a9d4e0012345678' },
       sender_id: { type: 'string', example: '664f1b2c3a9d4e0012345679' },
-      text: { type: 'string', example: 'Olá! Gostaria de conversar sobre o desempenho do seu filho.' },
+      text: {
+        type: 'string',
+        example: 'Olá! Gostaria de conversar sobre o desempenho do seu filho.',
+      },
       read_by: {
         type: 'array',
         items: {
           type: 'object',
           properties: {
             user_id: { type: 'string', example: '664f1b2c3a9d4e001234567a' },
-            at: { type: 'string', format: 'date-time', example: '2024-06-01T10:05:00.000Z' },
+            at: {
+              type: 'string',
+              format: 'date-time',
+              example: '2024-06-01T10:05:00.000Z',
+            },
           },
         },
       },
-      sent_at: { type: 'string', format: 'date-time', example: '2024-06-01T10:00:00.000Z' },
+      sent_at: {
+        type: 'string',
+        format: 'date-time',
+        example: '2024-06-01T10:00:00.000Z',
+      },
       active: { type: 'boolean', example: true },
     },
   },

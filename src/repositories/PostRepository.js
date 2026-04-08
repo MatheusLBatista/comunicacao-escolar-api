@@ -1,6 +1,7 @@
 import PostModel from '../models/Post.js';
 import PostFilterBuilder from './filters/PostFilterBuilder.js'
 import { CustomError, messages } from '../utils/helpers/index.js';
+
 class PostRepository {
   constructor() {
     this.model = PostModel;
@@ -41,13 +42,13 @@ class PostRepository {
     const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
 
     const filterBuilder = new PostFilterBuilder()
-      .withSchoolId(school_id || "")
-      .withAuthorId(author_id || "")
-      .withTitle(title || "")
-      .withContent(content || "")
-      .withScope(scope || "")
-      .withTargetId(target_id || "")
-      .withActive(active || "");
+      .withSchoolId(school_id || '')
+      .withAuthorId(author_id || '')
+      .withTitle(title || '')
+      .withContent(content || '')
+      .withScope(scope || '')
+      .withTargetId(target_id || '')
+      .withActive(active || '');
 
     const filters = filterBuilder.build();
 

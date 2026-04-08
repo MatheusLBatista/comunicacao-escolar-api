@@ -10,7 +10,6 @@ class PostController {
     this.service = new PostService();
   }
 
-
   async list(req, res) {
 
     const {id} = req.params || {}
@@ -25,15 +24,20 @@ class PostController {
       UserIdSchema.parse(schoolId)
     }
 
-    const query = req.query || {}
-
-    if (Object.keys(query).length !== 0) {
-      await PostQuerySchema.safeParseAsync(query)
+    if (id) {
+      UserIdSchema.parse(id);
     }
 
-    const data = await this.service.list(req)
+    const query = req.query || {};
 
-    return CommonResponse.success(res, data)
+
+    if (Object.keys(query).length !== 0) {
+      await PostQuerySchema.safeParseAsync(query);
+    }
+
+    const data = await this.service.list(req);
+
+    return CommonResponse.success(res, data);
   }
 
   async create(req, res) {

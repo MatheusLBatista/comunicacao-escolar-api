@@ -33,12 +33,6 @@ router
     AuthPermission,
     asyncWrapper(schoolController.update.bind(schoolController)),
   )
-  .put(
-    '/schools/:id',
-    AuthMiddleware,
-    AuthPermission,
-    asyncWrapper(schoolController.update.bind(schoolController)),
-  )
   .delete(
     '/schools/:id',
     AuthMiddleware,

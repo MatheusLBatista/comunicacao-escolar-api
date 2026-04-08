@@ -1,8 +1,6 @@
 import MessageService from '../services/MessageService.js';
 import { MessageSchema } from '../utils/validators/schemas/zod/MessageSchema.js';
-import {
-  MessageQuerySchema,
-} from '../utils/validators/schemas/zod/querys/MessageQuerySchema.js';
+import { MessageQuerySchema } from '../utils/validators/schemas/zod/querys/MessageQuerySchema.js';
 import { ConversationIdSchema } from '../utils/validators/schemas/zod/querys/ConversationQuerySchema.js';
 import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
 

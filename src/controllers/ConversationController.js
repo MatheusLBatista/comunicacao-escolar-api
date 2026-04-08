@@ -4,7 +4,7 @@ import {
   ConversationIdSchema,
   ConversationQuerySchema,
 } from '../utils/validators/schemas/zod/querys/ConversationQuerySchema.js';
-import { CommonResponse, HttpStatusCodes } from '../utils/helpers/index.js';
+import { CommonResponse } from '../utils/helpers/index.js';
 
 class ConversationController {
   constructor() {
