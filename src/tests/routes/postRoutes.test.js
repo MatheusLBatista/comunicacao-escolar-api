@@ -22,18 +22,33 @@ async function loginAndGetToken() {
 }
 
 async function getFirstSchoolId(token) {
-	const response = await request(BASE_URL)
+	const listResponse = await request(BASE_URL)
 		.get('/schools')
 		.set('Authorization', `Bearer ${token}`);
 
-	expect(response.status).toBe(200);
+	expect(listResponse.status).toBe(200);
 
-	const schools = response.body?.data?.docs || [];
-	const firstSchoolId = schools[0]?._id;
+	const docs = listResponse.body?.data?.docs || [];
+	if (docs.length > 0) return docs[0]._id;
 
-	expect(firstSchoolId).toBeTruthy();
+	const suffix = Date.now().toString().slice(-14).padStart(14, '0');
+	const createResponse = await request(BASE_URL)
+		.post('/schools')
+		.set('Authorization', `Bearer ${token}`)
+		.send({
+			name: `Escola Post Teste ${suffix}`,
+			tax_id: suffix,
+			address: {
+				street: 'Rua Teste',
+				number: '100',
+				city: 'São Paulo',
+				state: 'SP',
+				zip_code: '01001000',
+			},
+		});
 
-	return firstSchoolId;
+	expect(createResponse.status).toBe(201);
+	return createResponse.body.data._id;
 }
 
 describe('Post - integração de rotas', () => {
