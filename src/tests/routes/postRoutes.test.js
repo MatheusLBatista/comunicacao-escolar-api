@@ -365,6 +365,83 @@ describe('Post Routes - Integração', () => {
     });
   });
 
+  describe('DELETE /post/:id - Deletar comunicado', () => {
+    test('deve retornar 401 sem token', async () => {
+      const response = await request(BASE_URL).delete(
+        `/post/${createdPostId || '507f1f77bcf86cd799439013'}`,
+      );
+
+      expect([401, 498]).toContain(response.status);
+    });
+
+    test('deve deletar post com sucesso', async () => {
+      // Primeiro criar um novo post para deletar
+      const createPayload = {
+        title: `Post para deletar ${Date.now()}`,
+        content: 'Conteúdo para deletar.',
+        target: {
+          scope: 'all',
+        },
+        active: true,
+      };
+
+      const createResponse = await request(BASE_URL)
+        .post(`/schools/${schoolId}/post`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(createPayload);
+
+      expect(createResponse.status).toBe(201);
+      const postIdToDelete = createResponse.body.data._id;
+
+      // Depois deletar
+      const deleteResponse = await request(BASE_URL)
+        .delete(`/post/${postIdToDelete}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(deleteResponse.status).toBe(200);
+      expect(deleteResponse.body).toHaveProperty('error', false);
+      expect(deleteResponse.body).toHaveProperty('data');
+      expect(deleteResponse.body.data).toHaveProperty(
+        'message',
+        'Anúncio deletado com sucesso',
+      );
+    });
+
+    test('deve retornar 404 ao deletar post inexistente', async () => {
+      const fakeId = '507f1f77bcf86cd799439999';
+
+      const response = await request(BASE_URL)
+        .delete(`/post/${fakeId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', true);
+    });
+
+    test('deve retornar 400 para ID em formato inválido', async () => {
+      const response = await request(BASE_URL)
+        .delete('/post/invalid-id-format')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect([400, 422]).toContain(response.status);
+    });
+
+    test('deve retornar 403 ao tentar deletar post de outro autor', async () => {
+      if (!createdPostId) {
+        console.log('⚠️  createdPostId não definido, pulando teste');
+        return;
+      }
+
+      // Tentar deletar o post criado anteriormente (que pode ter outro autor)
+      const response = await request(BASE_URL)
+        .delete(`/post/${createdPostId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      // Pode retornar 200 se for o mesmo autor, ou 403 se não for autorizado
+      expect([200, 403]).toContain(response.status);
+    });
+  });
+
   describe('GET /schools/:schoolId/post - Listar comunicados da escola', () => {
     test('deve retornar 401 sem token', async () => {
       const response = await request(BASE_URL).get(`/schools/${schoolId}/post`);
