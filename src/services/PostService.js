@@ -141,5 +141,13 @@ class PostService {
     return data
   }
 
+
+  async delete(id) {
+
+    await this.repository.delete(id)
+
+    return
+  }
+
 }
 export default PostService;

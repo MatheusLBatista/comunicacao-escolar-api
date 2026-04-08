@@ -28,4 +28,9 @@ router.patch('/post/:id',
   asyncWrapper(postController.update.bind(postController))
 )
 
+router.delete('/post/:id',
+  AuthMiddleware,
+  asyncWrapper(postController.delete.bind(postController))
+)
+
 export default router;

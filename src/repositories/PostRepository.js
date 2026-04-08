@@ -121,6 +121,12 @@ class PostRepository {
 
     return data
   }
+
+  async delete(id) {
+    
+    await this.model.findByIdAndDelete(id)
+    return
+  }
 }
 
 export default PostRepository;
