@@ -13,20 +13,23 @@ router.post(
   asyncWrapper(postController.create.bind(postController)),
 );
 
-router.get('/schools/:schoolId/post', 
-  AuthMiddleware,
-  asyncWrapper(postController.list.bind(postController))
-);
-
-router.get('/post/:id',
+router.get(
+  '/schools/:schoolId/post',
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController)),
 );
 
-router.patch('/post/:id', 
+router.get(
+  '/post/:id',
   AuthMiddleware,
-  asyncWrapper(postController.update.bind(postController))
-)
+  asyncWrapper(postController.list.bind(postController)),
+);
+
+router.patch(
+  '/post/:id',
+  AuthMiddleware,
+  asyncWrapper(postController.update.bind(postController)),
+);
 
 router.delete('/post/:id',
   AuthMiddleware,

@@ -10,7 +10,6 @@ class PostService {
     this.schoolRepository = new SchoolRepository();
     this.classRepository = new ClassRepository();
     this.userRepository = new UserRepository();
-
   }
 
   async list(req) {
@@ -81,13 +80,14 @@ class PostService {
 
     const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId });
 
+
     // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
     return data;
   }
 
   async update(id, parsedData, userId) {
+    const user = await this.userRepository.getById(userId);
 
-    const user = await this.userRepository.getById(userId)
 
     const clearParsed = await this.verifyRelation(id, parsedData)
 
@@ -95,12 +95,14 @@ class PostService {
 
       const data = await this.repository.update(id, clearParsed)
 
-      return data
+
+      return data;
     }
-   
+
     const data = await this.repository.update(id, clearParsed, userId)
 
-    return data
+
+    return data;
   }
 
 
@@ -174,12 +176,13 @@ class PostService {
       return parsedData
     }
 
-    if(parsedData.target){
+    if (parsedData.target) {
       delete parsedData.target
     }
 
     return parsedData
   }
+
 }
 
 export default PostService;
