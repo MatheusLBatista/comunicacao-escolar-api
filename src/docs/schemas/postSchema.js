@@ -74,6 +74,22 @@ const postSchemas = {
         example: [],
       },
       active: { type: 'boolean', example: true },
+      likes_count: {
+        type: 'number',
+        description: 'Total de curtidas do comunicado',
+        example: 5,
+      },
+      totalLikes: {
+        type: 'number',
+        description: 'Total de curtidas do comunicado (duplicado para compatibilidade)',
+        example: 5,
+      },
+      user_liked: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Array de IDs dos usuários que curtiram este comunicado',
+        example: ['000000000000000000000003', '000000000000000000000004'],
+      },
       created_at: {
         type: 'string',
         format: 'date-time',

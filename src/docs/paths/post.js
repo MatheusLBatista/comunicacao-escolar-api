@@ -3,7 +3,7 @@ import commonResponses from '../schemas/swaggerCommonResponses.js';
 import { generateParameters } from './utils/generateParameters.js';
 
 const postPaths = {
-  '/schools/{schoolId}/post': {
+  '/schools/{schoolId}/posts': {
     post: {
       tags: ['Comunicados'],
       summary: 'Criar comunicado',
@@ -98,7 +98,7 @@ const postPaths = {
     },
   },
 
-  '/post': {
+  '/posts': {
     get: {
       tags: ['Comunicados'],
       summary: 'Listar todos os comunicados',
@@ -133,7 +133,7 @@ const postPaths = {
     },
   },
 
-  '/post/{id}': {
+  '/posts/{id}': {
     get: {
       tags: ['Comunicados'],
       summary: 'Buscar comunicado por ID',
