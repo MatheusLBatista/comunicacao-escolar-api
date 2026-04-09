@@ -69,6 +69,16 @@ class PostController {
 
     return CommonResponse.success(res, data);
   }
+
+  async delete(req, res) {
+    const {id} = req.params ||  {}
+    const userId = req.user_id
+    ObjectIdSchema.parse(id)
+
+    await this.service.delete(id, userId)
+
+    return CommonResponse.success(res,{message: "Anúncio deletado com sucesso"})
+  }
 }
 
 export default PostController;

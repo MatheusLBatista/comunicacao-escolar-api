@@ -60,7 +60,7 @@ async function createPost(token, schoolId) {
   };
 
   const response = await request(BASE_URL)
-    .post(`/schools/${schoolId}/post`)
+    .post(`/schools/${schoolId}/posts`)
     .set('Authorization', `Bearer ${token}`)
     .send(payload);
 
