@@ -189,24 +189,24 @@ class PostRepository {
           errorType: 'resourceNotFound',
           field: 'Announcements',
           details: [],
-          customMessage: messages.error.resourceNotFound('Announcements')
-        })
+          customMessage: messages.error.resourceNotFound('Announcements'),
+        });
       }
 
-      return
+      return data;
     }
 
-    const data = await this.model.findByIdAndDelete(id)
+    const data = await this.model.findByIdAndDelete(id);
     if (!data) {
       throw new CustomError({
         statusCode: 404,
         errorType: 'resourceNotFound',
         field: 'Announcements',
         details: [],
-        customMessage: messages.error.resourceNotFound('Announcements')
-      })
+        customMessage: messages.error.resourceNotFound('Announcements'),
+      });
     }
-    return
+    return data;
   }
 }
 
