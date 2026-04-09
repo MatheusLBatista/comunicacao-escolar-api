@@ -11,6 +11,8 @@ import conversationSeed from './conversationSeed.js';
 import messageSeed from './messageSeed.js';
 import pickupAuthorizationSeed from './pickupAuthorization.js';
 import eventSeed from './eventSeed.js';
+import likeSeed from './likeSeed.js';
+import linkStudentsToClasses from './linkStudentsToClasses.js';
 
 await DbConnect.conectar();
 
@@ -21,8 +23,11 @@ try {
 
   const schools = await schoolSeed();
   const users = await userSeed();
-  await classSeed();
+  const classesResult = await classSeed();
+  const classes = classesResult.classes || [];
+  await linkStudentsToClasses();
   await postSeed(schools, users);
+  await likeSeed();
   await dailyLogTemplateSeed();
   await dailyLogSeed();
   await conversationSeed();

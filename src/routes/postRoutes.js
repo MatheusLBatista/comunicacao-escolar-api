@@ -8,30 +8,30 @@ const router = express.Router();
 const postController = new PostController();
 
 router.post(
-  '/schools/:schoolId/post',
+  '/schools/:schoolId/posts',
   AuthMiddleware,
   asyncWrapper(postController.create.bind(postController)),
 );
 
 router.get(
-  '/schools/:schoolId/post',
+  '/schools/:schoolId/posts',
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController)),
 );
 
 router.get(
-  '/post/:id',
+  '/posts/:id',
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController)),
 );
 
 router.patch(
-  '/post/:id',
+  '/posts/:id',
   AuthMiddleware,
   asyncWrapper(postController.update.bind(postController)),
 );
 
-router.delete('/post/:id',
+router.delete('/posts/:id',
   AuthMiddleware,
   asyncWrapper(postController.delete.bind(postController))
 )

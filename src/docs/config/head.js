@@ -7,6 +7,7 @@ import postSchemas from '../schemas/postSchema.js';
 import eventSchemas from '../schemas/eventSchema.js';
 import schoolSchemas from '../schemas/schoolSchema.js';
 import pickupAuthorizationSchemas from '../schemas/pickupAuthorizationSchema.js';
+import likeSchemas from '../schemas/likeSchema.js';
 import usuariosPaths from '../paths/usuarios.js';
 import authPaths from '../paths/auth.js';
 import gruposPaths from '../paths/grupo.js';
@@ -16,6 +17,7 @@ import postPaths from '../paths/post.js';
 import pickupAuthorizationPaths from '../paths/pickupAuthorization.js';
 import eventPaths from '../paths/event.js';
 import schoolPaths from '../paths/school.js';
+import likePaths from '../paths/like.js';
 
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
@@ -81,6 +83,10 @@ const getSwaggerOptions = () => {
           name: 'Eventos',
           description: 'Rotas para gestão de eventos escolares',
         },
+        {
+          name: 'Likes',
+          description: 'Rotas para gerenciar likes em comunicados',
+        },
       ],
       paths: {
         ...authPaths,
@@ -92,6 +98,7 @@ const getSwaggerOptions = () => {
         ...pickupAuthorizationPaths,
         ...eventPaths,
         ...schoolPaths,
+        ...likePaths,
       },
       components: {
         securitySchemes: {
@@ -111,6 +118,7 @@ const getSwaggerOptions = () => {
           ...pickupAuthorizationSchemas,
           ...eventSchemas,
           ...schoolSchemas,
+          ...likeSchemas,
         },
       },
       security: [
