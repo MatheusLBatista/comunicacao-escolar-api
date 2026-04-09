@@ -49,6 +49,7 @@ const routes = (app) => {
     event,
     conversation,
     pickupAuthorization,
+    like
   );
 
   app.use((req, res) => {

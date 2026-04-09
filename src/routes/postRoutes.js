@@ -20,13 +20,13 @@ router.get(
 );
 
 router.get(
-  '/post/:id',
+  '/posts/:id',
   AuthMiddleware,
   asyncWrapper(postController.list.bind(postController)),
 );
 
 router.patch(
-  '/post/:id',
+  '/posts/:id',
   AuthMiddleware,
   asyncWrapper(postController.update.bind(postController)),
 );

@@ -4,13 +4,19 @@ class LikeRepository {
     constructor() {
         this.model = LikeModel;
     }
-    async toglleLike(user, post){
+    async toglleLike(userId, postId){
         
-        const like = await this.model.findOne({user_id:user, post_id:post}).exec();
-        if(!like) {
-            return await this.model.insertOne({user_id:user, post_id:post}).exec();
+        const like = await this.model.findOne({user_id: userId, post_id:postId})
+
+        if(!like){
+            const like = await this.model.insertOne({user_id:userId, post_id: postId})
+
+            return like
         }
-        return await this.model.deleteOne({user_id:user, post_id:post}).exec();
+
+        await this.model.findByIdAndDelete(like._id)
+        
+        return {message:"Like removido com sucesso."}
     }
 }
 

@@ -12,12 +12,13 @@ class LikeController {
     }
 
     async toggleLike(req, res) {
+        const userId = req.user_id
+        
+        const {id} = req.params || {}
 
-        const {post} = req.body;
-        if(post) {
-            UserIdSchema.parse(post);
-        }
-        const data = await this.service.toggleLike(req.user_id, post);
+        UserIdSchema.parse(id)
+
+        const data = await this.service.toggleLike(userId, id);
         CommonResponse.success(res, data);
     }
 }
