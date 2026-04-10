@@ -79,6 +79,17 @@ class PostController {
 
     return CommonResponse.success(res,{message: "Anúncio deletado com sucesso"})
   }
+
+  async uploadFoto(req, res) {
+
+    const {id} = req.params || {}
+
+    UserIdSchema.parse(id);
+
+    const data = await this.service.uploadFoto(req, id)
+
+
+  }
 }
 
 export default PostController;

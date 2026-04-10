@@ -31,7 +31,7 @@ class PostRepository {
 
         const user_liked = likes.map(l => l.user_id);
         const totalLikes = likes.length;
-        
+
         return {
           ...dataObj,
           likes_count: totalLikes,
@@ -81,7 +81,7 @@ class PostRepository {
 
     try {
       const docIds = result.docs.map(doc => doc._id);
-      
+
       const likes = await LikeModel.find({ post_id: { $in: docIds } });
 
       const likesMap = {};
@@ -97,7 +97,7 @@ class PostRepository {
         const docId = doc._id?.toString();
         const user_liked = likesMap[docId] || [];
         const likes_count = user_liked.length;
-        
+
         const docObj = typeof doc.toObject === 'function' ? doc.toObject() : doc;
 
         return {
@@ -180,7 +180,7 @@ class PostRepository {
   async delete(id, userId) {
     if (userId) {
       const data = await this.model.findOneAndDelete({ _id: id, author_id: userId })
-     
+
       console.log(data)
 
       if (!data) {
@@ -207,6 +207,27 @@ class PostRepository {
       });
     }
     return data;
+  }
+
+  async uploadFoto(id, urlMinio) {
+
+    const data = await this.model.findOneAndUpdate({ _id: id }, { attachments: urlMinio })
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Announcements',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Announcements'),
+      });
+    }
+
+    return data
+  }
+
+  async deleteFoto(id, urlMinio) {
+    const data = await this.model.findOneAndUpdate({_id: id}, {attachments:urlMinio})
   }
 }
 

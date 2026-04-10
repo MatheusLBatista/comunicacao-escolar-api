@@ -4,6 +4,10 @@ import ClassRepository from '../repositories/ClassRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
+import compress from '../config/SharpConfig.js';
+import mongoose from 'mongoose';
+import minioClient from '../config/MinIO.js';
+
 class PostService {
   constructor() {
     this.repository = new PostRepository();
@@ -117,7 +121,6 @@ class PostService {
       return
     }
 
-    console.log("aqui")
     await this.repository.delete(id, userId)
 
     return
@@ -181,6 +184,72 @@ class PostService {
     }
 
     return parsedData
+  }
+
+  async uploadFoto(req, id) {
+
+    const files = req.files;
+
+    if (files.length == 0) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: "badRequest",
+        field: "Foto",
+        details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
+        customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
+      })
+    }
+
+    files.forEach((file) => {
+      if (file.size > (10 * 1024 * 1024)) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
+          errorType: 'payloadTooLarge',
+          field: "Imagem",
+          details: [{ path: "Imagem", message: "Arquivo é superior a 10 MB" }],
+          customMessage: "O arquivo é maior do que 10 MB."
+        });
+      }
+
+    })
+
+    const post = await this.repository.getById(id)
+    if (!post) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'notFound',
+        field: "post",
+        details: [{ path: "post", message: "anuncio não encontrado." }],
+        customMessage: "post não encontrado."
+      });
+    }
+
+   files.forEach(async (file) => {
+
+    const image = await compress(file.buffer)
+
+    const obj = new mongoose.Types.ObjectId()
+
+    const objectName =`${obj.toString()}.${image[1]}`
+
+    let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIIO_BUCKET}/${objectName}` 
+
+    const data = await this.repository.uploadFoto(id, urlMinio)
+
+    try {
+    await minioClient.putObject(process.env.MINIIO_BUCKET, objectName, image[0], {
+      'Content-Type':file.mimetype,
+    })
+
+    return data
+
+    } catch(error) {
+      
+      throw new Error(error)
+    }
+
+   })
+
   }
 
 }
