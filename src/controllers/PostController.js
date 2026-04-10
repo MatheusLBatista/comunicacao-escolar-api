@@ -88,8 +88,23 @@ class PostController {
 
     const data = await this.service.uploadFoto(req, id)
 
+    return CommonResponse.created(res, data)
+  }
+
+  async deleteFoto(req, res) {
+    const {id} = req.params || {}
+
+    const {postId} = req.params || {}
+
+    UserIdSchema.parse(id)
+    UserIdSchema.parse(postId)
+
+    const data = await this.service.deleteFoto(req, postId, id)
+
+    return CommonResponse.success(200, data)
 
   }
+
 }
 
 export default PostController;

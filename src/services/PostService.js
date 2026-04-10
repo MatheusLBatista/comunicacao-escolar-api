@@ -7,6 +7,7 @@ import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 import compress from '../config/SharpConfig.js';
 import mongoose from 'mongoose';
 import minioClient from '../config/MinIO.js';
+import 'dotenv/config';
 
 class PostService {
   constructor() {
@@ -188,6 +189,11 @@ class PostService {
 
   async uploadFoto(req, id) {
 
+    
+
+    const userId = req.user_id
+
+
     const files = req.files;
 
     if (files.length == 0) {
@@ -200,8 +206,8 @@ class PostService {
       })
     }
 
-    files.forEach((file) => {
-      if (file.size > (10 * 1024 * 1024)) {
+    for(const file of files) {
+            if (file.size > (10 * 1024 * 1024)) {
         throw new CustomError({
           statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
           errorType: 'payloadTooLarge',
@@ -210,8 +216,7 @@ class PostService {
           customMessage: "O arquivo é maior do que 10 MB."
         });
       }
-
-    })
+    }
 
     const post = await this.repository.getById(id)
     if (!post) {
@@ -224,34 +229,63 @@ class PostService {
       });
     }
 
-   files.forEach(async (file) => {
 
-    const image = await compress(file.buffer)
+    for (const file of files) {
+      const image = await compress(file.buffer)
 
-    const obj = new mongoose.Types.ObjectId()
+      const obj = new mongoose.Types.ObjectId().toString()
 
-    const objectName =`${obj.toString()}.${image[1]}`
+      const objectName = `${obj.toString()}.${image[1].format}`
 
-    let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIIO_BUCKET}/${objectName}` 
+      // let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
 
-    const data = await this.repository.uploadFoto(id, urlMinio)
+      await this.repository.uploadFoto(id, objectName, userId)
 
-    try {
-    await minioClient.putObject(process.env.MINIIO_BUCKET, objectName, image[0], {
-      'Content-Type':file.mimetype,
-    })
+      try {
+        await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
+          'Content-Type': file.mimetype,
+        })
+
+      } catch (error) {
+        await this.repository.deletaFoto(id, objectName, userId)
+        throw new Error(error)
+      }
+
+    }
+    const data = await this.repository.getById(id)
 
     return data
 
-    } catch(error) {
-      
-      throw new Error(error)
-    }
-
-   })
-
   }
 
+  async deleteFoto(req, postId, id) {
+
+    const userId = req.user_id
+
+    const role = await this.userRepository.getById(userId)
+
+    if(role.memberships.some((member) => member == "admin")){
+      const data = await this.repository.getFoto(id)
+      if(!data) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.NOT_FOUND.code,
+          errorType: "notFound",
+          field: "attachments",
+          details: [{ path:"attachments", message:"url da foto não encontrada"}],
+          customMessage: `Nenhuma foto com a url ${id}`
+        })
+      }
+      await this.repository.deletaFoto(postId, id)
+    }
+
+    try {
+
+
+    } catch (err) {
+
+    }
+
+  }
 }
 
 export default PostService;

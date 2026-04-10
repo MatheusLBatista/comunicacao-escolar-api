@@ -209,9 +209,9 @@ class PostRepository {
     return data;
   }
 
-  async uploadFoto(id, urlMinio) {
+  async uploadFoto(id, urlMinio, idUser) {
 
-    const data = await this.model.findOneAndUpdate({ _id: id }, { attachments: urlMinio })
+    const data = await this.model.findOneAndUpdate({ _id: id, author_id: idUser }, { $addToSet: {attachments: urlMinio}}, {new:true})
 
     if (!data) {
       throw new CustomError({
@@ -226,8 +226,21 @@ class PostRepository {
     return data
   }
 
-  async deleteFoto(id, urlMinio) {
-    const data = await this.model.findOneAndUpdate({_id: id}, {attachments:urlMinio})
+  async deletaFoto(id, urlMinio, idUser) {
+    const data = await this.model.findOneAndUpdate({_id: id, author_id: idUser}, {$pull: {attachments:urlMinio}})
+    return data
+  }
+
+  async getFoto(id, userId, fotoLink) {
+    if(userId) {
+      const data = await this.model.findOne({_id:id, author_id:userId})
+      const foto = data.attachments.find((item) => item == fotoLink)
+      return foto
+    }
+    
+    const data = await this.model.findById(id)
+    const foto = await data.attachments.find((item) => item == fotoLink)
+    return foto
   }
 }
 

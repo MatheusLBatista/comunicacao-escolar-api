@@ -37,7 +37,7 @@ router.delete('/posts/:id',
   asyncWrapper(postController.delete.bind(postController))
 )
 
-router.post('/post/:id/attachments',
+router.post('/posts/:id/attachments',
   AuthMiddleware,
   upload.array('files', 10),
   asyncWrapper(postController.uploadFoto.bind(postController))

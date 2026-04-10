@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import AuthenticationError from '../errors/AuthenticationError.js';
 import TokenExpiredError from '../errors/TokenExpiredError.js';
 import CustomError from './CustomError.js';
+import { MulterError } from 'multer';
 
 /**
  * Middleware para tratamento centralizado de erros.
@@ -108,7 +109,35 @@ const errorHandler = (err, req, res, next) => {
     );
   }
 
-  // Tratamento para erros operacionais (erros esperados na aplicação).
+  // Tratamento para erros de upload de arquivo (Multer).
+  if (err instanceof MulterError) {
+    const multerErrorMessages = {
+      'LIMIT_FILE_SIZE': 'Arquivo muito grande',
+      'LIMIT_FILE_COUNT': 'Muitos arquivos enviados',
+      'FILE_TOO_LARGE': 'Arquivo excede o tamanho máximo',
+      'LIMIT_PART_COUNT': 'Muitas partes no formulário',
+    };
+
+    const errorMessage = multerErrorMessages[err.code] || err.message;
+    const statusCode = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+
+    logger.warn('Erro de upload de arquivo', {
+      message: err.message,
+      code: err.code,
+      path: req.path,
+      requestId,
+    });
+
+    return CommonResponse.error(
+      res,
+      statusCode,
+      'fileUploadError',
+      err.field || 'file',
+      [{ path: err.field || 'file', message: errorMessage }],
+      `Erro ao fazer upload: ${errorMessage}`,
+    );
+  }
+
   if (err.isOperational) {
     logger.warn('Erro operacional', {
       message: err.message,
@@ -136,6 +165,8 @@ const errorHandler = (err, req, res, next) => {
     : [{ message: err.message, stack: err.stack }];
 
   return CommonResponse.error(res, 500, 'serverError', null, detalhes);
+
+
 };
 
 export default errorHandler;

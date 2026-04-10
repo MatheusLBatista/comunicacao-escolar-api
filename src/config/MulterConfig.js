@@ -1,4 +1,4 @@
-import multer from 'multer';
+import multer, { MulterError } from 'multer';
 import path from 'path';
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 
@@ -40,6 +40,9 @@ const upload = multer({
       }
       cb(null, true);
     } catch (error) {
+      if(error instanceof MulterError) {
+        cb(error.stack, false)
+      }
       cb(error, false);
     }
   },
