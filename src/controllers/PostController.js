@@ -92,16 +92,19 @@ class PostController {
   }
 
   async deleteFoto(req, res) {
-    const {id} = req.params || {}
+
+     console.log("Chegamos")
+    const {linkId} = req.params || {}
 
     const {postId} = req.params || {}
-
-    UserIdSchema.parse(id)
+ 
+    UserIdSchema.parse(linkId)
     UserIdSchema.parse(postId)
 
-    const data = await this.service.deleteFoto(req, postId, id)
+    
+    const data = await this.service.deleteFoto(req, postId, linkId)
 
-    return CommonResponse.success(200, data)
+    return CommonResponse.success(res, data)
 
   }
 

@@ -3,7 +3,7 @@ import SchoolRepository from '../repositories/SchoolRepository.js';
 import ClassRepository from '../repositories/ClassRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 
-import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
+import { CommonResponse, CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 import compress from '../config/SharpConfig.js';
 import mongoose from 'mongoose';
 import minioClient from '../config/MinIO.js';
@@ -189,12 +189,21 @@ class PostService {
 
   async uploadFoto(req, id) {
 
-    
+
 
     const userId = req.user_id
 
 
     const files = req.files;
+    if (!files) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: "badRequest",
+        field: "Foto",
+        details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
+        customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
+      })
+    }
 
     if (files.length == 0) {
       throw new CustomError({
@@ -206,8 +215,8 @@ class PostService {
       })
     }
 
-    for(const file of files) {
-            if (file.size > (10 * 1024 * 1024)) {
+    for (const file of files) {
+      if (file.size > (10 * 1024 * 1024)) {
         throw new CustomError({
           statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
           errorType: 'payloadTooLarge',
@@ -237,9 +246,9 @@ class PostService {
 
       const objectName = `${obj.toString()}.${image[1].format}`
 
-      // let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
+      let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
 
-      await this.repository.uploadFoto(id, objectName, userId)
+      await this.repository.uploadFoto(id, urlMinio, userId)
 
       try {
         await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
@@ -247,7 +256,7 @@ class PostService {
         })
 
       } catch (error) {
-        await this.repository.deletaFoto(id, objectName, userId)
+        await this.repository.deletaFoto(id, urlMinio, userId)
         throw new Error(error)
       }
 
@@ -258,33 +267,55 @@ class PostService {
 
   }
 
-  async deleteFoto(req, postId, id) {
+  async deleteFoto(req, postId, linkId) {
 
     const userId = req.user_id
 
     const role = await this.userRepository.getById(userId)
 
-    if(role.memberships.some((member) => member == "admin")){
-      const data = await this.repository.getFoto(id)
-      if(!data) {
+    if (role.memberships.some((member) => member == "admin")) {
+      const data = await this.repository.getFoto(postId, linkId)
+      if (!data) {
         throw new CustomError({
           statusCode: HttpStatusCodes.NOT_FOUND.code,
           errorType: "notFound",
           field: "attachments",
-          details: [{ path:"attachments", message:"url da foto não encontrada"}],
+          details: [{ path: "attachments", message: "url da foto não encontrada" }],
           customMessage: `Nenhuma foto com a url ${id}`
         })
       }
-      await this.repository.deletaFoto(postId, id)
+
+      const objectName = `${process.env.MINIO_BUCKET}/${data}`
+
+      await this.repository.deletaFoto(postId, linkId)
+
+
+      await minioClient.getObject(process.env.MINIO_BUCKET, objectName)
+
+      return { message: "Sucesso ao deletar imagem" }
+
     }
 
-    try {
+    const data = await this.repository.getFoto(postId, linkId, userId)
 
-
-    } catch (err) {
-
+    if (!data) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: "notFound",
+        field: "attachments",
+        details: [{ path: "attachments", message: "url da foto não encontrada" }],
+        customMessage: `Nenhuma foto com a url ${id}`
+      })
     }
 
+    const objectName = `${process.env.MINIO_BUCKET}/${data}`
+
+    await this.repository.deletaFoto(postId, linkId)
+
+
+    await minioClient.getObject(process.env.MINIO_BUCKET, objectName)
+
+    return { message: "Sucesso ao deletar imagem" }
   }
 }
 

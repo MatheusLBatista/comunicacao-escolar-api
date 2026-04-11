@@ -42,4 +42,10 @@ router.post('/posts/:id/attachments',
   upload.array('files', 10),
   asyncWrapper(postController.uploadFoto.bind(postController))
 )
+
+router.delete('/posts/:postId/attachments/:linkId',
+  AuthMiddleware,
+  asyncWrapper(postController.delete.bind(postController))
+)
+
 export default router;

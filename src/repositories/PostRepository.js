@@ -2,6 +2,7 @@ import PostModel from '../models/Post.js';
 import LikeModel from '../models/Like.js';
 import PostFilterBuilder from './filters/PostFilterBuilder.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
+import mongoose from 'mongoose';
 
 class PostRepository {
   constructor() {
@@ -231,15 +232,23 @@ class PostRepository {
     return data
   }
 
-  async getFoto(id, userId, fotoLink) {
+  async getFoto(postId, linkId, userId) {
     if(userId) {
-      const data = await this.model.findOne({_id:id, author_id:userId})
-      const foto = data.attachments.find((item) => item == fotoLink)
+      const data = await this.model.findOne({_id:postId, author_id:userId})
+
+      for(const foto of data.attachments) {
+        const url = foto.split("/")
+        if(url.some((parte) => mongoose.Types.ObjectId.isValid(parte))) {
+          
+        }
+      }
+
+      // const foto = data.attachments.find((item) => item == linkId)
       return foto
     }
     
-    const data = await this.model.findById(id)
-    const foto = await data.attachments.find((item) => item == fotoLink)
+    const data = await this.model.findById(postId)
+    const foto = data.attachments.find((item) => item == linkId)
     return foto
   }
 }
