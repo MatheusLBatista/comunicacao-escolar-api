@@ -37,5 +37,4 @@ test-e2e:
     - npx wait-on tcp:5000
     - npx jest --silent --coverage 
   only:
-    - develop
     - merge_requests
