@@ -28,14 +28,14 @@ test-e2e:
     JWT_SECRET_INVITE: "teste_invite_secret"
     JWT_ACCESS_TOKEN_EXPIRATION: "1d"
     JWT_REFRESH_TOKEN_EXPIRATION: "7d"
+    NODE_NO_WARNINGS: "1"
     
   script:
-    - npm ci
+    - npm ci --no-fund --no-audit --loglevel=error
     - node src/seeds/seeds.js
     - node server.js &
-    - node -e "const net=require('net');const host='127.0.0.1';const port=Number(process.env.PORT||5000);let attempts=0;const maxAttempts=60;const wait=()=>{attempts+=1;const socket=net.createConnection({host,port});socket.once('connect',()=>{socket.end();console.log('API pronta em '+host+':'+port);process.exit(0);});socket.once('error',()=>{socket.destroy();if(attempts>=maxAttempts){console.error('API nao subiu em tempo habil.');process.exit(1);}setTimeout(wait,1000);});};wait();"
-    - npx jest --coverage
-
+    - npx wait-on tcp:5000
+    - npx jest --silent --coverage 
   only:
     - develop
     - merge_requests
