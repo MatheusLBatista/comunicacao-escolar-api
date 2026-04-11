@@ -1,0 +1,39 @@
+stages:
+  - test
+  - build_and_update
+
+test-e2e:
+  stage: test
+  image: node:20
+  services:
+    - name: mongo:latest
+      alias: mongo
+    - name: minio/minio:latest
+      alias: minio
+      command: ["server", "/data"]
+  variables:
+    DB_URL: "mongodb://mongo:27017/comunicacao_escolar_test"
+    MONGO_URI: "mongodb://mongo:27017/comunicacao_escolar_test"
+    MINIO_ENDPOINT: "minio"
+    MINIO_PORT: "9000"
+    MINIO_ACCESS_KEY: "minioadmin"
+    MINIO_SECRET_KEY: "minioadmin"
+    MINIO_BUCKET: "comunicacao-escolar-test"
+    PORT: "5000"
+    INTEGRATION_BASE_URL: "http://127.0.0.1:5000"
+    NODE_ENV: "test"
+    JWT_SECRET_ACCESS_TOKEN: "teste_access_secret"
+    JWT_SECRET_REFRESH_TOKEN: "teste_refresh_secret"
+    JWT_SECRET_PASSWORD_RECOVERY: "teste_recovery_secret"
+    JWT_SECRET_INVITE: "teste_invite_secret"
+    JWT_ACCESS_TOKEN_EXPIRATION: "1d"
+    JWT_REFRESH_TOKEN_EXPIRATION: "7d"
+    
+  script:
+    - npm ci
+    - node src/seeds/seeds.js
+    - node server.js &
+    - node -e "const net=require('net');const host='127.0.0.1';const port=Number(process.env.PORT||5000);let attempts=0;const maxAttempts=60;const wait=()=>{attempts+=1;const socket=net.createConnection({host,port});socket.once('connect',()=>{socket.end();console.log('API pronta em '+host+':'+port);process.exit(0);});socket.once('error',()=>{socket.destroy();if(attempts>=maxAttempts){console.error('API nao subiu em tempo habil.');process.exit(1);}setTimeout(wait,1000);});};wait();"
+    - npx jest --coverage
+  only:
+    - main
