@@ -1,0 +1,26 @@
+# stages:
+#   - test
+#   - build_and_update
+# test-e2e:
+#   stage: test
+#   image: node:20
+#   services:
+#     - name: mongo:latest
+#       alias: mongo
+#     - name: minio/minio:latest
+#       alias: minio
+#       command: ["server", "/data"]
+#   variables:
+#     MONGO_URI: "mongodb://mongo:27017/comunicacao_escolar_test"
+#     MINIO_ENDPOINT: "minio"
+#     MINIO_PORT: "9000"
+#     MINIO_ACCESS_KEY: "minioadmin" # Credenciais default do container MinIO
+#     MINIO_SECRET_KEY: "minioadmin"
+#     NODE_ENV: "test"
+#   script:
+#     - npm ci
+#
+#     # - npm run seed 
+#     - npm test
+#   only:
+#     - main
