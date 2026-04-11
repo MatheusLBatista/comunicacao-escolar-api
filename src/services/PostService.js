@@ -8,6 +8,7 @@ import compress from '../config/SharpConfig.js';
 import mongoose from 'mongoose';
 import minioClient from '../config/MinIO.js';
 import 'dotenv/config';
+import Post from '../models/Post.js';
 
 class PostService {
   constructor() {
@@ -19,6 +20,24 @@ class PostService {
 
   async list(req) {
     const data = await this.repository.list(req);
+
+    // Processar attachments para resultado paginado (com docs)
+    if (data?.docs && Array.isArray(data.docs)) {
+      data.docs = data.docs.map(item => {
+        if (item?.attachments?.length > 0) {
+          return {
+            ...item,
+            attachments: this.generatePublicUrl(item.attachments)
+          };
+        }
+        return item;
+      });
+    }
+    // Processar attachments para busca por ID (objeto único)
+    else if (data?.attachments?.length > 0) {
+      console.log(data.attachments)
+      data.attachments = await this.generatePublicUrl(data.attachments);
+    }
 
     return data;
   }
@@ -246,9 +265,9 @@ class PostService {
 
       const objectName = `${obj.toString()}.${image[1].format}`
 
-      let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
+      // let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
 
-      await this.repository.uploadFoto(id, urlMinio, userId)
+      await this.repository.uploadFoto(id, objectName, userId)
 
       try {
         await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
@@ -256,7 +275,7 @@ class PostService {
         })
 
       } catch (error) {
-        await this.repository.deletaFoto(id, urlMinio, userId)
+        await this.repository.deletaFoto(id, objectName, userId)
         throw new Error(error)
       }
 
@@ -316,6 +335,22 @@ class PostService {
     await minioClient.getObject(process.env.MINIO_BUCKET, objectName)
 
     return { message: "Sucesso ao deletar imagem" }
+  }
+
+  async generatePublicUrl(lista) {
+
+    const novasUrls = []
+
+    for (const foto of lista) {
+      
+      try {
+        const url = await minioClient.presignedGetObject(process.env.MINIO_BUCKET, foto)
+        novasUrls.push(url)
+      } catch (err) {
+        novasUrls.push(null)
+      }
+    }
+    return novasUrls
   }
 }
 
