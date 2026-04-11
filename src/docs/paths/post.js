@@ -3,7 +3,7 @@ import commonResponses from '../schemas/swaggerCommonResponses.js';
 import { generateParameters } from './utils/generateParameters.js';
 
 const postPaths = {
-  '/schools/{schoolId}/post': {
+  '/schools/{schoolId}/posts': {
     post: {
       tags: ['Comunicados'],
       summary: 'Criar comunicado',
@@ -98,7 +98,42 @@ const postPaths = {
     },
   },
 
-  '/post/{id}': {
+  '/posts': {
+    get: {
+      tags: ['Comunicados'],
+      summary: 'Listar todos os comunicados',
+      description: `
+            + Caso de uso: Listar todos os comunicados do sistema com filtros opcionais.
+
+            + Função de Negócio:
+                - Retornar lista paginada de todos os comunicados das escolas.
+                - Permitir filtros por autor, conteúdo, target, escola e status.
+
+            + Resultado Esperado:
+                - HTTP 200 OK com lista paginada de comunicados.
+            `,
+      security: [{ bearerAuth: [] }],
+      parameters: generateParameters(postSchemas.PostFiltro),
+      responses: {
+        200: {
+          description: 'Lista de comunicados retornada com sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/PostListagem',
+              },
+            },
+          },
+        },
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
+  },
+
+  '/posts/{id}': {
     get: {
       tags: ['Comunicados'],
       summary: 'Buscar comunicado por ID',
@@ -178,6 +213,46 @@ const postPaths = {
         403: commonResponses[403](),
         404: commonResponses[404](),
         422: commonResponses[422](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
+
+    delete: {
+      tags: ['Comunicados'],
+      summary: 'Excluir comunicado',
+      description: `
+            + Caso de uso: Excluir um comunicado existente pelo identificador.
+
+            + Função de Negócio:
+                - Permitir que usuários autenticados autorizados deletem comunicados.
+                - Apenas o autor do comunicado ou usuários com permissão podem deletar.
+
+            + Regras de Negócio:
+                - O comunicado deve existir.
+                - Apenas o autor ou administradores podem deletar.
+
+            + Resultado Esperado:
+                - HTTP 200 OK com mensagem de sucesso.
+            `,
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+          description: 'ID do comunicado',
+        },
+      ],
+      responses: {
+        200: commonResponses[200](),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        403: commonResponses[403](),
+        404: commonResponses[404](),
         498: commonResponses[498](),
         500: commonResponses[500](),
       },

@@ -36,6 +36,7 @@ export default async function userSeed() {
 
   // MOCK: Create students
   const students = [];
+
   for (let i = 0; i < 5; i++) {
     students.push({
       full_name: fakeMappings.User.full_name(),
@@ -48,7 +49,7 @@ export default async function userSeed() {
         {
           school_id: school._id,
           role: 'student',
-          class_id: fakeMappings.User.class_id(),
+          class_id: null,
         },
       ],
     });

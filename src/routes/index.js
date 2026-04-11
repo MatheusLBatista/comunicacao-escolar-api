@@ -4,6 +4,7 @@ import swaggerUI from 'swagger-ui-express';
 import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
+import like from './likeRoutes.js'
 import users from './userRoutes.js';
 import grupos from './groupRoutes.js';
 import rotas from './routeRoutes.js';
@@ -34,6 +35,7 @@ const routes = (app) => {
     swaggerUI.setup(swaggerDocs)(req, res, next);
   });
 
+
   app.use(
     express.json(),
     auth,
@@ -47,6 +49,7 @@ const routes = (app) => {
     event,
     conversation,
     pickupAuthorization,
+    like
   );
 
   app.use((req, res) => {

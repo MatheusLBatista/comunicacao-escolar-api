@@ -1,9 +1,12 @@
-import { PostSchemaInput, PostSchemaUpdate } from '../utils/validators/schemas/zod/PostSchema.js';
+import {
+  PostSchemaInput,
+  PostSchemaUpdate,
+} from '../utils/validators/schemas/zod/PostSchema.js';
 import PostService from '../services/PostService.js';
 import { CommonResponse } from '../utils/helpers/index.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { PostQuerySchema } from '../utils/validators/schemas/zod/querys/PostQuerySchema.js';
-import  ObjectIdSchema  from '../utils/validators/schemas/zod/ObjectIdSchema.js';
+import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 
 class PostController {
   constructor() {
@@ -11,17 +14,16 @@ class PostController {
   }
 
   async list(req, res) {
+    const { id } = req.params || {};
 
-    const {id} = req.params || {}
+    const { schoolId } = req.params || {};
 
-    const {schoolId} = req.params || {}
-
-    if(id) {
-      UserIdSchema.parse(id)
+    if (id) {
+      UserIdSchema.parse(id);
     }
 
-    if(schoolId) {
-      UserIdSchema.parse(schoolId)
+    if (schoolId) {
+      UserIdSchema.parse(schoolId);
     }
 
     if (id) {
@@ -29,7 +31,6 @@ class PostController {
     }
 
     const query = req.query || {};
-
 
     if (Object.keys(query).length !== 0) {
       await PostQuerySchema.safeParseAsync(query);
@@ -43,9 +44,9 @@ class PostController {
   async create(req, res) {
     const { schoolId } = req.params;
     ObjectIdSchema.parse(schoolId);
-    
+
     const body = req.body;
-    const userId= req.user_id;
+    const userId = req.user_id;
     const parsedData = PostSchemaInput.parse(body);
 
     const data = await this.service.create(parsedData, userId, schoolId);
@@ -54,20 +55,29 @@ class PostController {
   }
 
   async update(req, res) {
-
     const body = req.body;
 
-    const {id} = req.params || {}
+    const { id } = req.params || {};
 
-    UserIdSchema.parse(id)
+    UserIdSchema.parse(id);
 
-    const parsedData = PostSchemaUpdate.parse(body)
+    const parsedData = PostSchemaUpdate.parse(body);
 
+    const userId = req.user_id;
+
+    const data = await this.service.update(id, parsedData, userId);
+
+    return CommonResponse.success(res, data);
+  }
+
+  async delete(req, res) {
+    const {id} = req.params ||  {}
     const userId = req.user_id
+    ObjectIdSchema.parse(id)
 
-    const data = await this.service.update(id, parsedData, userId)
+    await this.service.delete(id, userId)
 
-    return CommonResponse.success(res, data)
+    return CommonResponse.success(res,{message: "Anúncio deletado com sucesso"})
   }
 }
 

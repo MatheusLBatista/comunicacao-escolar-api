@@ -10,7 +10,6 @@ class PostService {
     this.schoolRepository = new SchoolRepository();
     this.classRepository = new ClassRepository();
     this.userRepository = new UserRepository();
-
   }
 
   async list(req) {
@@ -74,72 +73,116 @@ class PostService {
           customMessage: 'class_id não foi encontrado.',
         });
       }
-      const data = await this.repository.create({...parsedData, author_id: userId, school_id:schoolId})
+      const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId })
       return data
 
     }
 
-    const data = await this.repository.create({...parsedData, author_id: userId, school_id:schoolId});
+    const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId });
+
 
     // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
     return data;
   }
 
   async update(id, parsedData, userId) {
+    const user = await this.userRepository.getById(userId);
+
+
+    const clearParsed = await this.verifyRelation(id, parsedData)
+
+    if (user.memberships.some(user => user.role === "admin")) {
+
+      const data = await this.repository.update(id, clearParsed)
+
+
+      return data;
+    }
+
+    const data = await this.repository.update(id, clearParsed, userId)
+
+
+    return data;
+  }
+
+
+  async delete(id, userId) {
 
     const user = await this.userRepository.getById(userId)
 
     if (user.memberships.some(user => user.role === "admin")) {
 
-      if (parsedData.target && parsedData.target.scope != "all") {
+      await this.repository.delete(id)
 
-        if (!parsedData.target.target_id) {
-          throw new CustomError({
-            statusCode: HttpStatusCodes.BAD_REQUEST.code,
-            errorType: 'badRequest',
-            field: 'class',
-            details: [
-              {
-                path: 'class',
-                message: 'O id da class/turma informado não foi encontrado.',
-              },
-            ],
-            customMessage: 'class_id/target_id não foi encontrado.',
-          })
-        }
-
-        const turma = await this.classRepository.findById(parsedData.target.target_id)
-
-        if (!turma) {
-          throw new CustomError({
-            statusCode: HttpStatusCodes.NOT_FOUND.code,
-            errorType: 'notFound',
-            field: 'class',
-            details: [
-              {
-                path: 'class',
-                message: 'O id da class/turma informado não foi encontrado.',
-              },
-            ],
-            customMessage: 'class_id/target_id não foi encontrado.',
-          })
-        }
-        
-        const data = await this.repository.update(id, parsedData)
-
-        return data
-      }
-
-      delete parsedData.target.target_id
-      const data = await this.repository.update(id, parsedData)
-
-      return data
+      return
     }
 
-    const data = await this.repository.update(id, parsedData, userId)
+    console.log("aqui")
+    await this.repository.delete(id, userId)
 
-    return data
+    return
+  }
+
+  async verifyRelation(id, parsedData) {
+
+    if (parsedData.target?.scope && parsedData.target.scope != "all") {
+
+      if (!parsedData.target.target_id) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.BAD_REQUEST.code,
+          errorType: 'badRequest',
+          field: 'class',
+          details: [
+            {
+              path: 'class',
+              message: 'O id da class/turma informado não foi encontrado.',
+            },
+          ],
+          customMessage: 'class_id/target_id não foi encontrado.',
+        })
+      }
+
+      const turma = await this.classRepository.findById(parsedData.target.target_id)
+      const post = await this.repository.getById(id)
+      if (!turma) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.NOT_FOUND.code,
+          errorType: 'notFound',
+          field: 'class',
+          details: [
+            {
+              path: 'class',
+              message: 'O id da class/turma informado não foi encontrado.',
+            },
+          ],
+          customMessage: 'class_id/target_id não foi encontrado.',
+        })
+      }
+
+      if (post.school_id !== turma.school_id) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.CONFLICT.code,
+          errorType: 'conflictError',
+          field: 'class',
+          details: [
+            {
+              path: 'class',
+              message: 'A turma selecionada pertence a uma escola diferente do anúncio.',
+            },
+          ],
+          customMessage: 'Não é possível vincular o anúncio a uma turma de outra escola.',
+        });
+      }
+      return parsedData
+    }
+
+    if (parsedData.target) {
+      delete parsedData.target
+    }
+
+    return parsedData
   }
 
 }
+
 export default PostService;

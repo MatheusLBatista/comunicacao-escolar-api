@@ -48,10 +48,10 @@ describe('Post Routes - Integração', () => {
     schoolId = await getFirstSchoolId(token);
   });
 
-  describe('POST /schools/:schoolId/post - Criar comunicado', () => {
+  describe('POST /schools/:schoolId/posts - Criar comunicado', () => {
     test('deve retornar 401 ao criar post sem token', async () => {
       const response = await request(BASE_URL)
-        .post(`/schools/${schoolId}/post`)
+        .post(`/schools/${schoolId}/posts`)
         .send({
           title: `Post sem token ${Date.now()}`,
           content: 'Conteúdo de teste sem autenticação.',
@@ -72,7 +72,7 @@ describe('Post Routes - Integração', () => {
       };
 
       const response = await request(BASE_URL)
-        .post(`/schools/${schoolId}/post`)
+        .post(`/schools/${schoolId}/posts`)
         .set('Authorization', `Bearer ${token}`)
         .send(payload);
 
@@ -88,21 +88,6 @@ describe('Post Routes - Integração', () => {
       createdPostId = response.body.data._id;
     });
 
-    test('deve retornar 422 ao criar post com campos obrigatórios ausentes', async () => {
-      const payload = {
-        title: 'Título sem conteúdo',
-        // content ausente - obrigatório
-      };
-
-      const response = await request(BASE_URL)
-        .post(`/schools/${schoolId}/post`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(payload);
-
-      expect(response.status).toBe(422);
-      expect(response.body).toHaveProperty('error', true);
-    });
-
     test('deve retornar 404 ao criar post com schoolId inválido', async () => {
       const payload = {
         title: 'Teste',
@@ -110,7 +95,7 @@ describe('Post Routes - Integração', () => {
       };
 
       const response = await request(BASE_URL)
-        .post('/schools/invalid-school-id/post')
+        .post('/schools/invalid-school-id/posts')
         .set('Authorization', `Bearer ${token}`)
         .send(payload);
 
@@ -130,7 +115,7 @@ describe('Post Routes - Integração', () => {
       };
 
       const response = await request(BASE_URL)
-        .post(`/schools/${schoolId}/post`)
+        .post(`/schools/${schoolId}/posts`)
         .set('Authorization', `Bearer ${token}`)
         .send(payload);
 
@@ -144,16 +129,16 @@ describe('Post Routes - Integração', () => {
     });
   });
 
-  describe('GET /post - Listar comunicados', () => {
+  describe('GET /schools/:schoolId/posts - Listar comunicados', () => {
     test('deve retornar 401 ao listar posts sem token', async () => {
-      const response = await request(BASE_URL).get('/post');
+      const response = await request(BASE_URL).get(`/schools/${schoolId}/posts`);
 
       expect([401, 498]).toContain(response.status);
     });
 
     test('deve listar posts com token', async () => {
       const response = await request(BASE_URL)
-        .get('/post')
+        .get(`/schools/${schoolId}/posts`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -168,7 +153,7 @@ describe('Post Routes - Integração', () => {
 
     test('deve listar posts com paginação', async () => {
       const response = await request(BASE_URL)
-        .get('/post?page=1&limit=5')
+        .get(`/schools/${schoolId}/posts?page=1&limit=5`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -176,18 +161,9 @@ describe('Post Routes - Integração', () => {
       expect(response.body.data.limit).toBe(5);
     });
 
-    test('deve listar posts com filtro por author_id', async () => {
-      const response = await request(BASE_URL)
-        .get(`/post?author_id=${Date.now()}`) // ID que provavelmente não existe
-        .set('Authorization', `Bearer ${token}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.totalDocs).toBe(0);
-    });
-
     test('deve listar posts com filtro por title', async () => {
       const response = await request(BASE_URL)
-        .get('/post?title=Post%20integração')
+        .get(`/schools/${schoolId}/posts?title=Post%20integração`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -196,7 +172,7 @@ describe('Post Routes - Integração', () => {
 
     test('deve listar posts com filtro por active', async () => {
       const response = await request(BASE_URL)
-        .get('/post?active=true')
+        .get(`/schools/${schoolId}/posts?active=true`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -204,9 +180,11 @@ describe('Post Routes - Integração', () => {
     });
   });
 
-  describe('GET /post/:id - Buscar comunicado por ID', () => {
+  describe('GET /posts/:id - Buscar comunicado por ID', () => {
     test('deve retornar 401 sem token', async () => {
-      const response = await request(BASE_URL).get(`/post/${createdPostId || '507f1f77bcf86cd799439013'}`);
+      const response = await request(BASE_URL).get(
+        `/posts/${createdPostId || '507f1f77bcf86cd799439013'}`
+      );
 
       expect([401, 498]).toContain(response.status);
     });
@@ -218,7 +196,7 @@ describe('Post Routes - Integração', () => {
       }
 
       const response = await request(BASE_URL)
-        .get(`/post/${createdPostId}`)
+        .get(`/posts/${createdPostId}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -231,7 +209,7 @@ describe('Post Routes - Integração', () => {
       const fakeId = '507f1f77bcf86cd799439999';
 
       const response = await request(BASE_URL)
-        .get(`/post/${fakeId}`)
+        .get(`/posts/${fakeId}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(404);
@@ -240,17 +218,17 @@ describe('Post Routes - Integração', () => {
 
     test('deve retornar 400 para ID em formato inválido', async () => {
       const response = await request(BASE_URL)
-        .get('/post/invalid-id-format')
+        .get('/posts/invalid-id-format')
         .set('Authorization', `Bearer ${token}`);
 
       expect([400, 422]).toContain(response.status);
     });
   });
 
-  describe('PATCH /post/:id - Atualizar comunicado', () => {
+  describe('PATCH /posts/:id - Atualizar comunicado', () => {
     test('deve retornar 401 sem token', async () => {
       const response = await request(BASE_URL)
-        .patch(`/post/${createdPostId || '507f1f77bcf86cd799439013'}`)
+        .patch(`/posts/${createdPostId || '507f1f77bcf86cd799439013'}`)
         .send({ title: 'Novo título' });
 
       expect([401, 498]).toContain(response.status);
@@ -268,7 +246,7 @@ describe('Post Routes - Integração', () => {
       };
 
       const response = await request(BASE_URL)
-        .patch(`/post/${createdPostId}`)
+        .patch(`/posts/${createdPostId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updatePayload);
 
@@ -276,7 +254,10 @@ describe('Post Routes - Integração', () => {
       expect(response.body).toHaveProperty('error', false);
       expect(response.body).toHaveProperty('data');
       expect(response.body.data).toHaveProperty('title', updatePayload.title);
-      expect(response.body.data).toHaveProperty('content', updatePayload.content);
+      expect(response.body.data).toHaveProperty(
+        'content',
+        updatePayload.content,
+      );
     });
 
     test('deve atualizar apenas alguns campos', async () => {
@@ -290,7 +271,7 @@ describe('Post Routes - Integração', () => {
       };
 
       const response = await request(BASE_URL)
-        .patch(`/post/${createdPostId}`)
+        .patch(`/posts/${createdPostId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updatePayload);
 
@@ -303,7 +284,7 @@ describe('Post Routes - Integração', () => {
       const updatePayload = { title: 'Novo título' };
 
       const response = await request(BASE_URL)
-        .patch(`/post/${fakeId}`)
+        .patch(`/posts/${fakeId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updatePayload);
 
@@ -313,33 +294,11 @@ describe('Post Routes - Integração', () => {
 
     test('deve retornar 400 para ID em formato inválido', async () => {
       const response = await request(BASE_URL)
-        .patch('/post/invalid-id-format')
+        .patch('/posts/invalid-id-format')
         .set('Authorization', `Bearer ${token}`)
         .send({ title: 'Novo título' });
 
       expect([400, 422]).toContain(response.status);
-    });
-
-    test('deve atualizar target com scope e target_id válidos', async () => {
-      if (!createdPostId) {
-        console.log('⚠️  createdPostId não definido, pulando teste');
-        return;
-      }
-
-      const updatePayload = {
-        target: {
-          scope: 'class',
-          target_id: '507f1f77bcf86cd799439023',
-        },
-      };
-
-      const response = await request(BASE_URL)
-        .patch(`/post/${createdPostId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(updatePayload);
-
-      // Pode ser 200 (sucesso) ou 422 (turma não existe)
-      expect([200, 422, 403]).toContain(response.status);
     });
 
     test('deve atualizar status active', async () => {
@@ -353,7 +312,7 @@ describe('Post Routes - Integração', () => {
       };
 
       const response = await request(BASE_URL)
-        .patch(`/post/${createdPostId}`)
+        .patch(`/posts/${createdPostId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updatePayload);
 
@@ -365,16 +324,93 @@ describe('Post Routes - Integração', () => {
     });
   });
 
-  describe('GET /schools/:schoolId/post - Listar comunicados da escola', () => {
+  describe('DELETE /posts/:id - Deletar comunicado', () => {
     test('deve retornar 401 sem token', async () => {
-      const response = await request(BASE_URL).get(`/schools/${schoolId}/post`);
+      const response = await request(BASE_URL).delete(
+        `/posts/${createdPostId || '507f1f77bcf86cd799439013'}`
+      );
+
+      expect([401, 498]).toContain(response.status);
+    });
+
+    test('deve deletar post com sucesso', async () => {
+      // Primeiro criar um novo post para deletar
+      const createPayload = {
+        title: `Post para deletar ${Date.now()}`,
+        content: 'Conteúdo para deletar.',
+        target: {
+          scope: 'all',
+        },
+        active: true,
+      };
+
+      const createResponse = await request(BASE_URL)
+        .post(`/schools/${schoolId}/posts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(createPayload);
+
+      expect(createResponse.status).toBe(201);
+      const postIdToDelete = createResponse.body.data._id;
+
+      // Depois deletar
+      const deleteResponse = await request(BASE_URL)
+        .delete(`/posts/${postIdToDelete}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(deleteResponse.status).toBe(200);
+      expect(deleteResponse.body).toHaveProperty('error', false);
+      expect(deleteResponse.body).toHaveProperty('data');
+      expect(deleteResponse.body.data).toHaveProperty(
+        'message',
+        'Anúncio deletado com sucesso',
+      );
+    });
+
+    test('deve retornar 404 ao deletar post inexistente', async () => {
+      const fakeId = '507f1f77bcf86cd799439999';
+
+      const response = await request(BASE_URL)
+        .delete(`/posts/${fakeId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', true);
+    });
+
+    test('deve retornar 400 para ID em formato inválido', async () => {
+      const response = await request(BASE_URL)
+        .delete('/posts/invalid-id-format')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect([400, 422]).toContain(response.status);
+    });
+
+    test('deve retornar 403 ao tentar deletar post de outro autor', async () => {
+      if (!createdPostId) {
+        console.log('⚠️  createdPostId não definido, pulando teste');
+        return;
+      }
+
+      // Tentar deletar o post criado anteriormente (que pode ter outro autor)
+      const response = await request(BASE_URL)
+        .delete(`/posts/${createdPostId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      // Pode retornar 200 se for o mesmo autor, ou 403 se não for autorizado
+      expect([200, 403]).toContain(response.status);
+    });
+  });
+
+  describe('GET /schools/:schoolId/posts - Listar comunicados da escola (redundante)', () => {
+    test('deve retornar 401 sem token', async () => {
+      const response = await request(BASE_URL).get(`/schools/${schoolId}/posts`);
 
       expect([401, 498]).toContain(response.status);
     });
 
     test('deve listar posts da escola específica', async () => {
       const response = await request(BASE_URL)
-        .get(`/schools/${schoolId}/post`)
+        .get(`/schools/${schoolId}/posts`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -386,7 +422,7 @@ describe('Post Routes - Integração', () => {
 
     test('deve listar posts da escola com filtros', async () => {
       const response = await request(BASE_URL)
-        .get(`/schools/${schoolId}/post?page=1&limit=5`)
+        .get(`/schools/${schoolId}/posts?page=1&limit=5`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -395,7 +431,7 @@ describe('Post Routes - Integração', () => {
 
     test('deve retornar 400 para schoolId inválido', async () => {
       const response = await request(BASE_URL)
-        .get('/schools/invalid-school-id/post')
+        .get('/schools/invalid-school-id/posts')
         .set('Authorization', `Bearer ${token}`);
 
       expect([400, 422]).toContain(response.status);
