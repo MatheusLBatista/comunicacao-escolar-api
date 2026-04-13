@@ -39,7 +39,7 @@
 
 ## Resumo do Projeto
 
-| | |
+| Campo | Descrição |
 | :---- | :---- |
 | **Nome** | Comunicação Escolar |
 | **Principal objetivo** | Desenvolver uma plataforma que centralize e facilite a comunicação entre escolas, professores e responsáveis, em torno da vida escolar dos alunos. |
