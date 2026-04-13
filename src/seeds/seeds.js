@@ -13,6 +13,7 @@ import pickupAuthorizationSeed from './pickupAuthorization.js';
 import pickupLogSeed from './pickupLogSeed.js';
 import eventSeed from './eventSeed.js';
 import likeSeed from './likeSeed.js';
+import auditLogSeed from './auditLogSeed.js';
 import linkStudentsToClasses from './linkStudentsToClasses.js';
 
 await DbConnect.conectar();
@@ -36,6 +37,7 @@ try {
   await pickupAuthorizationSeed();
   await pickupLogSeed();
   await eventSeed(schools, users);
+  await auditLogSeed(schools, users);
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
 } catch (error) {

@@ -206,6 +206,34 @@ export const fakeMappings = {
     notes: () => fakebr.lorem.sentence(),
     active: () => true,
   },
+
+  AuditLog: {
+    user_role: () =>
+      fakebr.random.arrayElement(['admin', 'teacher', 'parent']),
+    action: () => fakebr.random.arrayElement(['view', 'download', 'export']),
+    resource_type: () =>
+      fakebr.random.arrayElement([
+        'daily_log',
+        'announcement',
+        'message',
+        'conversation',
+        'incident',
+        'event',
+        'pickup_log',
+        'student_profile',
+      ]),
+    resource_id: () => new mongoose.Types.ObjectId(),
+    resource_summary: () => fakebr.lorem.sentence(),
+    ip_address: () => fakebr.internet.ip(),
+    user_agent: () => fakebr.internet.userAgent(),
+    device_info: () => ({
+      platform: fakebr.random.arrayElement(['ios', 'android', 'web']),
+      app_version: `1.${fakebr.random.number({ min: 0, max: 5 })}.${fakebr.random.number({ min: 0, max: 9 })}`,
+      os_version: `${fakebr.random.number({ min: 13, max: 17 })}.${fakebr.random.number({ min: 0, max: 6 })}`,
+    }),
+    session_id: () => uuid(),
+    metadata: () => ({ page: 1 }),
+  },
 };
 
 // Retorna o mapping global, consolidando os mappings comuns e específicos.
