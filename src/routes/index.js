@@ -15,6 +15,7 @@ import dailyLogTemplate from './dailyLogTemplateRoutes.js';
 import event from './eventRoutes.js';
 import conversation from './conversationRoutes.js';
 import pickupAuthorization from './pickupAuthorizationRoutes.js';
+import auditLog from './auditLogRoutes.js';
 
 import dotenv from 'dotenv';
 
@@ -49,6 +50,7 @@ const routes = (app) => {
     event,
     conversation,
     pickupAuthorization,
+    auditLog,
     like
   );
 
