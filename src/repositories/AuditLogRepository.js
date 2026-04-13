@@ -9,15 +9,15 @@ class AuditLogRepository {
   }
 
   async list(req) {
-    const id = req?.params?.logId || req?.params?.id;
+    const logId = req?.params?.logId;
     const populate = [
       { path: 'school_id', select: 'name tax_id active' },
       { path: 'user_id', select: 'full_name email active' },
       { path: 'student_id', select: 'full_name email active' },
     ];
 
-    if (id && !req?.params?.resourceType && !req?.params?.userId && !req?.params?.studentId) {
-      const data = await this.model.findById(id).populate(populate);
+    if (logId && !req?.params?.resourceType && !req?.params?.userId && !req?.params?.studentId) {
+      const data = await this.model.findById(logId).populate(populate);
 
       if (!data) {
         throw new CustomError({
