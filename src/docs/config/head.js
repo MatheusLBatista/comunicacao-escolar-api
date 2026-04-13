@@ -23,7 +23,7 @@ import likePaths from '../paths/like.js';
 const getServersInCorrectOrder = () => {
   const PORT = process.env.PORT;
   const devUrl = {
-    url: process.env.SWAGGER_DEV_URL || `http://localhost:${PORT}`,
+    url: process.env.SWAGGER_DEV_URL || `https://ca-comunicacao-escolar-api.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io` || `http://localhost:${PORT}`,
   };
 
   if (process.env.NODE_ENV === 'production') return [devUrl];
