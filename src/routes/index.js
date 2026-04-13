@@ -4,7 +4,7 @@ import swaggerUI from 'swagger-ui-express';
 import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
-import like from './likeRoutes.js'
+import like from './likeRoutes.js';
 import users from './userRoutes.js';
 import grupos from './groupRoutes.js';
 import rotas from './routeRoutes.js';
@@ -15,6 +15,7 @@ import dailyLogTemplate from './dailyLogTemplateRoutes.js';
 import event from './eventRoutes.js';
 import conversation from './conversationRoutes.js';
 import pickupAuthorization from './pickupAuthorizationRoutes.js';
+import pickupLog from './pickupLogRoutes.js';
 import auditLog from './auditLogRoutes.js';
 
 import dotenv from 'dotenv';
@@ -36,7 +37,6 @@ const routes = (app) => {
     swaggerUI.setup(swaggerDocs)(req, res, next);
   });
 
-
   app.use(
     express.json(),
     auth,
@@ -50,8 +50,9 @@ const routes = (app) => {
     event,
     conversation,
     pickupAuthorization,
+    pickupLog,
     auditLog,
-    like
+    like,
   );
 
   app.use((req, res) => {
