@@ -27,14 +27,31 @@ const routes = (app) => {
     app.use(logRoutes);
   }
 
+  const allowSwaggerUI = (req, res, next) => {
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('Cross-Origin-Embedder-Policy');
+    res.removeHeader('Cross-Origin-Opener-Policy');
+    next();
+  };
+
   app.get('/', (req, res) => {
     res.redirect('/docs');
   });
 
   const swaggerDocs = swaggerJsDoc(getSwaggerOptions());
-  app.use(swaggerUI.serve);
-  app.get('/docs', (req, res, next) => {
-    swaggerUI.setup(swaggerDocs)(req, res, next);
+  const swaggerUIHandler = swaggerUI.setup(swaggerDocs, {
+    explorer: true,
+  });
+
+  app.get('/docs.json', allowSwaggerUI, (req, res) => {
+    res.json(swaggerDocs);
+  });
+
+  app.use('/docs', allowSwaggerUI, swaggerUI.serve);
+  app.get('/docs', allowSwaggerUI, swaggerUIHandler);
+
+  app.get('/api-docs', (req, res) => {
+    res.redirect('/docs');
   });
 
   app.use(
