@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const BASE_URL = process.env.INTEGRATION_BASE_URL || `http://localhost:${PORT}`;
 
 describe('Grupos', () => {

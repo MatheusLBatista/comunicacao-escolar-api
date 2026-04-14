@@ -7,6 +7,7 @@ import postSchemas from '../schemas/postSchema.js';
 import eventSchemas from '../schemas/eventSchema.js';
 import schoolSchemas from '../schemas/schoolSchema.js';
 import pickupAuthorizationSchemas from '../schemas/pickupAuthorizationSchema.js';
+import pickupLogSchemas from '../schemas/pickupLogSchema.js';
 import likeSchemas from '../schemas/likeSchema.js';
 import usuariosPaths from '../paths/usuarios.js';
 import authPaths from '../paths/auth.js';
@@ -15,6 +16,7 @@ import rotasPaths from '../paths/rota.js';
 import conversationPaths from '../paths/conversation.js';
 import postPaths from '../paths/post.js';
 import pickupAuthorizationPaths from '../paths/pickupAuthorization.js';
+import pickupLogPaths from '../paths/pickupLog.js';
 import eventPaths from '../paths/event.js';
 import schoolPaths from '../paths/school.js';
 import likePaths from '../paths/like.js';
@@ -23,7 +25,10 @@ import likePaths from '../paths/like.js';
 const getServersInCorrectOrder = () => {
   const PORT = process.env.PORT;
   const devUrl = {
-    url: process.env.SWAGGER_DEV_URL || `http://localhost:${PORT}`,
+    url:
+      process.env.SWAGGER_DEV_URL ||
+      `https://ca-comunicacao-escolar-api.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io` ||
+      `http://localhost:${PORT}`,
   };
 
   if (process.env.NODE_ENV === 'production') return [devUrl];
@@ -84,6 +89,14 @@ const getSwaggerOptions = () => {
           description: 'Rotas para gestão de eventos escolares',
         },
         {
+          name: 'Autorizações de Retirada',
+          description: 'Rotas para gerenciamento de autorizações de retirada',
+        },
+        {
+          name: 'Logs de Retirada',
+          description: 'Rotas para registro e auditoria de retirada de alunos',
+        },
+        {
           name: 'Likes',
           description: 'Rotas para gerenciar likes em comunicados',
         },
@@ -96,6 +109,7 @@ const getSwaggerOptions = () => {
         ...conversationPaths,
         ...postPaths,
         ...pickupAuthorizationPaths,
+        ...pickupLogPaths,
         ...eventPaths,
         ...schoolPaths,
         ...likePaths,
@@ -116,6 +130,7 @@ const getSwaggerOptions = () => {
           ...conversationSchemas,
           ...postSchemas,
           ...pickupAuthorizationSchemas,
+          ...pickupLogSchemas,
           ...eventSchemas,
           ...schoolSchemas,
           ...likeSchemas,

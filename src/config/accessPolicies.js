@@ -61,8 +61,26 @@ const userPolicies = [
   },
 ];
 
-const rolePolicies = [...groupPolicies, ...routePolicies, ...userPolicies];
+const auditLogPolicies = [
+  {
+    pattern: /^\/schools\/([^/]+)\/audit-logs(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'school',
+        roles: ['admin'],
+        schoolParam: 'id',
+      },
+    },
+  },
+];
 
-export { groupPolicies, routePolicies, userPolicies };
+const rolePolicies = [
+  ...groupPolicies,
+  ...routePolicies,
+  ...userPolicies,
+  ...auditLogPolicies,
+];
+
+export { groupPolicies, routePolicies, userPolicies, auditLogPolicies };
 
 export default rolePolicies;
