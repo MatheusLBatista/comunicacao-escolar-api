@@ -93,7 +93,6 @@ class PostController {
 
   async deleteFoto(req, res) {
 
-     console.log("Chegamos")
     const {linkId} = req.params || {}
 
     const {postId} = req.params || {}
@@ -108,7 +107,14 @@ class PostController {
 
   }
 
+  async getFoto(req, res) {
+    
+    const {schoolId} = req.params || {}
 
+    const {id} = req.params || {}
+
+    const data = await this.service.getFoto(id, schoolId)
+  }
 
 }
 

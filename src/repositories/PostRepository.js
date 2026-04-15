@@ -232,19 +232,17 @@ class PostRepository {
     return data
   }
 
-  async getFoto(postId, linkId, userId) {
+  async getFoto({postId, linkId, userId} = {}) {
     if(userId) {
       const data = await this.model.findOne({_id:postId, author_id:userId})
 
       for(const foto of data.attachments) {
-        const url = foto.split("/")
+        const url = foto.split(".")
         if(url.some((parte) => mongoose.Types.ObjectId.isValid(parte))) {
-          
+          return url[0]
         }
       }
-
-      // const foto = data.attachments.find((item) => item == linkId)
-      return foto
+      return null
     }
     
     const data = await this.model.findById(postId)
