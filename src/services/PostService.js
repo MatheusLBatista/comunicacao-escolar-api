@@ -10,6 +10,7 @@ import minioClient from '../config/MinIO.js';
 import 'dotenv/config';
 import Post from '../models/Post.js';
 
+
 class PostService {
   constructor() {
     this.repository = new PostRepository();
@@ -274,31 +275,13 @@ class PostService {
     const userId = req.user_id
 
     const role = await this.userRepository.getById(userId)
+    const isAdmin = role.memberships.some((member) => member.role === 'admin')
 
-    if (role.memberships.some((member) => member == "admin")) {
-      const data = await this.repository.getFoto(postId, linkId)
-      if (!data) {
-        throw new CustomError({
-          statusCode: HttpStatusCodes.NOT_FOUND.code,
-          errorType: "notFound",
-          field: "attachments",
-          details: [{ path: "attachments", message: "url da foto não encontrada" }],
-          customMessage: `Nenhuma foto com a url ${id}`
-        })
-      }
-
-      const objectName = `${process.env.MINIO_BUCKET}/${data}`
-
-      await this.repository.deletaFoto(postId, linkId)
-
-
-      await minioClient.getObject(process.env.MINIO_BUCKET, objectName)
-
-      return { message: "Sucesso ao deletar imagem" }
-
-    }
-
-    const data = await this.repository.getFoto(postId, linkId, userId)
+    const data = await this.repository.getFoto({
+      postId,
+      linkId,
+      userId: isAdmin ? undefined : userId,
+    })
 
     if (!data) {
       throw new CustomError({
@@ -306,18 +289,43 @@ class PostService {
         errorType: "notFound",
         field: "attachments",
         details: [{ path: "attachments", message: "url da foto não encontrada" }],
-        customMessage: `Nenhuma foto com a url ${id}`
+        customMessage: `Nenhuma foto com a url ${linkId}`
       })
     }
 
-    const objectName = `${process.env.MINIO_BUCKET}/${data}`
 
-    await this.repository.deletaFoto(postId, linkId)
+    try {
+
+      await this.repository.deletaFoto(postId, data, isAdmin ? undefined : userId)
 
 
-    await minioClient.getObject(process.env.MINIO_BUCKET, objectName)
+      await minioClient.removeObject(process.env.MINIO_BUCKET, data)
 
-    return { message: "Sucesso ao deletar imagem" }
+      return { message: "Sucesso ao deletar imagem" }
+    } catch (err) {
+
+      if (err.code === 'NoSuchKey') {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.NOT_FOUND.code,
+          errorType: 'notFound',
+          field: 'attachments',
+          details: [{ path: 'attachments', message: 'A foto não existe no armazenamento.' }],
+          customMessage: `A foto ${linkId} não foi encontrada no armazenamento de arquivos.`,
+        })
+      }
+
+      await this.repository.uploadFoto(postId, data, isAdmin ? undefined : userId)
+
+      throw new CustomError({
+        statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
+        errorType: 'internalServerError',
+        field: 'attachments',
+        details: [{ path: 'attachments', message: 'Falha ao excluir foto do armazenamento.' }],
+        customMessage: 'Não foi possível excluir a foto. Tente novamente.',
+      })
+
+    }
+
   }
 
   async getFoto(id) {
@@ -325,8 +333,10 @@ class PostService {
     try {
       const foto = await minioClient.getObject(process.env.MINIO_BUCKET, id)
 
-      
-    } catch(error) {
+      const data = await this.constructorBuffer(foto)
+
+      return { buffer: data, content_type: foto.headers['content-type'] }
+    } catch (error) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
         errorType: "notFound",
@@ -335,10 +345,27 @@ class PostService {
         customMessage: `Nenhuma foto com o ${id} encontrada`
       })
     }
-    
+  }
 
+// Constrói o buffer da imagem
+  async constructorBuffer(foto) {
+    const chunks = []
+    const imagem = new Promise((resolve, reject) => {
+      try {
+        foto.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+        foto.on('end', () => {
+          const imagemBuffer = Buffer.concat(chunks)
+          resolve(imagemBuffer)
+        })
+      } catch (err) {
+        reject(err)
+      }
 
+    })
 
+    return await imagem
   }
 }
 

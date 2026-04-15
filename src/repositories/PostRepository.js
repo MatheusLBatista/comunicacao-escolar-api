@@ -2,7 +2,6 @@ import PostModel from '../models/Post.js';
 import LikeModel from '../models/Like.js';
 import PostFilterBuilder from './filters/PostFilterBuilder.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
-import mongoose from 'mongoose';
 
 class PostRepository {
   constructor() {
@@ -211,8 +210,9 @@ class PostRepository {
   }
 
   async uploadFoto(id, urlMinio, idUser) {
+    const filter = idUser ? { _id: id, author_id: idUser } : { _id: id }
 
-    const data = await this.model.findOneAndUpdate({ _id: id, author_id: idUser }, { $addToSet: {attachments: urlMinio}}, {new:true})
+    const data = await this.model.findOneAndUpdate(filter, { $addToSet: {attachments: urlMinio}}, {new:true})
 
     if (!data) {
       throw new CustomError({
@@ -228,7 +228,8 @@ class PostRepository {
   }
 
   async deletaFoto(id, urlMinio, idUser) {
-    const data = await this.model.findOneAndUpdate({_id: id, author_id: idUser}, {$pull: {attachments:urlMinio}})
+    const filter = idUser ? { _id: id, author_id: idUser } : { _id: id }
+    const data = await this.model.findOneAndUpdate(filter, {$pull: {attachments:urlMinio}})
     return data
   }
 
@@ -236,16 +237,15 @@ class PostRepository {
     if(userId) {
       const data = await this.model.findOne({_id:postId, author_id:userId})
 
-      for(const foto of data.attachments) {
-        const url = foto.split(".")
-        if(url.some((parte) => mongoose.Types.ObjectId.isValid(parte))) {
-          return url[0]
-        }
+      if (!data) {
+        return null
       }
-      return null
+
+      return data.attachments.find((item) => item == linkId) || null
     }
     
     const data = await this.model.findById(postId)
+    
     const foto = data.attachments.find((item) => item == linkId)
     return foto
   }

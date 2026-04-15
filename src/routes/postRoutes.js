@@ -45,7 +45,11 @@ router.post('/posts/:id/attachments',
 
 router.delete('/posts/:postId/attachments/:linkId',
   AuthMiddleware,
-  asyncWrapper(postController.delete.bind(postController))
+  asyncWrapper(postController.deleteFoto.bind(postController))
 )
 
+router.get('/attachments/:id', 
+  AuthMiddleware,
+  asyncWrapper(postController.getFoto.bind(postController))
+)
 export default router;

@@ -97,7 +97,7 @@ class PostController {
 
     const {postId} = req.params || {}
  
-    UserIdSchema.parse(linkId)
+
     UserIdSchema.parse(postId)
 
     
@@ -108,12 +108,12 @@ class PostController {
   }
 
   async getFoto(req, res) {
-    
-    const {schoolId} = req.params || {}
 
     const {id} = req.params || {}
 
-    const data = await this.service.getFoto(id, schoolId)
+    const data = await this.service.getFoto(id)
+    res.setHeader('Content-Type',data.content_type)
+    return res.send(data.buffer)
   }
 
 }
