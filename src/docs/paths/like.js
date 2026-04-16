@@ -1,4 +1,3 @@
-import likeSchemas from '../schemas/likeSchema.js';
 import commonResponses from '../schemas/swaggerCommonResponses.js';
 
 const likePaths = {
@@ -47,7 +46,32 @@ const likePaths = {
         },
       },
       responses: {
-        200: commonResponses[200]('#/components/schemas/LikeItem'),
+        200: {
+          description: 'Like criado ou removido com sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  data: {
+                    oneOf: [
+                      { $ref: '#/components/schemas/LikeItem' },
+                      { $ref: '#/components/schemas/LikeRemoved' },
+                    ],
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'Operação realizada com sucesso',
+                  },
+                  errors: {
+                    type: 'array',
+                    example: [],
+                  },
+                },
+              },
+            },
+          },
+        },
         400: commonResponses[400](),
         401: commonResponses[401](),
         403: commonResponses[403](),
