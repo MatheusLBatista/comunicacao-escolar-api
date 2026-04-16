@@ -39,7 +39,7 @@ class LikeService {
             return data;
         }
 
-        if (!user.memberships.some((user) => user.school_id.toJSON() == post.school_id.toJSON())) {
+        if (!user.memberships.some((membership) => membership.school_id?.toString() === post.school_id?.toString())) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.FORBIDDEN.code,
                 errorType: 'forbidden',
@@ -69,12 +69,31 @@ class LikeService {
             return data
         }
 
-        const classExists = user.memberships.some(async(member) => {
-            member.associated_students.some(async (studant) => {
-                const studantInfo = await this.userRepository.getById(studant)
-                return studantInfo.memberships.some((turma) => turma.class_id === post.target.target_id)
-            })
-        })
+        const targetClassId = post.target?.target_id?.toString();
+        const associatedStudentIds = user.memberships.flatMap((membership) =>
+            Array.isArray(membership.associated_students)
+                ? membership.associated_students.map((studentId) => studentId?.toString())
+                : [],
+        );
+
+        const uniqueAssociatedStudentIds = [...new Set(associatedStudentIds.filter(Boolean))];
+
+        const associatedStudents = await Promise.all(
+            uniqueAssociatedStudentIds.map(async (studentId) => {
+                try {
+                    return await this.userRepository.getById(studentId);
+                } catch {
+                    return null;
+                }
+            }),
+        );
+
+        const classExists = associatedStudents.some((student) =>
+            student?.memberships?.some(
+                (membership) => membership?.class_id?.toString() === targetClassId,
+            ),
+        );
+
         if (!classExists) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.FORBIDDEN.code,
