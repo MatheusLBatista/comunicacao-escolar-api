@@ -1,4 +1,4 @@
-import multer from 'multer';
+import multer, { MulterError } from 'multer';
 import path from 'path';
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 
@@ -6,13 +6,13 @@ const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
-  // limits: {
-  // fileSize: 1  * 1024 * 1024
-  // },
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
   fileFilter: (req, file, cb) => {
     try {
       const extensao = path.extname(file.originalname).toLowerCase();
-      const permitidas = ['.jpg', '.jpeg', '.png'];
+      const permitidas = ['.jpg', '.jpeg', '.png', '.webp'];
 
       if (!permitidas.includes(extensao)) {
         return cb(
@@ -40,6 +40,9 @@ const upload = multer({
       }
       cb(null, true);
     } catch (error) {
+      if(error instanceof MulterError) {
+        cb(error.stack, false)
+      }
       cb(error, false);
     }
   },

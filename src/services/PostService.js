@@ -3,7 +3,14 @@ import SchoolRepository from '../repositories/SchoolRepository.js';
 import ClassRepository from '../repositories/ClassRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 
-import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
+import { CommonResponse, CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
+import compress from '../config/SharpConfig.js';
+import mongoose from 'mongoose';
+import minioClient from '../config/MinIO.js';
+import 'dotenv/config';
+import Post from '../models/Post.js';
+
+
 class PostService {
   constructor() {
     this.repository = new PostRepository();
@@ -16,6 +23,7 @@ class PostService {
     const data = await this.repository.list(req);
 
     return data;
+
   }
 
   async create(parsedData, userId, schoolId) {
@@ -117,7 +125,6 @@ class PostService {
       return
     }
 
-    console.log("aqui")
     await this.repository.delete(id, userId)
 
     return
@@ -183,6 +190,125 @@ class PostService {
     return parsedData
   }
 
+  async uploadFoto(req, id) {
+
+
+
+    const userId = req.user_id
+
+
+    const files = req.files;
+    if (!files) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: "badRequest",
+        field: "Foto",
+        details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
+        customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
+      })
+    }
+
+    if (files.length == 0) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: "badRequest",
+        field: "Foto",
+        details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
+        customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
+      })
+    }
+
+    for (const file of files) {
+      if (file.size > (10 * 1024 * 1024)) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
+          errorType: 'payloadTooLarge',
+          field: "Imagem",
+          details: [{ path: "Imagem", message: "Arquivo é superior a 10 MB" }],
+          customMessage: "O arquivo é maior do que 10 MB."
+        });
+      }
+    }
+
+    const post = await this.repository.getById(id)
+    if (!post) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'notFound',
+        field: "post",
+        details: [{ path: "post", message: "anuncio não encontrado." }],
+        customMessage: "post não encontrado."
+      });
+    }
+
+
+    for (const file of files) {
+      const image = await compress(file.buffer)
+
+      const obj = new mongoose.Types.ObjectId().toString()
+
+      const objectName = `${obj.toString()}.${image[1].format}`
+
+      // let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
+
+      await this.repository.uploadFoto(id, objectName, userId)
+
+      try {
+        await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
+          'Content-Type': file.mimetype,
+        })
+
+      } catch (error) {
+        await this.repository.deletaFoto(id, objectName, userId)
+        throw new Error(error)
+      }
+
+    }
+    const data = await this.repository.getById(id)
+
+    return data
+
+  }
+
+  async getFoto(id) {
+
+    try {
+      const foto = await minioClient.getObject(process.env.MINIO_BUCKET, id)
+
+      const data = await this.constructorBuffer(foto)
+
+      return { buffer: data, content_type: foto.headers['content-type'] }
+    } catch (error) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: "notFound",
+        field: "attachments",
+        details: [{ path: "attachments", message: "Foto não encontrada" }],
+        customMessage: `Nenhuma foto com o ${id} encontrada`
+      })
+    }
+  }
+
+// Constrói o buffer da imagem
+  async constructorBuffer(foto) {
+    const chunks = []
+    const imagem = new Promise((resolve, reject) => {
+      try {
+        foto.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+        foto.on('end', () => {
+          const imagemBuffer = Buffer.concat(chunks)
+          resolve(imagemBuffer)
+        })
+      } catch (err) {
+        reject(err)
+      }
+
+    })
+
+    return await imagem
+  }
 }
 
 export default PostService;
