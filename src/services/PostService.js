@@ -270,64 +270,6 @@ class PostService {
 
   }
 
-  async deleteFoto(req, postId, linkId) {
-
-    const userId = req.user_id
-
-    const role = await this.userRepository.getById(userId)
-    const isAdmin = role.memberships.some((member) => member.role === 'admin')
-
-    const data = await this.repository.getFoto({
-      postId,
-      linkId,
-      userId: isAdmin ? undefined : userId,
-    })
-
-    if (!data) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.NOT_FOUND.code,
-        errorType: "notFound",
-        field: "attachments",
-        details: [{ path: "attachments", message: "url da foto não encontrada" }],
-        customMessage: `Nenhuma foto com a url ${linkId}`
-      })
-    }
-
-
-    try {
-
-      await this.repository.deletaFoto(postId, data, isAdmin ? undefined : userId)
-
-
-      await minioClient.removeObject(process.env.MINIO_BUCKET, data)
-
-      return { message: "Sucesso ao deletar imagem" }
-    } catch (err) {
-
-      if (err.code === 'NoSuchKey') {
-        throw new CustomError({
-          statusCode: HttpStatusCodes.NOT_FOUND.code,
-          errorType: 'notFound',
-          field: 'attachments',
-          details: [{ path: 'attachments', message: 'A foto não existe no armazenamento.' }],
-          customMessage: `A foto ${linkId} não foi encontrada no armazenamento de arquivos.`,
-        })
-      }
-
-      await this.repository.uploadFoto(postId, data, isAdmin ? undefined : userId)
-
-      throw new CustomError({
-        statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
-        errorType: 'internalServerError',
-        field: 'attachments',
-        details: [{ path: 'attachments', message: 'Falha ao excluir foto do armazenamento.' }],
-        customMessage: 'Não foi possível excluir a foto. Tente novamente.',
-      })
-
-    }
-
-  }
-
   async getFoto(id) {
 
     try {

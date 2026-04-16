@@ -179,9 +179,8 @@ class PostRepository {
 
   async delete(id, userId) {
     if (userId) {
-      const data = await this.model.findOneAndDelete({ _id: id, author_id: userId })
+      const data = await this.model.findOneAndUpdate({ _id: id, author_id: userId }, {active:false})
 
-      console.log(data)
 
       if (!data) {
         throw new CustomError({
