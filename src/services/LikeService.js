@@ -15,7 +15,7 @@ class LikeService {
 
         const post = await this.postRepository.getById(postId)
 
-        if (!post) {
+        if (!post || post.active == false) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.NOT_FOUND.code,
                 errorType: 'notFound',
@@ -26,7 +26,7 @@ class LikeService {
                         message: 'O id de post informado não foi encontrado.'
                     }
                 ],
-                customMessage: 'post não foi encontrado'
+                customMessage: 'post não foi encontrado ou está desativado.'
             })
         }
 
