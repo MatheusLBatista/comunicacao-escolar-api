@@ -99,6 +99,10 @@ class UserRepository {
     return user;
   }
 
+  async getByGoogleId(googleId) {
+    return await this.model.findOne({ google_id: googleId }).select('+google_id');
+  }
+
   async getByEmail(email, idIgnorado = null) {
     const filtro = { email };
 

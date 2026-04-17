@@ -7,6 +7,7 @@ import seedGroups from './groupSeed.js';
 
 export default async function userSeed() {
   await User.deleteMany({});
+  await User.syncIndexes();
 
   const rotasCompletas = await seedRoutes();
   const grupos = await seedGroups(rotasCompletas);
@@ -34,17 +35,14 @@ export default async function userSeed() {
     10,
   );
 
-  // MOCK: Create students
+  // MOCK: Create students (sem credenciais de acesso — criados internamente ao vincular responsáveis)
   const students = [];
 
   for (let i = 0; i < 5; i++) {
     students.push({
       full_name: fakeMappings.User.full_name(),
-      email: fakeMappings.User.email(),
-      password: defaultPassword,
+      auth_provider: 'local',
       active: true,
-      permissions: userGroup?.permissions || [],
-      groups: userGroup ? [userGroup._id] : [],
       memberships: [
         {
           school_id: school._id,

@@ -13,12 +13,24 @@ class User {
         email: {
           type: String,
           unique: true,
-          required: true,
+          sparse: true,
+          required: false,
         },
         password: {
           type: String,
           select: false,
-          required: true,
+          required: false,
+        },
+        google_id: {
+          type: String,
+          unique: true,
+          sparse: true,
+          select: false,
+        },
+        auth_provider: {
+          type: String,
+          enum: ['local', 'google'],
+          default: 'local',
         },
         active: {
           type: Boolean,

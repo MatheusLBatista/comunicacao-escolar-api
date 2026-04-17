@@ -24,15 +24,14 @@ import likePaths from '../paths/like.js';
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
   const PORT = process.env.PORT;
-  const devUrl = {
+  const localUrl = { url: `http://localhost:${PORT}` };
+  const prodUrl = {
     url:
       process.env.SWAGGER_DEV_URL ||
-      `https://ca-comunicacao-escolar-api.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io` ||
-      `http://localhost:${PORT}`,
+      `https://ca-comunicacao-escolar-api.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io`,
   };
 
-  if (process.env.NODE_ENV === 'production') return [devUrl];
-  else return [devUrl];
+  return [localUrl, prodUrl];
 };
 
 // Função para obter as opções do Swagger

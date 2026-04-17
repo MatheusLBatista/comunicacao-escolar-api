@@ -7,7 +7,10 @@ import {
   messages,
 } from '../utils/helpers/index.js';
 import { LoginSchema } from '../utils/validators/schemas/zod/LoginSchema.js';
-import { UserUpdateSchema } from '../utils/validators/schemas/zod/UserSchema.js';
+import {
+  UserUpdateSchema,
+  RegisterSchema,
+} from '../utils/validators/schemas/zod/UserSchema.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { RequestAuthorizationSchema } from '../utils/validators/schemas/zod/querys/RequestAuthorizationSchema.js';
 import { EmailSchema } from '../utils/validators/schemas/zod/EmailSchema.js';
@@ -30,6 +33,33 @@ class AuthController {
     const body = req.body || {};
     const validatedBody = LoginSchema.parse(body);
     const data = await this.service.login(validatedBody);
+    return CommonResponse.success(res, data);
+  };
+
+  /**
+   * Auto-cadastro: responsável ou professor cria sua própria conta
+   */
+  register = async (req, res) => {
+    const parsedData = RegisterSchema.parse(req.body);
+    const data = await this.service.register(parsedData);
+    return CommonResponse.created(res, data);
+  };
+
+  /**
+   * Login via Google (token-based): recebe id_token do frontend
+   */
+  googleAuth = async (req, res) => {
+    const { id_token } = req.body;
+    if (!id_token) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: 'validationError',
+        field: 'id_token',
+        details: [],
+        customMessage: 'O campo id_token é obrigatório.',
+      });
+    }
+    const data = await this.service.googleAuth(id_token);
     return CommonResponse.success(res, data);
   };
 

@@ -16,6 +16,18 @@ router
     asyncWrapper(userController.createAdmin.bind(userController)),
   )
   .post(
+    '/schools/:schoolId/members',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.linkToSchool.bind(userController)),
+  )
+  .post(
+    '/schools/:schoolId/members/:userId/students',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.addStudentToParent.bind(userController)),
+  )
+  .post(
     '/schools/:schoolId/users',
     AuthMiddleware,
     AuthPermission,

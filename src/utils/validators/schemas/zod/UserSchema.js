@@ -78,4 +78,64 @@ const UserUpdateSchema = z
   })
   .partial();
 
-export { UserSchema, AdminCreateSchema, UserUpdateSchema, MembershipSchema };
+const RegisterSchema = z.object({
+  full_name: z
+    .string()
+    .min(1, 'Campo full_name é obrigatório.')
+    .max(100, 'O nome deve ter no máximo 100 caracteres.'),
+  email: z
+    .string()
+    .email('Formato de email inválido.')
+    .min(1, 'Campo email é obrigatório.'),
+  password: z
+    .string()
+    .min(8, 'A senha deve ter pelo menos 8 caracteres.')
+    .refine((val) => passwordRegex.test(val), {
+      message:
+        'A senha deve conter pelo menos 1 letra, 1 número e 1 caractere especial.',
+    }),
+});
+
+const StudentInputSchema = z.object({
+  full_name: z
+    .string()
+    .min(1, 'Campo full_name do aluno é obrigatório.')
+    .max(100, 'O nome do aluno deve ter no máximo 100 caracteres.'),
+  class_id: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, 'class_id inválido'),
+});
+
+const LinkToSchoolSchema = z
+  .object({
+    user_id: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/, 'user_id inválido')
+      .optional(),
+    email: z.string().email('Formato de email inválido.').optional(),
+    role: z.enum(['teacher', 'parent'], {
+      errorMap: () => ({
+        message: "Role deve ser 'teacher' ou 'parent'.",
+      }),
+    }),
+    student: StudentInputSchema.optional(),
+  })
+  .refine((data) => data.user_id || data.email, {
+    message: 'Informe user_id ou email do usuário a ser vinculado.',
+    path: ['user_id'],
+  })
+  .refine((data) => data.role !== 'parent' || data.student, {
+    message:
+      'Ao vincular um responsável, é obrigatório informar os dados do aluno (campo student).',
+    path: ['student'],
+  });
+
+export {
+  UserSchema,
+  AdminCreateSchema,
+  UserUpdateSchema,
+  MembershipSchema,
+  RegisterSchema,
+  StudentInputSchema,
+  LinkToSchoolSchema,
+};
