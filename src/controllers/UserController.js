@@ -7,6 +7,8 @@ import {
   UserSchema,
   AdminCreateSchema,
   UserUpdateSchema,
+  LinkToSchoolSchema,
+  StudentInputSchema,
 } from '../utils/validators/schemas/zod/UserSchema.js';
 import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 import { CommonResponse } from '../utils/helpers/index.js';
@@ -38,6 +40,33 @@ class UserController {
     const userLimpo = data.toObject
       ? data.toObject()
       : { ...(data._doc || data) };
+    delete userLimpo.password;
+
+    return CommonResponse.created(res, userLimpo);
+  }
+
+  async linkToSchool(req, res) {
+    const { schoolId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+
+    const parsedData = LinkToSchoolSchema.parse(req.body);
+    const data = await this.service.linkToSchool(schoolId, parsedData);
+
+    const userLimpo = data.toObject ? data.toObject() : { ...(data._doc || data) };
+    delete userLimpo.password;
+
+    return CommonResponse.created(res, userLimpo);
+  }
+
+  async addStudentToParent(req, res) {
+    const { schoolId, userId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    ObjectIdSchema.parse(userId);
+
+    const parsedData = StudentInputSchema.parse(req.body);
+    const data = await this.service.addStudentToParent(schoolId, userId, parsedData);
+
+    const userLimpo = data.toObject ? data.toObject() : { ...(data._doc || data) };
     delete userLimpo.password;
 
     return CommonResponse.created(res, userLimpo);

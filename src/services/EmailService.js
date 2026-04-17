@@ -23,7 +23,7 @@ class EmailService {
           pass: process.env.EMAIL_APP_PASSWORD,
         },
       });
-      console.log('✓ Serviço de e-mail inicializado com sucesso');
+      console.log('Serviço de e-mail inicializado com sucesso');
     } catch (error) {
       console.error('Erro ao inicializar serviço de e-mail:', error);
     }

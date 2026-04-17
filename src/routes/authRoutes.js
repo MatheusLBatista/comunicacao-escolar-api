@@ -7,6 +7,8 @@ const router = express.Router();
 const authController = new AuthController();
 
 router
+  .post('/register', asyncWrapper(authController.register.bind(authController)))
+  .post('/google', asyncWrapper(authController.googleAuth.bind(authController)))
   .post('/login', asyncWrapper(authController.login.bind(authController)))
   .post(
     '/recover',

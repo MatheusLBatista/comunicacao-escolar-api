@@ -62,6 +62,8 @@ export const fakeMappings = {
     activated_at: () => null,
     password_recovery_code: () => null,
     password_recovery_code_exp: () => null,
+    google_id: () => null,
+    auth_provider: () => 'local',
   },
 
   School: {

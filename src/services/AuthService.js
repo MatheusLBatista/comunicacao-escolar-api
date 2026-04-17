@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 import {
   CustomError,
   HttpStatusCodes,
@@ -16,6 +17,7 @@ class AuthService {
     // Se nada for injetado, usa a instância importada
     this.TokenUtil = injectedTokenUtil || tokenUtil;
     this.repository = new UserRepository();
+    this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
   }
 
   async loadTokens(id, token) {
@@ -65,6 +67,116 @@ class AuthService {
     return { data };
   }
 
+  async register(data) {
+    const existente = await this.repository.getByEmail(data.email);
+    if (existente) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.CONFLICT.code,
+        errorType: 'duplicateEntry',
+        field: 'email',
+        details: [{ path: 'email', message: 'Email já está em uso.' }],
+        customMessage: 'Email já está em uso.',
+      });
+    }
+
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(data.password, saltRounds);
+
+    const userData = {
+      full_name: data.full_name,
+      email: data.email,
+      password: passwordHash,
+      auth_provider: 'local',
+      active: true,
+      memberships: [],
+    };
+
+    const usuario = await this.repository.create(userData);
+    const obj = usuario.toObject ? usuario.toObject() : { ...usuario };
+    delete obj.password;
+    return obj;
+  }
+
+  async googleAuth(idToken) {
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
+        errorType: 'serverError',
+        field: 'Google OAuth',
+        details: [],
+        customMessage: 'Autenticação com Google não está configurada no servidor.',
+      });
+    }
+
+    let payload;
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+        errorType: 'unauthorized',
+        field: 'id_token',
+        details: [],
+        customMessage: 'Token do Google inválido ou expirado.',
+      });
+    }
+
+    const { sub: googleId, email, name } = payload;
+
+    // Busca por google_id ou email
+    let usuario = await this.repository.getByGoogleId(googleId);
+    if (!usuario && email) {
+      usuario = await this.repository.getByEmail(email);
+    }
+
+    if (!usuario) {
+      // Cria nova conta via Google
+      const userData = {
+        full_name: name,
+        email: email || null,
+        google_id: googleId,
+        auth_provider: 'google',
+        active: true,
+        memberships: [],
+      };
+      usuario = await this.repository.create(userData);
+    } else if (!usuario.google_id) {
+      // Conta local existente: vincula o google_id
+      await this.repository.update(usuario._id, { google_id: googleId, auth_provider: 'google' });
+      usuario = await this.repository.getById(usuario._id);
+    }
+
+    const memberships = Array.isArray(usuario.memberships) ? usuario.memberships : [];
+    const hasNonStudentRole = memberships.some(
+      (m) => m?.role && m.role !== 'student',
+    );
+
+    if (!hasNonStudentRole) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+        errorType: 'pendingApproval',
+        field: 'memberships',
+        details: [],
+        customMessage:
+          'Conta criada com sucesso. Aguarde o administrador vincular sua conta a uma escola.',
+      });
+    }
+
+    const access_token = await this.TokenUtil.generateAccessToken(usuario._id);
+    const refresh_token = await this.TokenUtil.generateRefreshToken(usuario._id);
+    await this.repository.storeTokens(usuario._id, access_token, refresh_token);
+
+    const userAtualizado = await this.repository.getById(usuario._id);
+    const obj = userAtualizado.toObject ? userAtualizado.toObject() : { ...userAtualizado };
+    delete obj.password;
+
+    return { user: { access_token, refresh_token, ...obj } };
+  }
+
   async login(body) {
     // Buscar o usuário pelo email
     const userEncontrado = await this.repository.getByEmail(body.email);
@@ -75,6 +187,18 @@ class AuthService {
         field: 'Email',
         details: [],
         customMessage: messages.error.unauthorized('Senha ou Email'),
+      });
+    }
+
+    // Bloquear conta Google de usar login com senha
+    if (userEncontrado.auth_provider === 'google') {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+        errorType: 'unauthorized',
+        field: 'auth_provider',
+        details: [],
+        customMessage:
+          'Esta conta foi criada com o Google. Use o login com Google.',
       });
     }
 
