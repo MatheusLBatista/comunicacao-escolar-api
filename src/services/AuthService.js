@@ -150,22 +150,6 @@ class AuthService {
       usuario = await this.repository.getById(usuario._id);
     }
 
-    const memberships = Array.isArray(usuario.memberships) ? usuario.memberships : [];
-    const hasNonStudentRole = memberships.some(
-      (m) => m?.role && m.role !== 'student',
-    );
-
-    if (!hasNonStudentRole) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
-        errorType: 'pendingApproval',
-        field: 'memberships',
-        details: [],
-        customMessage:
-          'Conta criada com sucesso. Aguarde o administrador vincular sua conta a uma escola.',
-      });
-    }
-
     const access_token = await this.TokenUtil.generateAccessToken(usuario._id);
     const refresh_token = await this.TokenUtil.generateRefreshToken(usuario._id);
     await this.repository.storeTokens(usuario._id, access_token, refresh_token);
@@ -214,23 +198,6 @@ class AuthService {
         field: 'Senha',
         details: [],
         customMessage: messages.error.unauthorized('Senha ou Email'),
-      });
-    }
-
-    const memberships = Array.isArray(userEncontrado.memberships)
-      ? userEncontrado.memberships
-      : [];
-    const hasNonStudentRole = memberships.some(
-      (membership) => membership?.role && membership.role !== 'student',
-    );
-
-    if (!hasNonStudentRole) {
-      throw new CustomError({
-        statusCode: 401,
-        errorType: 'unauthorized',
-        field: 'Role',
-        details: [],
-        customMessage: 'Este perfil não possui acesso ao aplicativo.',
       });
     }
 
