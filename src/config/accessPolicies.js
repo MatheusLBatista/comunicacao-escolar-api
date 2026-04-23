@@ -68,6 +68,7 @@ const userPolicies = [
       PATCH: {
         scope: 'global',
         roles: ['admin'],
+        allowSelf: true,
       },
       PUT: {
         scope: 'global',

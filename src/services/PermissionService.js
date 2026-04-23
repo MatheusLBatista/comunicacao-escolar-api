@@ -81,6 +81,10 @@ class PermissionService {
       return this.hasRoleInSchool(user, schoolId, rule.roles || []);
     }
 
+    if (rule.allowSelf && params?.id === user._id.toString()) {
+      return true;
+    }
+
     return this.hasGlobalRole(user, rule.roles || []);
   }
 
@@ -118,6 +122,18 @@ class PermissionService {
 
       if (!hasRoleAccess) {
         return false;
+      }
+
+      const pathNorm = this.normalizeRequestPath(requestPath);
+      const methodUpper = (httpMethod || '').toUpperCase();
+      const matchedPolicy = this.rolePolicies.find((policy) =>
+        policy.pattern.test(pathNorm),
+      );
+      if (matchedPolicy) {
+        const rule = matchedPolicy.methods[methodUpper] || matchedPolicy.methods['*'];
+        if (rule?.allowSelf && params?.id === user._id.toString()) {
+          return true;
+        }
       }
 
       let permissions = user.permissions || [];
