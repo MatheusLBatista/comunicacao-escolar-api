@@ -48,7 +48,6 @@ function createFirebaseApp() {
 
 // Instância principal do Firebase Admin para uso no restante da aplicação.
 const firebaseApp = createFirebaseApp();
-
 // Serviço de envio de mensagens push para tokens, tópicos e grupos.
 const firebaseMessaging = getMessaging(firebaseApp);
 
