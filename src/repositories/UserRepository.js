@@ -216,8 +216,8 @@ class UserRepository {
       }
     });
 
-    const ClassModel = mongoose.model('Class');
-    const classDoc = await ClassModel.findById(class_id);
+
+    const classDoc = await this.class.findById(class_id);
     const teacherIds = classDoc ? classDoc.teacher_ids : [];
 
     const teachers = await this.model.find({

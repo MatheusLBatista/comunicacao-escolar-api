@@ -11,7 +11,6 @@ import 'dotenv/config';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 
-const notificar = process.env.NOTIFICAR
 class PostService {
   constructor() {
     this.repository = new PostRepository();
@@ -83,74 +82,15 @@ class PostService {
         });
       }
       const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId })
-      if (notificar == "true") {
-        const users = await this.userRepository.listByClass(parsedData.target.target_id)
-
-        const fcmTokens = []
-
-        if (users && Array.isArray(users)) {
-          for (const doc of users) {
-            if (doc instanceof User || doc.fcm_tokens) {
-              if (doc.fcm_tokens && doc.fcm_tokens.length > 0) {
-                doc.fcm_tokens.forEach((token) => {
-                  fcmTokens.push(token)
-                })
-              }
-            }
-          }
-        }
-
-        if (fcmTokens.length > 0) {
-          const message = {
-            tokens: fcmTokens,
-            notification: {
-              title: 'Novo Anúncio na sua Turma',
-              body: parsedData.title || `Um novo anúncio foi publicado para a turma ${turma.name || ''}`.trim()
-            },
-            data: {
-              type: 'announcement',
-              postId: data._id.toString()
-            }
-          }
-
-          try {
-            const response = await firebaseMessaging.sendEachForMulticast(message)
-            console.log(`Notificações enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`)
-
-            if (response.failureCount > 0) {
-              response.responses.forEach((resp, idx) => {
-                if (!resp.success) {
-                  console.error(`Token falhou: ${fcmTokens[idx]}`)
-                }
-              })
-            }
-          } catch (error) {
-            console.error('Erro ao enviar notificação Firebase:', error)
-          }
-        }
-      }
-
-
-      return data
-
-    }
-
-    const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId });
-    if (notificar == "true") {
-      const users = await this.userRepository.listBySchool(schoolId)
+      const users = await this.userRepository.listByClass(parsedData.target.target_id)
 
       const fcmTokens = []
 
-      if (users?.docs && Array.isArray(users.docs)) {
-
-        for (const doc of users.docs) {
-
-          if (doc instanceof User) {
-
-            if (doc.fcm_tokens.length > 0) {
-
+      if (users && Array.isArray(users)) {
+        for (const doc of users) {
+          if (doc instanceof User || doc.fcm_tokens) {
+            if (doc.fcm_tokens && doc.fcm_tokens.length > 0) {
               doc.fcm_tokens.forEach((token) => {
-
                 fcmTokens.push(token)
               })
             }
@@ -162,8 +102,8 @@ class PostService {
         const message = {
           tokens: fcmTokens,
           notification: {
-            title: 'Novo Anúncio',
-            body: parsedData.title || 'Um novo anúncio foi publicado na sua escola'
+            title: 'Novo Anúncio na sua Turma',
+            body: parsedData.title || `Um novo anúncio foi publicado para a turma ${turma.name || ''}`.trim()
           },
           data: {
             type: 'announcement',
@@ -186,8 +126,65 @@ class PostService {
           console.error('Erro ao enviar notificação Firebase:', error)
         }
       }
-      // TODO: EMITIR EVENTO WEBSOCKET ANNOUNCEMENT:CREATED AO CRIAR UM NOVO ANÙNCIO
+
+
+
+      return data
+
     }
+
+    const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId });
+
+    const users = await this.userRepository.listBySchool(schoolId)
+
+    const fcmTokens = []
+
+    if (users?.docs && Array.isArray(users.docs)) {
+
+      for (const doc of users.docs) {
+
+        if (doc instanceof User) {
+
+          if (doc.fcm_tokens.length > 0) {
+
+            doc.fcm_tokens.forEach((token) => {
+
+              fcmTokens.push(token)
+            })
+          }
+        }
+      }
+    }
+
+    if (fcmTokens.length > 0) {
+      const message = {
+        tokens: fcmTokens,
+        notification: {
+          title: 'Novo Anúncio',
+          body: parsedData.title || 'Um novo anúncio foi publicado na sua escola'
+        },
+        data: {
+          type: 'announcement',
+          postId: data._id.toString()
+        }
+      }
+
+      try {
+        const response = await firebaseMessaging.sendEachForMulticast(message)
+        console.log(`Notificações enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`)
+
+        if (response.failureCount > 0) {
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              console.error(`Token falhou: ${fcmTokens[idx]}`)
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Erro ao enviar notificação Firebase:', error)
+      }
+    }
+
 
     return data;
   }
