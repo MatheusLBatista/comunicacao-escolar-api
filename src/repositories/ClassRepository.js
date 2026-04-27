@@ -5,6 +5,11 @@ class ClassRepository {
     this.model = classModel;
   }
 
+  async create(data) {
+    const data = await this.model(data)
+    return data
+  }
+
   async findById(id) {
     const data = await this.model.findById(id);
 

@@ -33,7 +33,7 @@ export const PostSchema = z.object({
     .url({ message: 'A url passada não é uma url válida.' })
     .array()
     .optional(),
-  active: z.boolean().default(true),
+  active: z.coerce.boolean().default(true),
 });
 
 export const PostSchemaInput = PostSchema.omit({ id: true }).partial({
