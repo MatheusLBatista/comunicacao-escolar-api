@@ -24,6 +24,16 @@ const routePolicies = [
 
 const userPolicies = [
   {
+    pattern: /^\/schools\/([^/]+)\/class(?:\/|$)/,
+    methods: {
+      POST: {
+        scope: 'school',
+        roles: ['admin'],
+        schoolParam: 'schoolId',
+      },
+    },
+  },
+  {
     pattern: /^\/schools\/([^/]+)\/members(?:\/|$)/,
     methods: {
       POST: {

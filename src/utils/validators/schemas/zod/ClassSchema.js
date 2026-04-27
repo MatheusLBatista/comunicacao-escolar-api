@@ -18,3 +18,5 @@ export const ClassSchema = z.object({
     ).min(1, {message: "A turma deve conter pelo menos um professor associado."}),
     metadata: z.string().optional()
 });
+
+export const ClassSchemaInput = ClassSchema.omit({id:true, school_id:true})
