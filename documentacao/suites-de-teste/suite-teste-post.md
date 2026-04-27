@@ -27,9 +27,10 @@ Cenarios cobertos:
 - Sem token retorna 401 ou 498.
 - Payload valido cria post com 201.
 - schoolId invalido retorna erro (400, 404 ou 422).
-- Tentativa com target.scope=class aceita comportamento variavel:
-  - 201 quando target_id for aceito pela API.
-  - 422 quando target_id nao for encontrado.
+- Criação de post com scope diferente de "all" ("class", por exemplo) sem enviar o `target_id` retorna validação estrita 422.
+- Tentativa com target.scope=class e target_id válido aceita comportamento variavel:
+  - 201 quando target_id for aceito e encontrado no banco.
+  - 422 quando target_id nao for encontrado na busca.
 
 Validacoes verificadas no sucesso:
 
@@ -87,9 +88,10 @@ Cenarios cobertos:
 
 ## Divergencias corrigidas neste documento
 
+- Adição da documentação sobre o comportamento 422 ao omitir `target_id` para escopos diferentes de "all".
 - Removida referencia a rota GET /posts (nao existe na suite atual).
 - Removida secao duplicada de DELETE /post/:id (singular), que nao e rota testada.
-- Removidos cenarios nao implementados na suite atual, como validacoes estritas de class sem target_id em PATCH e cenarios detalhados de ownership.
+- Refinadas premissas sobre buscas de scope em classes para refletir a implementação do UserRepository.
 
 ## Observacoes de qualidade da suite atual
 
