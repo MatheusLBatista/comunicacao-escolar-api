@@ -17,11 +17,12 @@ const postPaths = {
 
             + Regras de Negócio:
                 - A escola (schoolId) deve existir.
-                - Se target.scope for class, target_id é obrigatório.
-                - Quando informado, target_id deve corresponder a uma turma existente da mesma escola.
+                - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório.
+                - Quando informado, target_id deve corresponder a uma turma existente da mesma escola validada.
 
             + Resultado Esperado:
                 - HTTP 201 Created com dados do comunicado criado.
+                - HTTP 422 Unprocessable Entity caso target_id seja ausente para scope != "all" ou a turma não exista.
             `,
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -143,11 +144,12 @@ const postPaths = {
             + Regras de Negócio:
                 - O comunicado deve existir.
                 - Todos os campos são opcionais.
-                - Se target.scope for class, target_id é obrigatório.
+                - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório.
                 - Quando informado, target_id deve corresponder a uma turma existente.
 
             + Resultado Esperado:
                 - HTTP 200 OK com dados do comunicado atualizado.
+                - HTTP 422 Unprocessable Entity caso target_id seja ausente para scope != "all" ou a turma não exista.
             `,
       security: [{ bearerAuth: [] }],
       parameters: [

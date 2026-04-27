@@ -1,10 +1,12 @@
 import UserFilterBuilder from './filters/UserFilterBuilder.js';
 import UserModel from '../models/User.js';
+import mongoose from 'mongoose';
 import { CustomError, messages } from '../utils/helpers/index.js';
-
+import ClassModel from '../models/Class.js'
 class UserRepository {
   constructor({ userModel = UserModel } = {}) {
     this.model = userModel;
+    this.class =  ClassModel;
   }
 
   async create(data) {
@@ -191,6 +193,38 @@ class UserRepository {
 
     await user.save();
     return user;
+  }
+
+  async listByClass(class_id) {
+    const students = await this.model.find({
+      memberships: {
+        $elemMatch: {
+          class_id: class_id,
+          role: 'student'
+        }
+      }
+    });
+
+    const studentIds = students.map(student => student._id);
+
+    const parents = await this.model.find({
+      memberships: {
+        $elemMatch: {
+          role: 'parent',
+          associated_students: { $in: studentIds }
+        }
+      }
+    });
+
+
+    const classDoc = await this.class.findById(class_id);
+    const teacherIds = classDoc ? classDoc.teacher_ids : [];
+
+    const teachers = await this.model.find({
+      _id: { $in: teacherIds }
+    });
+
+    return [...parents, ...teachers];
   }
 }
 

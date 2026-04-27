@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import firebaseApp, { firebaseMessaging } from '../config/Firebase.js';
 import {
   CustomError,
   HttpStatusCodes,

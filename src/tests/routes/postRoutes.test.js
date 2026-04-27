@@ -102,6 +102,26 @@ describe('Post Routes - Integração', () => {
       expect([400, 404, 422]).toContain(response.status);
     });
 
+    test('deve retornar 422 ao criar post com scope diferente de "all" sem target_id', async () => {
+      const payload = {
+        title: `Post inválido ${Date.now()}`,
+        content: 'Conteúdo sem o target_id exigido.',
+        target: {
+          scope: 'class',
+          // target_id ausente
+        },
+        active: true,
+      };
+
+      const response = await request(BASE_URL)
+        .post(`/schools/${schoolId}/posts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(payload);
+
+      expect(response.status).toBe(422);
+      expect(response.body).toHaveProperty('error', true);
+    });
+
     test('deve criar post com target.scope=class quando target_id for válido', async () => {
       // Assumindo que existe uma turma vinculada à escola
       const payload = {
