@@ -226,6 +226,23 @@ class UserRepository {
 
     return [...parents, ...teachers];
   }
+
+  async findUsers(ids, role) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return [];
+    }
+
+    const data = await this.model.find({
+      _id: { $in: ids },
+      memberships: {
+        $elemMatch: {
+          role: role,
+        },
+      },
+    });
+
+    return data;
+  }
 }
 
 export default UserRepository;
