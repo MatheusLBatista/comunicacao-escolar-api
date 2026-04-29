@@ -10,6 +10,11 @@ class ClassService {
         this.userRepository = new UserRepository()
     }
 
+    async list(req) {
+        const data = await this.repository.list(req)
+        return data
+    }
+
     async create(parsedData, schoolId) {
         const { name, grade } = parsedData;
         

@@ -26,6 +26,11 @@ const userPolicies = [
   {
     pattern: /^\/schools\/([^/]+)\/class(?:\/|$)/,
     methods: {
+      GET: {
+        scope: 'school',
+        roles: ['admin', 'teacher'],
+        schoolParam: 'schoolId',
+      },
       POST: {
         scope: 'school',
         roles: ['admin'],

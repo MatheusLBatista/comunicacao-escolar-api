@@ -7,6 +7,24 @@ class ClassController {
     constructor() {
         this.service = new ClassService()
     }
+
+    async list(req, res) {
+
+        const {id} = req.params
+
+        const {schoolId} = req.params
+
+        ObjectIdSchema.parse(schoolId)
+
+        if(id) {
+            ObjectIdSchema.parse(id)
+        }
+
+        const data = await this.service.list(req)
+
+        return CommonResponse.success(res, data, 200)
+    }
+
     async create(req, res) {
         const body = req.body
 
