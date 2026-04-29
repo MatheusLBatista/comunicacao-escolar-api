@@ -9,6 +9,7 @@ import schoolSchemas from '../schemas/schoolSchema.js';
 import pickupAuthorizationSchemas from '../schemas/pickupAuthorizationSchema.js';
 import pickupLogSchemas from '../schemas/pickupLogSchema.js';
 import likeSchemas from '../schemas/likeSchema.js';
+import classSchemas from '../schemas/classSchema.js';
 import usuariosPaths from '../paths/usuarios.js';
 import authPaths from '../paths/auth.js';
 import gruposPaths from '../paths/grupo.js';
@@ -20,6 +21,7 @@ import pickupLogPaths from '../paths/pickupLog.js';
 import eventPaths from '../paths/event.js';
 import schoolPaths from '../paths/school.js';
 import likePaths from '../paths/like.js';
+import classPaths from '../paths/class.js';
 
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
@@ -88,6 +90,10 @@ const getSwaggerOptions = () => {
           description: 'Rotas para gestão de eventos escolares',
         },
         {
+          name: 'Turmas',
+          description: 'Rotas para gestão de turmas',
+        },
+        {
           name: 'Autorizações de Retirada',
           description: 'Rotas para gerenciamento de autorizações de retirada',
         },
@@ -112,6 +118,7 @@ const getSwaggerOptions = () => {
         ...eventPaths,
         ...schoolPaths,
         ...likePaths,
+        ...classPaths,
       },
       components: {
         securitySchemes: {
@@ -133,6 +140,7 @@ const getSwaggerOptions = () => {
           ...eventSchemas,
           ...schoolSchemas,
           ...likeSchemas,
+          ...classSchemas,
         },
       },
       security: [
