@@ -239,6 +239,7 @@ class UserRepository {
           role: role,
         },
       },
+      active:true
     });
 
     return data;

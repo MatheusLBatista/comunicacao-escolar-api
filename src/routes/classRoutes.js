@@ -11,4 +11,5 @@ const classController = new ClassController()
 router.get('/schools/:schoolId/class', AuthMiddleware, AuthPermission, asyncWrapper(classController.list.bind(classController)))
 router.post('/schools/:schoolId/class', AuthMiddleware, AuthPermission, asyncWrapper(classController.create.bind(classController)))
 router.get('/schools/:schoolId/class/:id', AuthMiddleware, AuthPermission, asyncWrapper(classController.list.bind(classController)))
+router.patch('/schools/:schoolId/class/:id', AuthMiddleware, AuthPermission, asyncWrapper(classController.update.bind(classController)))
 export default router

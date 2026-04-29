@@ -19,4 +19,4 @@ export const ClassSchema = z.object({
     metadata: z.string().optional()
 });
 
-export const ClassSchemaInput = ClassSchema.omit({id:true, school_id:true})
+export const ClassSchemaInput = ClassSchema.omit({id:true, school_id:true, active:true}).partial()

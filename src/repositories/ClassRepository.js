@@ -79,8 +79,16 @@ class ClassRepository {
     return data;
   }
 
-  async existClass(school_id, name, grade) {
-    const data = this.model.findOne({school_id:school_id, name:name, grade})
+  async existClass(school_id, name, grade, year) {
+
+    const data = this.model.findOne({school_id:school_id, name:name, grade:grade, year:year})
+
+    return data
+  }
+
+  async update(parsedData, id) {
+  
+    const data = await this.model.findByIdAndUpdate(id, parsedData, { new: true, runValidators: true })
 
     return data
   }

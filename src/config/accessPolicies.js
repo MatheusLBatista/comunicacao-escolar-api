@@ -36,6 +36,11 @@ const userPolicies = [
         roles: ['admin'],
         schoolParam: 'schoolId',
       },
+      PATCH: {
+        scope:'school',
+        roles:['admin'],
+        schoolParam: 'schoolId'
+      }
     },
   },
   {
