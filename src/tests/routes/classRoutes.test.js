@@ -90,6 +90,44 @@ describe('Class Routes - Integracao', () => {
     });
   });
 
+  test('deve retornar 401/498 ao listar turmas sem token', async () => {
+    const response = await request(BASE_URL).get(
+      `/schools/${schoolId}/class`,
+    );
+
+    expect([401, 498]).toContain(response.status);
+  });
+
+  test('deve listar turmas com token', async () => {
+    const response = await request(BASE_URL)
+      .get(`/schools/${schoolId}/class`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('error', false);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveProperty('docs');
+    expect(Array.isArray(response.body.data.docs)).toBe(true);
+  });
+
+  //400
+  test('deve retornar 403 ao listar turmas com schoolId invalido', async () => {
+    const response = await request(BASE_URL)
+      .get('/schools/invalidSchoolId/class')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(403);
+  });
+
+  //404
+  test('deve retornar 403 ao listar turmas com schoolId inexistente', async () => {
+    const response = await request(BASE_URL)
+      .get(`/schools/${NONEXISTENT_ID}/class`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(403);
+  });
+
   test('deve retornar 401/498 ao criar turma sem token', async () => {
     const response = await request(BASE_URL)
       .post(`/schools/${schoolId}/class`)
@@ -131,7 +169,6 @@ describe('Class Routes - Integracao', () => {
       });
 
     expect(response.status).toBe(403);
-    console.log(response.body)
   });
 
   //404
@@ -209,6 +246,39 @@ describe('Class Routes - Integracao', () => {
       name: payload.name,
       grade: payload.grade,
     };
+  });
+
+  test('deve buscar turma por id', async () => {
+    if (!createdClass?.id) {
+      expect(createdClass?.id).toBeTruthy();
+      return;
+    }
+
+    const response = await request(BASE_URL)
+      .get(`/schools/${schoolId}/class/${createdClass.id}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('error', false);
+    expect(response.body).toHaveProperty('data');
+    expect(asId(response.body.data)).toBe(createdClass.id);
+  });
+
+  test('deve retornar 400 ao buscar turma com id invalido', async () => {
+    const response = await request(BASE_URL)
+      .get(`/schools/${schoolId}/class/invalidClassId`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(400);
+  });
+
+  test('deve retornar 404 ao buscar turma inexistente', async () => {
+    const response = await request(BASE_URL)
+      .get(`/schools/${schoolId}/class/${NONEXISTENT_ID}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', true);
   });
 
   test('deve retornar 409 ao criar turma duplicada na mesma escola', async () => {
