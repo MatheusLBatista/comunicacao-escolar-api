@@ -74,6 +74,76 @@ const classSchemas = {
       },
     },
   },
+
+  ClassListagem: {
+    type: 'object',
+    properties: {
+      data: {
+        type: 'object',
+        properties: {
+          docs: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/ClassItem' },
+          },
+          totalDocs: { type: 'number', example: 2 },
+          limit: { type: 'number', example: 10 },
+          totalPages: { type: 'number', example: 1 },
+          page: { type: 'number', example: 1 },
+          pagingCounter: { type: 'number', example: 1 },
+          hasPrevPage: { type: 'boolean', example: false },
+          hasNextPage: { type: 'boolean', example: false },
+          prevPage: { type: 'number', nullable: true, example: null },
+          nextPage: { type: 'number', nullable: true, example: null },
+        },
+      },
+      message: { type: 'string', example: 'Operacao realizada com sucesso' },
+      errors: { type: 'array', example: [] },
+    },
+  },
+
+  ClassFiltro: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        description: 'Filtrar por nome da turma',
+        example: 'Turma',
+      },
+      grade: {
+        type: 'string',
+        description: 'Filtrar por serie/grau',
+        example: '5o ano',
+      },
+      year: {
+        type: 'integer',
+        description: 'Filtrar por ano letivo',
+        example: 2026,
+      },
+      teacher_id: {
+        type: 'string',
+        description: 'Filtrar por professor vinculado',
+        example: '69d2e2353536b4f57ae1911c',
+      },
+      active: {
+        type: 'boolean',
+        description: 'Filtrar por status ativo',
+        example: true,
+      },
+      page: {
+        type: 'integer',
+        minimum: 1,
+        default: 1,
+        example: 1,
+      },
+      limit: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 100,
+        default: 10,
+        example: 10,
+      },
+    },
+  },
 };
 
 export default classSchemas;
