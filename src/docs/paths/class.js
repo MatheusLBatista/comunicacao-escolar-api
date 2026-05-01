@@ -194,6 +194,46 @@ const classPaths = {
         500: commonResponses[500](),
       },
     },
+    delete: {
+      tags: ['Turmas'],
+      summary: 'Excluir turma',
+      description: `
+            + Caso de uso: Desativar (exclusao logica) uma turma pelo identificador.
+
+            + Regras de Negocio:
+                - A turma deve existir e estar ativa.
+
+            + Resultado Esperado:
+                - HTTP 200 OK com os dados da turma desativada.
+            `,
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'schoolId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          description: 'ObjectId da escola',
+          example: '000000000000000000000001',
+        },
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          description: 'ID da turma',
+        },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/ClassItem'),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        403: commonResponses[403](),
+        404: commonResponses[404](),
+        498: commonResponses[498](),
+        500: commonResponses[500](),
+      },
+    },
   },
 };
 
