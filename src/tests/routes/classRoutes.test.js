@@ -72,6 +72,29 @@ async function createSchoolUser({ token, schoolId, role, seedLabel }) {
   };
 }
 
+async function createClassForDelete({ token, schoolId, teacherId, seedLabel }) {
+  const seed = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  const payload = {
+    name: `${seedLabel} ${seed}`,
+    grade: '6F',
+    year: 2026,
+    teacher_ids: [teacherId],
+    active: true,
+  };
+
+  const response = await request(BASE_URL)
+    .post(`/schools/${schoolId}/class`)
+    .set('Authorization', `Bearer ${token}`)
+    .send(payload);
+
+  expect(response.status).toBe(201);
+  expect(response.body?.data?._id).toBeTruthy();
+
+  return {
+    id: response.body.data._id,
+  };
+}
+
 describe('Class Routes - Integracao', () => {
   let adminToken;
   let schoolId;
@@ -343,6 +366,28 @@ describe('Class Routes - Integracao', () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', true);
+  });
+
+  test('deve deletar turma por DELETE', async () => {
+    const classToDelete = await createClassForDelete({
+      token: adminToken,
+      schoolId,
+      teacherId: teacherUser.id,
+      seedLabel: 'Turma Deletar',
+    });
+
+    const response = await request(BASE_URL)
+      .delete(`/schools/${schoolId}/class/${classToDelete.id}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('error', false);
+    expect(response.body).toHaveProperty('data');
+    expect(asId(response.body.data)).toBe(classToDelete.id);
+
+    if (response.body.data?.active !== undefined) {
+      expect(response.body.data.active).toBe(false);
+    }
   });
 
   test('deve retornar 409 ao criar turma duplicada na mesma escola', async () => {

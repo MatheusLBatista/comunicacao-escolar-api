@@ -74,7 +74,7 @@ class ClassRepository {
   }
 
   async findById(id) {
-    const data = await this.model.findOne({id:id, active:true});
+    const data = await this.model.findOne({ _id: id, active: true });
 
     return data;
   }
