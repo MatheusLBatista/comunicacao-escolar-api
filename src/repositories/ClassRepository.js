@@ -74,14 +74,14 @@ class ClassRepository {
   }
 
   async findById(id) {
-    const data = await this.model.findById(id);
+    const data = await this.model.findOne({id:id, active:true});
 
     return data;
   }
 
   async existClass(school_id, name, grade, year) {
 
-    const data = this.model.findOne({school_id:school_id, name:name, grade:grade, year:year})
+    const data = this.model.findOne({school_id:school_id, name:name, grade:grade, year:year, active:true})
 
     return data
   }
@@ -90,6 +90,22 @@ class ClassRepository {
   
     const data = await this.model.findByIdAndUpdate(id, parsedData, { new: true, runValidators: true })
 
+    return data
+  }
+
+  async delete(id) {
+
+    const data = await this.model.findOneAndUpdate({_id:id, active:true}, {$set: {active:false}}, {new:true})
+    console.log(data)
+    if(!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'Class',
+        details: [],
+        customMessage: messages.error.resourceNotFound('Class'),
+      })
+    }
     return data
   }
 }

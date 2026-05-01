@@ -63,6 +63,20 @@ class ClassController {
 
         return CommonResponse.success(res, data, 200)
     }
+
+    async delete(req, res) {
+        const {schoolId} = req.params
+
+        const {id} = req.params
+
+        ObjectIdSchema.parse(schoolId)
+
+        ObjectIdSchema.parse(id)
+
+        const data = await this.service.delete(id)
+
+        return CommonResponse.success(res, data, 200)
+    }
 }
 
 export default ClassController

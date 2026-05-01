@@ -160,6 +160,12 @@ class ClassService {
         return data
 
     }
+
+    async delete(id) {
+        const data = await this.repository.delete(id)
+
+        return data
+    }
 }
 
 export default ClassService;

@@ -12,4 +12,5 @@ router.get('/schools/:schoolId/class', AuthMiddleware, AuthPermission, asyncWrap
 router.post('/schools/:schoolId/class', AuthMiddleware, AuthPermission, asyncWrapper(classController.create.bind(classController)))
 router.get('/schools/:schoolId/class/:id', AuthMiddleware, AuthPermission, asyncWrapper(classController.list.bind(classController)))
 router.patch('/schools/:schoolId/class/:id', AuthMiddleware, AuthPermission, asyncWrapper(classController.update.bind(classController)))
+router.delete('/schools/:schoolId/class/:id', AuthMiddleware, AuthPermission, asyncWrapper(classController.delete.bind(classController)))
 export default router
