@@ -301,6 +301,7 @@ describe('Class Routes - Integracao', () => {
 
     if (response.body.data?.name) {
       expect(response.body.data.name).toBe(payload.name);
+      createdClass.name = payload.name;
     }
   });
 
