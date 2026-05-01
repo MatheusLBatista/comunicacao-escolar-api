@@ -72,6 +72,12 @@ Arquivo: src/tests/routes/classRoutes.test.js
 | Id invalido              | Deve rejeitar por validacao de ObjectId.                   | PATCH /schools/:schoolId/class/invalidClassId.             | Retorna 400.                                              |
 | Id inexistente           | Deve retornar recurso nao encontrado.                      | PATCH /schools/:schoolId/class/000000000000000000000000.   | Retorna 404 e error=true.                                 |
 
+## DELETE /schools/:schoolId/class/:id - Exclusao
+
+| Funcionalidade           | Comportamento Esperado                                     | Verificacoes                                               | Criterios de Aceite                                      |
+| :----------------------- | :--------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
+| Exclusao valida          | Deve desativar turma existente.                            | DELETE por classId com token.                              | Retorna 200, error=false e data._id igual ao id.         |
+
 ## Cenarios Transversais Obrigatorios (Integracao)
 
 | Tema                       | Verificacao de Integracao                                                             |
