@@ -17,6 +17,7 @@ import conversation from './conversationRoutes.js';
 import pickupAuthorization from './pickupAuthorizationRoutes.js';
 import pickupLog from './pickupLogRoutes.js';
 import auditLog from './auditLogRoutes.js';
+import turma from './classRoutes.js'
 
 import dotenv from 'dotenv';
 
@@ -70,6 +71,7 @@ const routes = (app) => {
     pickupLog,
     auditLog,
     like,
+    turma
   );
 
   app.use((req, res) => {
