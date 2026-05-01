@@ -75,6 +75,39 @@ const classSchemas = {
     },
   },
 
+  ClassPatch: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        description: 'Nome da turma',
+        example: 'Turma A - Atualizada',
+      },
+      grade: {
+        type: 'string',
+        description: 'Serie/grau da turma',
+        example: '5o ano',
+      },
+      year: {
+        type: 'integer',
+        description: 'Ano letivo da turma',
+        example: 2026,
+      },
+      teacher_ids: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Lista de ObjectIds dos professores',
+        example: ['69d2e2353536b4f57ae1911c'],
+      },
+      metadata: {
+        type: 'string',
+        description: 'Metadados adicionais da turma',
+        example: 'Turno vespertino',
+      },
+    },
+    additionalProperties: false,
+  },
+
   ClassListagem: {
     type: 'object',
     properties: {
