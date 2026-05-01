@@ -264,6 +264,46 @@ describe('Class Routes - Integracao', () => {
     expect(asId(response.body.data)).toBe(createdClass.id);
   });
 
+  test('deve retornar 401/498 ao atualizar turma sem token', async () => {
+    if (!createdClass?.id) {
+      expect(createdClass?.id).toBeTruthy();
+      return;
+    }
+
+    const response = await request(BASE_URL)
+      .patch(`/schools/${schoolId}/class/${createdClass.id}`)
+      .send({
+        name: `Turma Atualizada ${Date.now()}`,
+      });
+
+    expect([401, 498]).toContain(response.status);
+  });
+
+  test('deve atualizar turma por PATCH', async () => {
+    if (!createdClass?.id) {
+      expect(createdClass?.id).toBeTruthy();
+      return;
+    }
+
+    const payload = {
+      name: `Turma Atualizada ${Date.now()}`,
+    };
+
+    const response = await request(BASE_URL)
+      .patch(`/schools/${schoolId}/class/${createdClass.id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(payload);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('error', false);
+    expect(response.body).toHaveProperty('data');
+    expect(asId(response.body.data)).toBe(createdClass.id);
+
+    if (response.body.data?.name) {
+      expect(response.body.data.name).toBe(payload.name);
+    }
+  });
+
   test('deve retornar 400 ao buscar turma com id invalido', async () => {
     const response = await request(BASE_URL)
       .get(`/schools/${schoolId}/class/invalidClassId`)
@@ -276,6 +316,29 @@ describe('Class Routes - Integracao', () => {
     const response = await request(BASE_URL)
       .get(`/schools/${schoolId}/class/${NONEXISTENT_ID}`)
       .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', true);
+  });
+
+  test('deve retornar 400 ao atualizar turma com id invalido', async () => {
+    const response = await request(BASE_URL)
+      .patch(`/schools/${schoolId}/class/invalidClassId`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: `Turma Atualizada ${Date.now()}`,
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  test('deve retornar 404 ao atualizar turma inexistente', async () => {
+    const response = await request(BASE_URL)
+      .patch(`/schools/${schoolId}/class/${NONEXISTENT_ID}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: `Turma Atualizada ${Date.now()}`,
+      });
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', true);
