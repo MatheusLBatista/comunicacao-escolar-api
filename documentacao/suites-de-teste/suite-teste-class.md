@@ -63,6 +63,15 @@ Arquivo: src/tests/routes/classRoutes.test.js
 | Id invalido              | Deve rejeitar por validacao de ObjectId.                   | GET /schools/:schoolId/class/invalidClassId.               | Retorna 400.                                              |
 | Id inexistente           | Deve retornar recurso nao encontrado.                      | GET /schools/:schoolId/class/000000000000000000000000.     | Retorna 404 e error=true.                                 |
 
+## PATCH /schools/:schoolId/class/:id - Atualizacao
+
+| Funcionalidade           | Comportamento Esperado                                     | Verificacoes                                               | Criterios de Aceite                                      |
+| :----------------------- | :--------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
+| Sem token                | Deve bloquear atualizacao nao autenticada.                 | PATCH sem Authorization.                                   | Retorna 401 ou 498.                                      |
+| Atualizacao valida       | Deve atualizar campos da turma.                            | PATCH por classId com token e payload parcial.             | Retorna 200, error=false e data._id igual ao id.         |
+| Id invalido              | Deve rejeitar por validacao de ObjectId.                   | PATCH /schools/:schoolId/class/invalidClassId.             | Retorna 400.                                              |
+| Id inexistente           | Deve retornar recurso nao encontrado.                      | PATCH /schools/:schoolId/class/000000000000000000000000.   | Retorna 404 e error=true.                                 |
+
 ## Cenarios Transversais Obrigatorios (Integracao)
 
 | Tema                       | Verificacao de Integracao                                                             |
