@@ -1,100 +1,103 @@
-# Suite de Testes de Integracao - Post
+# Suite de Testes de Integracao - Post (/schools/:schoolId/posts e /posts)
 
-Documento alinhado com a cobertura atual da suite:
+Testes de integracao (endpoint) que validam os fluxos de listagem, detalhamento, criacao, atualizacao e exclusao de postagens.
 
-- Arquivo de teste: src/tests/routes/postRoutes.test.js
+Arquivo: src/tests/routes/postRoutes.test.js
 
-## Rotas cobertas
+## Visao de Fluxo e Regras de Negocio
 
-- POST /schools/:schoolId/posts
-- GET /schools/:schoolId/posts
-- GET /posts/:id
-- PATCH /posts/:id
-- DELETE /posts/:id
+| Regra                               | Comportamento Atual do Sistema                                                                           | Impacto na Suite de Integracao                                               |
+| :---------------------------------- | :-------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| Autenticacao obrigatoria            | Rotas usam autenticacao por token Bearer.                                                                | Cobrir listagem/criacao sem token (401/498) e fluxo autenticado com token valido. |
+| Validacao Zod                       | Payload invalido e rejeitado por validacao.                                                              | Cobrir erro 400 em criacao/atualizacao invalida.                             |
+| Escopo de Postagem                  | Postagens podem ter scope "all" ou "class".                                                              | Validar criacao com diferentes escopos.                                      |
+| Obrigatoriedade de target_id        | Se scope for diferente de "all", target_id deve ser informado.                                            | Cobrir erro 422 ao omitir target_id para scope "class".                      |
+| Vinculacao a Escola                 | Postagens sao criadas vinculadas a uma escola especifica via schoolId na rota.                            | Validar school_id no objeto retornado.                                       |
+| Busca por id no post                | GET por id retorna postagem ou not found.                                                                 | Cobrir detalhe por id e 404 para id inexistente.                             |
+| Delecao de Postagem                 | DELETE remove a postagem (ou realiza soft delete dependendo da regra).                                    | Cobrir exclusao de post existente.                                           |
+| Envelope padrao de resposta         | Em sucesso retorna error=false e data; em erro retorna error=true.                                        | Validar contrato basico de sucesso/erro nos cenarios principais.            |
 
-## Pre-condicoes usadas na suite
+## Massa de Dados Recomendada
 
-- Login via POST /login com usuario admin.
-- Obtencao de schoolId via GET /schools.
-- Reaproveitamento de createdPostId entre cenarios.
+| Entidade                      | Objetivo nos testes                                         |
+| :---------------------------- | :---------------------------------------------------------- |
+| Admin global valido           | Fazer login inicial e obter token de autenticacao.          |
+| Escola existente              | Fornecer schoolId para criacao e listagem de posts.         |
+| Turma existente               | Fornecer target_id para posts com escopo de turma.          |
+| Post criado na suite          | Reusar ID para testar detalhe, atualizacao e exclusao.      |
 
-## Cobertura atual por rota
+## Preparacao da Suite
 
-### POST /schools/:schoolId/posts
+| Etapa                       | Comportamento Esperado                       | Verificacoes                                 | Criterios de Aceite                               |
+| :-------------------------- | :------------------------------------------- | :------------------------------------------- | :------------------------------------------------ |
+| Login inicial               | Deve autenticar com credenciais de admin.    | POST /login com admin@admin.com e Senha@123. | Retorna 200 e access_token valido.                |
+| Resolucao inicial da escola | Deve obter schoolId para encadear os testes. | GET /schools autenticado.                    | Retorna 200 e docs[0]._id quando houver escolas.  |
 
-Cenarios cobertos:
+## POST /schools/:schoolId/posts - Criacao
 
-- Sem token retorna 401 ou 498.
-- Payload valido cria post com 201.
-- schoolId invalido retorna erro (400, 404 ou 422).
-- Criação de post com scope diferente de "all" ("class", por exemplo) sem enviar o `target_id` retorna validação estrita 422.
-- Tentativa com target.scope=class e target_id válido aceita comportamento variavel:
-  - 201 quando target_id for aceito e encontrado no banco.
-  - 422 quando target_id nao for encontrado na busca.
+| Funcionalidade                         | Comportamento Esperado                                                           | Verificacoes                                                          | Criterios de Aceite                                              |
+| :------------------------------------- | :------------------------------------------------------------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------- |
+| Sem token                              | Deve bloquear criacao nao autenticada.                                            | POST sem Authorization.                                               | Retorna 401 ou 498.                                              |
+| Payload valido (scope: all)            | Deve criar postagem com dados validos.                                            | POST com title, content, target.scope="all".                          | Retorna 201, error=false, data com _id e campos do payload.       |
+| schoolId invalido                      | Deve retornar erro de validacao ou permissao.                                     | POST /schools/invalid-school-id/posts.                                | Retorna 400, 403 ou 422.                                         |
+| Falta de target_id para scope class    | Deve rejeitar criacao sem alvo especifico para escopos restritos.                 | POST com target.scope="class" e target_id omitido.                    | Retorna 422 e error=true.                                        |
+| target_id inexistente                  | Deve falhar se o alvo da postagem nao for encontrado.                             | POST com target.scope="class" e target_id aleatorio.                  | Retorna 422 ou 404.                                              |
 
-Validacoes verificadas no sucesso:
+## GET /schools/:schoolId/posts - Listagem
 
-- error=false
-- data._id presente
-- school_id igual ao schoolId da rota
-- title, content e author_id presentes
+| Funcionalidade                         | Comportamento Esperado                                           | Verificacoes                                         | Criterios de Aceite                          |
+| :------------------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------- | :------------------------------------------- |
+| Sem token                              | Deve bloquear listagem nao autenticada.                          | GET sem Authorization.                               | Retorna 401 ou 498.                           |
+| Com token valido                       | Deve listar postagens paginadas.                                 | GET com Bearer token.                                | Retorna 200, error=false e data.docs array.   |
+| Paginacao customizada                  | Deve respeitar os limites de pagina e tamanho.                   | GET com ?page=1&limit=5.                             | Retorna 200 e limit=5 nos metadados.          |
+| Filtro por titulo                      | Deve filtrar postagens pelo titulo.                              | GET com ?title=algum-titulo.                         | Retorna 200 e docs filtrados.                 |
+| Filtro por status ativo                | Deve filtrar postagens pelo status.                              | GET com ?active=true.                                | Retorna 200 e docs filtrados.                 |
 
-### GET /schools/:schoolId/posts
+## GET /posts/:id - Detalhe
 
-Cenarios cobertos:
+| Funcionalidade           | Comportamento Esperado                                     | Verificacoes                                               | Criterios de Aceite                                      |
+| :----------------------- | :--------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
+| Busca por id existente   | Deve retornar postagem criada na suite.                    | GET por postId com token.                                  | Retorna 200, error=false e data._id igual ao id.          |
+| Id invalido              | Deve rejeitar por validacao de ObjectId.                   | GET /posts/invalidPostId.                                  | Retorna 400 ou 422.                                       |
+| Id inexistente           | Deve retornar recurso nao encontrado.                      | GET /posts/000000000000000000000000.                       | Retorna 404 e error=true.                                 |
 
-- Sem token retorna 401 ou 498.
-- Listagem com token retorna 200 e paginacao.
-- Paginacao com page=1 e limit=5 retorna limit=5.
-- Filtro por title retorna 200.
-- Filtro por active retorna 200.
-- Existe um bloco redundante no fim da suite repetindo listagem da escola.
+## PATCH /posts/:id - Atualizacao
 
-Validacoes verificadas:
+| Funcionalidade           | Comportamento Esperado                                     | Verificacoes                                               | Criterios de Aceite                                      |
+| :----------------------- | :--------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
+| Sem token                | Deve bloquear atualizacao nao autenticada.                 | PATCH sem Authorization.                                   | Retorna 401 ou 498.                                      |
+| Atualizacao completa     | Deve atualizar titulo e conteudo.                          | PATCH com title e content novos.                           | Retorna 200, error=false e data atualizado.              |
+| Atualizacao parcial      | Deve atualizar apenas um campo (ex: title).                | PATCH apenas com title.                                    | Retorna 200, error=false e data com novo titulo.          |
+| Atualizacao de status    | Deve permitir desativar a postagem.                        | PATCH com active: false.                                   | Retorna 200 ou 403 (dependendo da permissao).             |
+| Id inexistente           | Deve retornar recurso nao encontrado.                      | PATCH /posts/000000000000000000000000.                     | Retorna 404 e error=true.                                 |
 
-- error=false
-- data.docs como array
-- metadados de paginacao (totalDocs, page, limit)
+## DELETE /posts/:id - Exclusao
 
-### GET /posts/:id
+| Funcionalidade           | Comportamento Esperado                                     | Verificacoes                                               | Criterios de Aceite                                      |
+| :----------------------- | :--------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
+| Exclusao valida          | Deve remover/desativar postagem existente.                 | DELETE por postId com token.                               | Retorna 200, error=false e data._id igual ao id.         |
+| Id inexistente           | Deve retornar recurso nao encontrado.                      | DELETE /posts/000000000000000000000000.                    | Retorna 404.                                              |
 
-Cenarios cobertos:
+## Cenarios Transversais Obrigatorios (Integracao)
 
-- Sem token retorna 401 ou 498.
-- Busca por ID criado retorna 200.
-- ID inexistente retorna 404.
-- ID em formato invalido retorna 400 ou 422.
+| Tema                       | Verificacao de Integracao                                                             |
+| :------------------------- | :------------------------------------------------------------------------------------ |
+| Contrato basico de sucesso | Em cenarios felizes, validar error=false e objeto data presente.                      |
+| Contrato basico de erro    | Em cenarios tristes, validar error=true com status coerente (400, 401/498, 403, 404). |
+| Dependencia de ambiente    | Suite depende de API, banco e credenciais de admin disponiveis.                       |
 
-### PATCH /posts/:id
+## Variaveis de Ambiente Usadas
 
-Cenarios cobertos:
+| Variavel             | Uso na suite                                           |
+| :------------------- | :----------------------------------------------------- |
+| INTEGRATION_BASE_URL | Define URL base da API para os requests de integracao. |
+| PORT                 | Fallback de porta quando INTEGRATION_BASE_URL nao e informado. |
 
-- Sem token retorna 401 ou 498.
-- Atualizacao completa (title/content) retorna 200.
-- Atualizacao parcial (apenas title) retorna 200.
-- ID inexistente retorna 404.
-- ID invalido retorna 400 ou 422.
-- Atualizacao de active para false aceita 200 ou 403.
+## Observacoes de Implementacao para os Casos de Integracao
 
-### DELETE /posts/:id
-
-Cenarios cobertos:
-
-- Sem token retorna 401 ou 498.
-- Delecao de post criado durante o teste retorna 200.
-- ID inexistente retorna 404.
-- ID invalido retorna 400 ou 422.
-- Tentativa em post criado antes aceita 200 ou 403.
-
-## Divergencias corrigidas neste documento
-
-- Adição da documentação sobre o comportamento 422 ao omitir `target_id` para escopos diferentes de "all".
-- Removida referencia a rota GET /posts (nao existe na suite atual).
-- Removida secao duplicada de DELETE /post/:id (singular), que nao e rota testada.
-- Refinadas premissas sobre buscas de scope em classes para refletir a implementação do UserRepository.
-
-## Observacoes de qualidade da suite atual
-
-- Alguns testes aceitam multiplos status (ex.: 200 ou 403), reduzindo o rigor de contrato.
-- O bloco final de listagem de escola esta redundante com um bloco anterior.
-- Para aumentar confiabilidade, vale separar melhor cenarios de autorizacao por perfil e ownership com dados controlados por fixture.
+| Ponto                        | Diretriz                                                                 |
+| :--------------------------- | :----------------------------------------------------------------------- |
+| Validacao de target_id       | Escopos como "class" exigem target_id que deve ser validado no banco.     |
+| Redundancia de testes        | Evitar blocos repetidos de listagem que nao agregam novas validacoes.     |
+| IDs validos para 404         | Usar 000000000000000000000000 para ObjectId valido inexistente.           |
+| Rigor de contrato            | Alguns testes aceitam 200 ou 403, o que deve ser evitado em novas suites. |
