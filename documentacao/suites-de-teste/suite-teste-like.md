@@ -13,6 +13,7 @@ Arquivo: src/tests/routes/likeRoutes.test.js
 | Unicidade por Usuario/Post          | Um usuario so pode ter um like ativo por postagem.                                                       | Garantido pelo comportamento de toggle.                                      |
 | Multiplos Usuarios                  | Diferentes usuarios podem curtir a mesma postagem.                                                        | Validar que likes de diferentes tokens sao registrados separadamente.        |
 | Postagem inexistente                | Nao e possivel curtir um post que nao existe.                                                             | Cobrir erro 404 ao tentar curtir post inexistente.                           |
+| Escopo por Escola                   | Usuario deve pertencer a mesma escola da postagem para curtir.                                            | Validar erro 403 ou sucesso dependendo do vinculo do usuario.                |
 | Envelope padrao de resposta         | Em sucesso retorna error=false e data; em erro retorna error=true.                                        | Validar contrato basico de sucesso/erro.                                    |
 
 ## Massa de Dados Recomendada
@@ -29,7 +30,7 @@ Arquivo: src/tests/routes/likeRoutes.test.js
 | Etapa                       | Comportamento Esperado                       | Verificacoes                                 | Criterios de Aceite                               |
 | :-------------------------- | :------------------------------------------- | :------------------------------------------- | :------------------------------------------------ |
 | Login Admin                 | Deve autenticar admin global.                | POST /login com admin@admin.com.             | Retorna 200 e access_token.                       |
-| Login Teacher               | Deve autenticar usuario com role teacher.    | POST /login com teacher@escola.com.          | Retorna 200 e access_token.                       |
+| Login Teacher               | Deve autenticar usuario com role teacher.    | POST /login com maria.teacher@escola.com.    | Retorna 200 e access_token.                       |
 | Resolucao de escola         | Obter schoolId para criar post.              | GET /schools.                                | Retorna 200 e schoolId valido.                    |
 | Criacao de post base        | Criar post que recebera os likes.            | POST /schools/:schoolId/posts.               | Retorna 201 e postId valido.                      |
 
@@ -39,10 +40,11 @@ Arquivo: src/tests/routes/likeRoutes.test.js
 | :------------------------------------- | :------------------------------------------------------------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------- |
 | Sem token                              | Deve bloquear operacao nao autenticada.                                           | POST /posts/:id/like sem Authorization.                               | Retorna 401 ou 498.                                              |
 | Adicionar Like (primeira chamada)      | Deve registrar a curtida do usuario.                                              | POST com token valido.                                                | Retorna 200, error=false, data com post_id e user_id.            |
-| Remover Like (segunda chamada)         | Deve remover a curtida anterior (toggle).                                         | Repetir POST com mesmo token.                                         | Retorna 200, error=false, data.message indicando remocao.        |
-| Multiplos likes                        | Usuarios diferentes podem curtir o mesmo post.                                    | POST com token de Admin e depois com token de Teacher.                | Ambos retornam 200 e sucesso.                                    |
-| Id do post invalido                    | Deve rejeitar por formato de ID invalido.                                         | POST /posts/invalid-id/like.                                          | Retorna 400 ou 422.                                              |
+| Remover Like (segunda chamada)         | Deve remover a curtida anterior (toggle).                                         | Repetir POST com mesmo token.                                         | Retorna 200, error=false, data.message presente.                 |
+| Multiplos likes                        | Usuarios diferentes podem curtir o mesmo post.                                    | POST com token de Admin e depois com token de Teacher.                | Ambos retornam 200 e user_ids diferentes.                        |
+| Id do post invalido                    | Deve rejeitar por formato de ID invalido.                                         | POST /posts/invalid-id-format/like.                                   | Retorna 400 ou 422.                                              |
 | Id do post inexistente                 | Deve falhar pois o alvo nao existe.                                               | POST /posts/000000000000000000000000/like.                            | Retorna 404.                                                      |
+| Validacao de Escola                    | Validar se usuario pertence a escola do post.                                     | POST com token de teacher.                                            | Retorna 200 ou 403.                                              |
 
 ## Cenarios Transversais Obrigatorios (Integracao)
 
@@ -63,7 +65,7 @@ Arquivo: src/tests/routes/likeRoutes.test.js
 
 | Ponto                        | Diretriz                                                                 |
 | :--------------------------- | :----------------------------------------------------------------------- |
-| Idempotencia vs Toggle       | A rota e toggle, entao chamadas sucessivas alternam o estado.             |
-| Validacao de Autorizacao     | Validar se usuarios de diferentes perfis podem curtir.                    |
-| Resposta de remocao          | Na remocao (unlike), o campo data costuma conter uma mensagem de texto.   |
+| Resposta de remocao          | Na remocao (unlike), o campo data deve conter uma propriedade "message".  |
+| Estrutura de Criacao         | No like (create), deve conter post_id, user_id e created_at.             |
+| Multiplos Usuarios           | Validar que IDs de usuario sao distintos na resposta.                     |
 | IDs validos para 404         | Usar 000000000000000000000000 para ObjectId valido inexistente.           |
