@@ -96,6 +96,10 @@ const userPolicies = [
         scope: 'global',
         roles: ['admin', 'teacher'],
       },
+      POST: {
+        scope: 'global',
+        roles: ['admin', 'teacher', 'parent', 'student'],
+      },
     },
   },
   {
