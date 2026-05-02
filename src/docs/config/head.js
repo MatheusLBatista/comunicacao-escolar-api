@@ -10,6 +10,8 @@ import pickupAuthorizationSchemas from '../schemas/pickupAuthorizationSchema.js'
 import pickupLogSchemas from '../schemas/pickupLogSchema.js';
 import likeSchemas from '../schemas/likeSchema.js';
 import classSchemas from '../schemas/classSchema.js';
+import auditLogSchemas from '../schemas/auditLogSchema.js';
+import dailyLogSchemas from '../schemas/dailyLogSchema.js';
 import usuariosPaths from '../paths/usuarios.js';
 import authPaths from '../paths/auth.js';
 import gruposPaths from '../paths/grupo.js';
@@ -22,6 +24,9 @@ import eventPaths from '../paths/event.js';
 import schoolPaths from '../paths/school.js';
 import likePaths from '../paths/like.js';
 import classPaths from '../paths/class.js';
+import auditLogPaths from '../paths/auditLog.js';
+import dailyLogPaths from '../paths/dailyLog.js';
+import dailyLogTemplatePaths from '../paths/dailyLogTemplate.js';
 
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
@@ -79,7 +84,7 @@ const getSwaggerOptions = () => {
         },
         {
           name: 'Rotina Diária',
-          description: 'Rotas para relatórios diários dos alunos',
+          description: 'Rotas para relatórios diários e templates',
         },
         {
           name: 'Conversas',
@@ -105,6 +110,10 @@ const getSwaggerOptions = () => {
           name: 'Likes',
           description: 'Rotas para gerenciar likes em comunicados',
         },
+        {
+          name: 'Audit Log',
+          description: 'Rotas para consulta de logs de auditoria do sistema',
+        },
       ],
       paths: {
         ...authPaths,
@@ -119,6 +128,9 @@ const getSwaggerOptions = () => {
         ...schoolPaths,
         ...likePaths,
         ...classPaths,
+        ...auditLogPaths,
+        ...dailyLogPaths,
+        ...dailyLogTemplatePaths,
       },
       components: {
         securitySchemes: {
@@ -141,6 +153,8 @@ const getSwaggerOptions = () => {
           ...schoolSchemas,
           ...likeSchemas,
           ...classSchemas,
+          ...auditLogSchemas,
+          ...dailyLogSchemas,
         },
       },
       security: [

@@ -3,7 +3,7 @@ import commonResponses from '../schemas/swaggerCommonResponses.js';
 import { generateParameters } from './utils/generateParameters.js';
 
 const usuariosRoutes = {
-  '/usuarios': {
+  '/users': {
     post: {
       tags: ['Usuários'],
       summary: 'Cria um novo usuário',
@@ -42,15 +42,16 @@ const usuariosRoutes = {
         500: commonResponses[500](),
       },
     },
-
+  },
+  '/schools/{schoolId}/users': {
     get: {
       tags: ['Usuários'],
-      summary: 'Lista todos os usuários',
+      summary: 'Lista todos os usuários de uma escola',
       description: `
-        + Caso de uso: Listagem de usuários para gerenciamento e consulta.
+        + Caso de uso: Listagem de usuários de uma escola para gerenciamento e consulta.
         
         + Função de Negócio:
-            - Permitir à front-end, App Mobile e serviços server-to-server obter uma lista paginada de usuários cadastrados.
+            - Permitir à front-end, App Mobile e serviços server-to-server obter uma lista paginada de usuários cadastrados em uma escola.
             + Recebe como query parameters (opcionais):
                 • filtros: nome, email, ativo.  
                 • paginação: page (número da página), limite (quantidade de itens por página).
@@ -66,7 +67,10 @@ const usuariosRoutes = {
                 • **dados de paginação**: totalDocs, limit, totalPages, page, pagingCounter, hasPrevPage, hasNextPage, prevPage, nextPage.
             `,
       security: [{ bearerAuth: [] }],
-      parameters: generateParameters(usuariosSchemas.UsuarioFiltro),
+      parameters: [
+        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } },
+        ...generateParameters(usuariosSchemas.UsuarioFiltro)
+      ],
       responses: {
         200: {
           description: 'Lista de usuários retornada com sucesso',
@@ -85,8 +89,16 @@ const usuariosRoutes = {
         500: commonResponses[500](),
       },
     },
+    post: {
+      tags: ['Usuários'],
+      summary: 'Criar usuário na escola',
+      security: [{ bearerAuth: [] }],
+      parameters: [{ name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } }],
+      requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/UsuarioPost' } } } },
+      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes') }
+    }
   },
-  '/usuarios/{id}': {
+  '/users/{id}': {
     get: {
       tags: ['Usuários'],
       summary: 'Obtém detalhes de um usuário',
@@ -217,7 +229,17 @@ const usuariosRoutes = {
       },
     },
   },
-  '/usuarios/{id}/foto': {
+  '/schools/{schoolId}/members': {
+    post: {
+      tags: ['Usuários'],
+      summary: 'Vincular usuário existente à escola',
+      security: [{ bearerAuth: [] }],
+      parameters: [{ name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } }],
+      requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { email: { type: 'string' }, role: { type: 'string' } } } } } },
+      responses: { 201: commonResponses[201]() }
+    }
+  },
+  '/users/{id}/foto': {
     put: {
       tags: ['Usuários'],
       summary: 'Faz upload da foto do usuário',
