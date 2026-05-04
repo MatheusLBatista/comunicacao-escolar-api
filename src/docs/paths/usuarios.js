@@ -3,26 +3,20 @@ import commonResponses from '../schemas/swaggerCommonResponses.js';
 import { generateParameters } from './utils/generateParameters.js';
 
 const usuariosRoutes = {
-  '/usuarios': {
+  '/users': {
     post: {
       tags: ['Usuários'],
-      summary: 'Cria um novo usuário',
+      summary: 'Cria um novo usuário admin global',
       description: `
-            + Caso de uso: Criação de novo usuário no sistema.
+            + Caso de uso: Criação de novo usuário admin sem vínculo inicial com escola.
             
-            + Função de Negócio:
-                - Permitir ao perfil administrador inserir um novo usuário com todos os dados obrigatórios.
-                + Recebe no corpo da requisição:
-                    - Objeto conforme schema **UsuarioPost**, contendo campos como nome, email, senha.
-
             + Regras de Negócio:
-                - Validação de campos obrigatórios (nome, email, senha).  
+                - Validação de campos obrigatórios (nome, email, password).  
                 - Verificação de unicidade para email.  
-                - Definição de status inicial (ativo: false por padrão).  
-                - Em caso de duplicidade ou erro de validação, retorna erro apropriado.
+                - Campo password é removido da resposta por segurança.
 
             + Resultado Esperado:
-                - HTTP 201 Created com corpo conforme **UsuarioDetalhes**, contendo todos os dados do usuário criado.
+                - HTTP 201 Created com dados do usuário.
             `,
       security: [{ bearerAuth: [] }],
       requestBody: {
@@ -38,225 +32,178 @@ const usuariosRoutes = {
         201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'),
         400: commonResponses[400](),
         401: commonResponses[401](),
-        498: commonResponses[498](),
-        500: commonResponses[500](),
-      },
-    },
-
-    get: {
-      tags: ['Usuários'],
-      summary: 'Lista todos os usuários',
-      description: `
-        + Caso de uso: Listagem de usuários para gerenciamento e consulta.
-        
-        + Função de Negócio:
-            - Permitir à front-end, App Mobile e serviços server-to-server obter uma lista paginada de usuários cadastrados.
-            + Recebe como query parameters (opcionais):
-                • filtros: nome, email, ativo.  
-                • paginação: page (número da página), limite (quantidade de itens por página).
-
-        + Regras de Negócio:
-            - Validar formatos e valores dos filtros fornecidos.  
-            - Respeitar as permissões do usuário autenticado.  
-            - Aplicar paginação e retornar metadados: total de registros e total de páginas.
-
-        + Resultado Esperado:
-            - 200 OK com corpo conforme schema **UsuarioListagem**, contendo:
-                • **items**: array de usuários.  
-                • **dados de paginação**: totalDocs, limit, totalPages, page, pagingCounter, hasPrevPage, hasNextPage, prevPage, nextPage.
-            `,
-      security: [{ bearerAuth: [] }],
-      parameters: generateParameters(usuariosSchemas.UsuarioFiltro),
-      responses: {
-        200: {
-          description: 'Lista de usuários retornada com sucesso',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/UsuarioListagem',
-              },
-            },
-          },
-        },
-        400: commonResponses[400](),
-        401: commonResponses[401](),
-        404: commonResponses[404](),
+        409: commonResponses[409](),
         498: commonResponses[498](),
         500: commonResponses[500](),
       },
     },
   },
-  '/usuarios/{id}': {
+  '/schools/{schoolId}/users': {
     get: {
       tags: ['Usuários'],
-      summary: 'Obtém detalhes de um usuário',
-      description: `
-            + Caso de uso: Consulta de detalhes de usuário específico.
-            
-            + Função de Negócio:
-                - Permitir à front-end, App Mobile ou serviços obter todas as informações de um usuário cadastrado.
-                + Recebe como path parameter:
-                    - **id**: identificador do usuário (MongoDB ObjectId).
-
-            + Regras de Negócio:
-                - Validação do formato do ID.
-                - Verificar existência do usuário e seu status (ativo/inativo).  
-                - Checar permissões do solicitante para visualizar dados sensíveis.
-
-            + Resultado Esperado:
-                - HTTP 200 OK com corpo conforme **UsuarioDetalhes**, contendo dados completos do usuário.
-        `,
+      summary: 'Lista usuários de uma escola',
       security: [{ bearerAuth: [] }],
       parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-          },
-        },
+        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } },
+        ...generateParameters(usuariosSchemas.UsuarioFiltro)
       ],
       responses: {
-        200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'),
+        200: commonResponses[200]('#/components/schemas/UsuarioListagem'),
         400: commonResponses[400](),
         401: commonResponses[401](),
         404: commonResponses[404](),
-        498: commonResponses[498](),
-        500: commonResponses[500](),
       },
     },
-
-    patch: {
+    post: {
       tags: ['Usuários'],
-      summary: 'Atualiza um usuário',
+      summary: 'Criar novo usuário diretamente na escola',
       description: `
-            + Caso de uso: Atualização parcial de dados do usuário.
-            
-            + Função de Negócio:
-                - Permitir ao perfil administrador ou usuário autorizado modificar os campos desejados.
-                + Recebe:
-                    - **id** no path.  
-                    - No corpo, objeto conforme **UsuarioPutPatch** com os campos a alterar.
-
-            + Regras de Negócio:
-                - Garantir unicidade de campos como email.  
-                - Aplicar imediatamente alterações críticas (ex.: desativação inibe login).  
-                - Impedir alterações inconsistentes com regras de negócio.
-
-            + Resultado Esperado:
-                - HTTP 200 OK com corpo conforme **UsuarioDetalhes**, refletindo as alterações.
-        `,
+        + Caso de uso: Criar um usuário e já vinculá-lo a uma escola com uma role específica.
+        
+        + Regras de Negócio:
+            - Se o email já existir globalmente e não estiver na escola, anexa o membership.
+            - Se já estiver na escola, retorna 409 Conflict.
+            - Se não existir, cria o usuário com uma senha temporária (se não enviada).
+      `,
+      security: [{ bearerAuth: [] }],
+      parameters: [{ name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } }],
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['full_name', 'email', 'role'],
+              properties: {
+                full_name: { type: 'string' },
+                email: { type: 'string' },
+                role: { type: 'string', enum: ['admin', 'teacher', 'parent', 'student'] },
+                password: { type: 'string' },
+                class_id: { type: 'string', description: 'Obrigatório para student' },
+                associated_students: { type: 'array', items: { type: 'string' }, description: 'Para parent' }
+              }
+            }
+          }
+        }
+      },
+      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 409: commonResponses[409]() }
+    }
+  },
+  '/schools/{schoolId}/members': {
+    post: {
+      tags: ['Usuários'],
+      summary: 'Vincular usuário existente à escola',
+      description: `
+        + Caso de uso: Vincular um usuário já cadastrado a uma nova escola.
+        
+        + Fluxo Especial (Cascading):
+            - Se a role for 'parent', o sistema exige dados de um 'student' no payload.
+            - Cria automaticamente o aluno e o vincula ao pai nesta escola.
+      `,
+      security: [{ bearerAuth: [] }],
+      parameters: [{ name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } }],
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['role'],
+              properties: {
+                email: { type: 'string', description: 'Email do usuário existente' },
+                user_id: { type: 'string', description: 'Ou ID do usuário' },
+                role: { type: 'string', enum: ['admin', 'teacher', 'parent', 'student'] },
+                student: {
+                  type: 'object',
+                  description: 'Obrigatório se role=parent',
+                  properties: {
+                    full_name: { type: 'string' },
+                    class_id: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 409: commonResponses[409](), 404: commonResponses[404]() }
+    }
+  },
+  '/schools/{schoolId}/members/{userId}/students': {
+    post: {
+      tags: ['Usuários'],
+      summary: 'Adicionar novo filho (aluno) a um responsável',
+      description: `
+        + Caso de uso: Adicionar um novo aluno a um pai já vinculado à escola.
+        + Regras: Cria o aluno e atualiza o array associated_students do pai.
+      `,
       security: [{ bearerAuth: [] }],
       parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-          },
-        },
+        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } },
+        { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
       ],
       requestBody: {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/UsuarioPutPatch',
-            },
-          },
-        },
+              type: 'object',
+              required: ['full_name', 'class_id'],
+              properties: {
+                full_name: { type: 'string' },
+                class_id: { type: 'string' }
+              }
+            }
+          }
+        }
       },
-      responses: {
-        200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'),
-        400: commonResponses[400](),
-        401: commonResponses[401](),
-        404: commonResponses[404](),
-        498: commonResponses[498](),
-        500: commonResponses[500](),
-      },
+      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404]() }
+    }
+  },
+  '/users/{id}': {
+    get: {
+      tags: ['Usuários'],
+      summary: 'Obtém detalhes de um usuário',
+      security: [{ bearerAuth: [] }],
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+      responses: { 200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404]() },
     },
-
+    patch: {
+      tags: ['Usuários'],
+      summary: 'Atualiza um usuário',
+      description: 'Campos email e password são ignorados no update.',
+      security: [{ bearerAuth: [] }],
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+      requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/UsuarioPutPatch' } } } },
+      responses: { 200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404]() },
+    },
     delete: {
       tags: ['Usuários'],
-      summary: 'Deleta um usuário',
-      description: `
-            + Caso de uso: Exclusão ou inativação de usuário.
-            
-            + Função de Negócio:
-                - Permitir ao perfil administrador remover ou inativar um usuário sem afetar integridade de dados.
-                + Recebe como path parameter:
-                    - **id**: identificador do usuário.
-
-            + Regras de Negócio:
-                - Verificar impedimentos por relacionamento (conformidade ou auditoria) antes de excluir.  
-                - Registrar log de auditoria sobre a operação.  
-                - Garantir que não haja vínculos críticos pendentes.
-
-            + Resultado Esperado:
-                - HTTP 200 OK - usuário excluído ou inativado com sucesso.
-            `,
+      summary: 'Deleta (desativa) um usuário',
       security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-          },
-        },
-      ],
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
       responses: {
-        200: commonResponses[200](),
-        400: commonResponses[400](),
-        401: commonResponses[401](),
-        404: commonResponses[404](),
-        498: commonResponses[498](),
-        500: commonResponses[500](),
+        200: {
+          description: 'Sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  error: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Usuário desativado com sucesso.' }
+                }
+              }
+            }
+          }
+        },
+        404: commonResponses[404]()
       },
     },
   },
-  '/usuarios/{id}/foto': {
+  '/users/{id}/foto': {
     put: {
       tags: ['Usuários'],
       summary: 'Faz upload da foto do usuário',
-      description: `
-            + Caso de uso: Upload de foto de perfil do usuário.
-            
-            + Função de Negócio:
-                - Permitir ao usuário autenticado fazer upload de uma foto de perfil.
-                + Recebe como path parameter:
-                    - **id**: identificador do usuário (MongoDB ObjectId).
-                + Recebe no corpo da requisição:
-                    - Arquivo de imagem via multipart/form-data no campo 'file'.
-
-            + Regras de Negócio:
-                - Usuário deve existir e estar ativo.
-                - Arquivo deve ser uma imagem válida (formatos aceitos pelo multer).
-                - Tamanho máximo do arquivo: 5 MB.
-                - Arquivo não pode estar vazio.
-                - Imagem é comprimida automaticamente antes do armazenamento.
-                - Usuário só pode alterar sua própria foto ou admin pode alterar qualquer foto.
-
-            + Resultado Esperado:
-                - HTTP 201 Created com dados do upload (etag, versionId).
-                - Em caso de usuário inexistente, retorna erro 404.
-                - Em caso de arquivo inválido ou vazio, retorna erro 400.
-                - Em caso de arquivo maior que 5 MB, retorna erro 413.
-            `,
       security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-          },
-          description: 'ID do usuário',
-        },
-      ],
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
       requestBody: {
         required: true,
         content: {
@@ -264,78 +211,19 @@ const usuariosRoutes = {
             schema: {
               type: 'object',
               required: ['file'],
-              properties: {
-                file: {
-                  type: 'string',
-                  format: 'binary',
-                  description:
-                    'Arquivo de imagem para foto de perfil (máx 5 MB)',
-                },
-              },
-            },
-          },
-        },
+              properties: { file: { type: 'string', format: 'binary' } }
+            }
+          }
+        }
       },
-      responses: {
-        201: {
-          description: 'Foto atualizada com sucesso',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/UsuarioUploadFotoResposta',
-              },
-            },
-          },
-        },
-        400: commonResponses[400](),
-        401: commonResponses[401](),
-        404: commonResponses[404](),
-        413: commonResponses[413](),
-        498: commonResponses[498](),
-        500: commonResponses[500](),
-      },
+      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioUploadFotoResposta') },
     },
     delete: {
       tags: ['Usuários'],
       summary: 'Deleta a foto do usuário',
-      description: `
-            + Caso de uso: Remoção da foto de perfil do usuário.
-            
-            + Função de Negócio:
-                - Permitir ao usuário autenticado remover sua foto de perfil do sistema de armazenamento.
-                + Recebe como path parameter:
-                    - **id**: identificador do usuário (MongoDB ObjectId).
-
-            + Regras de Negócio:
-                - Usuário deve existir no sistema.
-                - Remove o arquivo de imagem do MinIO/S3.
-                - Usuário só pode deletar sua própria foto ou admin pode deletar qualquer foto.
-                - Operação é irreversível.
-
-            + Resultado Esperado:
-                - HTTP 200 OK - Foto deletada com sucesso.
-                - Em caso de usuário inexistente, retorna erro 404.
-                - Em caso de erro no serviço de armazenamento, retorna erro 500.
-            `,
       security: [{ bearerAuth: [] }],
-      parameters: [
-        {
-          name: 'id',
-          in: 'path',
-          required: true,
-          schema: {
-            type: 'string',
-          },
-          description: 'ID do usuário',
-        },
-      ],
-      responses: {
-        200: commonResponses[200](),
-        401: commonResponses[401](),
-        404: commonResponses[404](),
-        498: commonResponses[498](),
-        500: commonResponses[500](),
-      },
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+      responses: { 200: commonResponses[200]() },
     },
   },
 };

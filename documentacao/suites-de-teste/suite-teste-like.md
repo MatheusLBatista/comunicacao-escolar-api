@@ -1,54 +1,71 @@
-# Suite de Testes de Integracao - Like
+# Suite de Testes de Integracao - Like (/posts/:id/like)
 
-Documento alinhado com a cobertura atual da suite:
+Testes de integracao (endpoint) que validam a funcionalidade de "curtir" (toggle like) em postagens.
 
-- Arquivo de teste: src/tests/routes/likeRoutes.test.js
+Arquivo: src/tests/routes/likeRoutes.test.js
 
-## Rota coberta
+## Visao de Fluxo e Regras de Negocio
 
-- POST /posts/:id/like
+| Regra                               | Comportamento Atual do Sistema                                                                           | Impacto na Suite de Integracao                                               |
+| :---------------------------------- | :-------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| Autenticacao obrigatoria            | Rota usa autenticacao por token Bearer.                                                                  | Cobrir tentativa sem token (401/498) e com token valido.                     |
+| Comportamento de Toggle             | Se o usuario ja curtiu, a curtida e removida; caso contrario, e adicionada.                               | Validar adicao no primeiro POST e remocao no segundo POST.                  |
+| Unicidade por Usuario/Post          | Um usuario so pode ter um like ativo por postagem.                                                       | Garantido pelo comportamento de toggle.                                      |
+| Multiplos Usuarios                  | Diferentes usuarios podem curtir a mesma postagem.                                                        | Validar que likes de diferentes tokens sao registrados separadamente.        |
+| Postagem inexistente                | Nao e possivel curtir um post que nao existe.                                                             | Cobrir erro 404 ao tentar curtir post inexistente.                           |
+| Escopo por Escola                   | Usuario deve pertencer a mesma escola da postagem para curtir.                                            | Validar erro 403 ou sucesso dependendo do vinculo do usuario.                |
+| Envelope padrao de resposta         | Em sucesso retorna error=false e data; em erro retorna error=true.                                        | Validar contrato basico de sucesso/erro.                                    |
 
-## Pre-condicoes usadas na suite
+## Massa de Dados Recomendada
 
-- Login de dois perfis:
-  - Admin
-  - Teacher
-- Obtencao de schoolId via GET /schools.
-- Criacao de post base via POST /schools/:schoolId/posts.
+| Entidade                      | Objetivo nos testes                                         |
+| :---------------------------- | :---------------------------------------------------------- |
+| Admin global valido           | Fazer login e obter token de primeiro usuario.              |
+| Usuario Teacher valido        | Fazer login e obter token de segundo usuario.               |
+| Escola existente              | Fornecer contexto para criacao do post base.                |
+| Post criado na suite          | Servir como alvo para as operacoes de like.                 |
 
-## Cobertura atual da rota
+## Preparacao da Suite
 
-### POST /posts/:id/like
+| Etapa                       | Comportamento Esperado                       | Verificacoes                                 | Criterios de Aceite                               |
+| :-------------------------- | :------------------------------------------- | :------------------------------------------- | :------------------------------------------------ |
+| Login Admin                 | Deve autenticar admin global.                | POST /login com admin@admin.com.             | Retorna 200 e access_token.                       |
+| Login Teacher               | Deve autenticar usuario com role teacher.    | POST /login com maria.teacher@escola.com.    | Retorna 200 e access_token.                       |
+| Resolucao de escola         | Obter schoolId para criar post.              | GET /schools.                                | Retorna 200 e schoolId valido.                    |
+| Criacao de post base        | Criar post que recebera os likes.            | POST /schools/:schoolId/posts.               | Retorna 201 e postId valido.                      |
 
-Cenarios cobertos:
+## POST /posts/:id/like - Toggle Like
 
-- Sem token retorna 401 ou 498.
-- Like com token valido retorna 200.
-- Toggle de like (chamada repetida) retorna 200.
-- Post inexistente retorna 404.
-- postId em formato invalido retorna 400 ou 422.
-- Dois usuarios diferentes conseguem interagir no mesmo post.
-- Estrutura de resposta em criacao contem post_id, user_id e created_at.
-- Remocao por toggle retorna data.message.
+| Funcionalidade                         | Comportamento Esperado                                                           | Verificacoes                                                          | Criterios de Aceite                                              |
+| :------------------------------------- | :------------------------------------------------------------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------- |
+| Sem token                              | Deve bloquear operacao nao autenticada.                                           | POST /posts/:id/like sem Authorization.                               | Retorna 401 ou 498.                                              |
+| Adicionar Like (primeira chamada)      | Deve registrar a curtida do usuario.                                              | POST com token valido.                                                | Retorna 200, error=false, data com post_id e user_id.            |
+| Remover Like (segunda chamada)         | Deve remover a curtida anterior (toggle).                                         | Repetir POST com mesmo token.                                         | Retorna 200, error=false, data.message presente.                 |
+| Multiplos likes                        | Usuarios diferentes podem curtir o mesmo post.                                    | POST com token de Admin e depois com token de Teacher.                | Ambos retornam 200 e user_ids diferentes.                        |
+| Id do post invalido                    | Deve rejeitar por formato de ID invalido.                                         | POST /posts/invalid-id-format/like.                                   | Retorna 400 ou 422.                                              |
+| Id do post inexistente                 | Deve falhar pois o alvo nao existe.                                               | POST /posts/000000000000000000000000/like.                            | Retorna 404.                                                      |
+| Validacao de Escola                    | Validar se usuario pertence a escola do post.                                     | POST com token de teacher.                                            | Retorna 200 ou 403.                                              |
 
-Validacoes verificadas no sucesso:
+## Cenarios Transversais Obrigatorios (Integracao)
 
-- error=false
-- data presente
-- Na criacao: post_id, user_id e created_at
-- Na remocao: message presente em data
+| Tema                       | Verificacao de Integracao                                                             |
+| :------------------------- | :------------------------------------------------------------------------------------ |
+| Contrato basico de sucesso | Em cenarios felizes, validar error=false e objeto data presente.                      |
+| Contrato basico de erro    | Em cenarios tristes, validar error=true com status coerente (400, 401/498, 403, 404). |
+| Dependencia de ambiente    | Suite depende de API, banco e tokens validos disponiveis.                             |
 
-## Divergencias corrigidas neste documento
+## Variaveis de Ambiente Usadas
 
-- Removidos cenarios que a suite atual nao executa de forma deterministica, como:
-  - validacao real de usuario de escola diferente com fixture dedicada;
-  - validacao real de turma em post class-scoped com fixture controlada;
-  - terceira chamada para idempotencia estrita de remocao.
-- Corrigida referencia de pre-condicao para criacao de post:
-  - rota correta: POST /schools/{schoolId}/posts
+| Variavel             | Uso na suite                                           |
+| :------------------- | :----------------------------------------------------- |
+| INTEGRATION_BASE_URL | Define URL base da API para os requests de integracao. |
+| PORT                 | Fallback de porta quando INTEGRATION_BASE_URL nao e informado. |
 
-## Observacoes de qualidade da suite atual
+## Observacoes de Implementacao para os Casos de Integracao
 
-- O teste de pertencimento a escola aceita 200 ou 403 dependendo do ambiente, entao nao valida regra de autorizacao de forma estrita.
-- A suite esta adequada para regressao basica do endpoint de toggle, mas ainda nao fecha completamente regras de negocio de escopo por escola/turma.
-- Se houver necessidade de maior confiabilidade, o proximo passo e incluir fixtures para usuarios de escolas diferentes e post class-scoped com turma conhecida.
+| Ponto                        | Diretriz                                                                 |
+| :--------------------------- | :----------------------------------------------------------------------- |
+| Resposta de remocao          | Na remocao (unlike), o campo data deve conter uma propriedade "message".  |
+| Estrutura de Criacao         | No like (create), deve conter post_id, user_id e created_at.             |
+| Multiplos Usuarios           | Validar que IDs de usuario sao distintos na resposta.                     |
+| IDs validos para 404         | Usar 000000000000000000000000 para ObjectId valido inexistente.           |

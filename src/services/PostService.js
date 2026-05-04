@@ -405,6 +405,58 @@ class PostService {
 
     return await imagem
   }
+
+  async deleteFoto(req, postId, linkId) {
+    const userId = req.user_id
+
+    const post = await this.repository.getById(postId)
+
+    if (!post || post.active === false) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'notFound',
+        field: 'post',
+        details: [{ path: 'post', message: 'Anuncio nao encontrado.' }],
+        customMessage: 'Anuncio nao encontrado.',
+      })
+    }
+
+    const user = await this.userRepository.getById(userId)
+    const isAdmin = user?.memberships?.some((membership) => membership.role === 'admin')
+
+    if (!isAdmin) {
+      const isOwner = post.author_id?.toString() === userId?.toString()
+      if (!isOwner) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.FORBIDDEN.code,
+          errorType: 'forbidden',
+          field: 'post',
+          details: [{ path: 'post', message: 'Permissao negada para remover anexo.' }],
+          customMessage: 'Permissao negada para remover anexo.',
+        })
+      }
+    }
+
+    const foto = await this.repository.getFoto({
+      postId,
+      linkId,
+      userId: isAdmin ? null : userId,
+    })
+
+    if (!foto) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'notFound',
+        field: 'attachments',
+        details: [{ path: 'attachments', message: 'Foto nao encontrada.' }],
+        customMessage: 'Foto nao encontrada.',
+      })
+    }
+
+    await this.repository.deletaFoto(postId, linkId, isAdmin ? null : userId)
+
+    return { message: 'Foto removida com sucesso.' }
+  }
 }
 
 export default PostService;

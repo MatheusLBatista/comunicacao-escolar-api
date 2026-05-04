@@ -3,7 +3,7 @@ import commonResponses from '../schemas/swaggerCommonResponses.js';
 import { generateParameters } from './utils/generateParameters.js';
 
 const rotasRoutes = {
-  '/rotas': {
+  '/routes': {
     post: {
       tags: ['Rotas'],
       summary: 'Cria uma nova rota',
@@ -88,7 +88,7 @@ const rotasRoutes = {
       },
     },
   },
-  '/rotas/{id}': {
+  '/routes/{id}': {
     get: {
       tags: ['Rotas'],
       summary: 'Obtém detalhes de uma rota',

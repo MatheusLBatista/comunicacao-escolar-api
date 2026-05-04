@@ -14,15 +14,17 @@ const postPaths = {
                 - Permitir que usuários autenticados autorizados criem comunicados na escola.
                 - O autor é definido automaticamente pelo token da sessão.
                 - O school_id é extraído da URL e não precisa ser enviado no corpo da requisição.
+                - Dispara notificações push via Firebase para usuários da escola/turma.
 
             + Regras de Negócio:
-                - A escola (schoolId) deve existir.
-                - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório.
-                - Quando informado, target_id deve corresponder a uma turma existente da mesma escola validada.
+                - A escola (schoolId) deve existir (Erro 404).
+                - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório (Erro 422).
+                - Quando informado, target_id deve corresponder a uma turma existente da mesma escola validada (Erro 422).
 
             + Resultado Esperado:
                 - HTTP 201 Created com dados do comunicado criado.
                 - HTTP 422 Unprocessable Entity caso target_id seja ausente para scope != "all" ou a turma não exista.
+                - HTTP 404 Not Found caso a escola não exista.
             `,
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -49,6 +51,7 @@ const postPaths = {
         201: commonResponses[201]('#/components/schemas/PostItem'),
         400: commonResponses[400](),
         401: commonResponses[401](),
+        404: commonResponses[404](),
         422: commonResponses[422](),
         498: commonResponses[498](),
         500: commonResponses[500](),
@@ -144,12 +147,15 @@ const postPaths = {
             + Regras de Negócio:
                 - O comunicado deve existir.
                 - Todos os campos são opcionais.
-                - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório.
-                - Quando informado, target_id deve corresponder a uma turma existente.
+                - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório (Erro 400).
+                - Quando informado, target_id deve corresponder a uma turma existente (Erro 404).
+                - A turma selecionada deve pertencer à mesma escola do anúncio (Erro 409).
 
             + Resultado Esperado:
                 - HTTP 200 OK com dados do comunicado atualizado.
-                - HTTP 422 Unprocessable Entity caso target_id seja ausente para scope != "all" ou a turma não exista.
+                - HTTP 400 Bad Request caso target_id seja ausente para scope != "all".
+                - HTTP 404 Not Found caso a turma não exista.
+                - HTTP 409 Conflict caso a turma seja de outra escola.
             `,
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -179,6 +185,7 @@ const postPaths = {
         401: commonResponses[401](),
         403: commonResponses[403](),
         404: commonResponses[404](),
+        409: commonResponses[409](),
         422: commonResponses[422](),
         498: commonResponses[498](),
         500: commonResponses[500](),
@@ -201,7 +208,7 @@ const postPaths = {
           - Apenas o autor ou administradores podem desativar/excluir.
 
             + Resultado Esperado:
-                - HTTP 200 OK com mensagem de sucesso.
+                - HTTP 200 OK com mensagem "Anúncio deletado com sucesso".
             `,
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -216,7 +223,25 @@ const postPaths = {
         },
       ],
       responses: {
-        200: commonResponses[200](),
+        200: {
+          description: 'Sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  error: { type: 'boolean', example: false },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Anúncio deletado com sucesso' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         400: commonResponses[400](),
         401: commonResponses[401](),
         403: commonResponses[403](),
@@ -307,9 +332,10 @@ const postPaths = {
             + Regras de Negócio:
                 - O comunicado deve existir.
                 - O anexo informado deve existir no comunicado.
+                - Apenas autor ou admin podem remover anexos (Erro 403).
 
             + Resultado Esperado:
-                - HTTP 200 OK com o comunicado atualizado.
+                - HTTP 200 OK com mensagem "Foto removida com sucesso.".
             `,
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -333,7 +359,25 @@ const postPaths = {
         },
       ],
       responses: {
-        200: commonResponses[200]('#/components/schemas/PostItem'),
+        200: {
+          description: 'Sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  error: { type: 'boolean', example: false },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Foto removida com sucesso.' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         400: commonResponses[400](),
         401: commonResponses[401](),
         403: commonResponses[403](),

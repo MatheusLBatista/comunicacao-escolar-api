@@ -10,8 +10,8 @@ Arquivo: src/tests/routes/classRoutes.test.js
 | :---------------------------------- | :-------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
 | Autenticacao obrigatoria            | Rotas usam autenticacao por token Bearer.                                                                | Cobrir listagem/criacao sem token (401/498) e fluxo autenticado com token valido. |
 | Validacao Zod                       | Payload invalido e rejeitado por validacao.                                                              | Cobrir erro 400 em criacao invalida.                                         |
-| Validacao de ObjectId em schoolId   | Controller valida ObjectId no param.                                                                     | Cenarios de schoolId invalido podem ser barrados por permissao com 403.      |
-| Escola deve existir                 | Service valida escola e retorna 404 quando nao encontrada.                                                | Cobrir POST com schoolId inexistente (403/404 dependendo da permissao).      |
+| Validacao de ObjectId em schoolId   | Controller/Middleware valida ObjectId no param.                                                           | Cenarios de schoolId invalido retornam 403 (AuthPermission).                 |
+| Escola deve existir                 | Service/Middleware valida escola.                                                                         | Cobrir schoolId inexistente com 403.                                         |
 | Busca por id na turma               | GET por id retorna turma ou not found.                                                                    | Cobrir detalhe por id e 404 para id inexistente.                             |
 | Unicidade de turma por escola       | Service impede duplicidade por (school_id, name, grade).                                                  | Cobrir conflito com 409 ao repetir criacao na mesma escola.                  |
 | Professores validos                 | teacher_ids devem existir e ter role teacher; caso contrario retorna 422.                                 | Cobrir erro 422 com teacher_ids invalidos.                                   |
@@ -39,9 +39,9 @@ Arquivo: src/tests/routes/classRoutes.test.js
 | Funcionalidade                         | Comportamento Esperado                                                           | Verificacoes                                                          | Criterios de Aceite                                              |
 | :------------------------------------- | :------------------------------------------------------------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------- |
 | Sem token                              | Deve bloquear criacao nao autenticada.                                            | POST sem Authorization.                                               | Retorna 401 ou 498.                                              |
-| Payload invalido                       | Deve rejeitar por validacao.                                                      | POST com name/grade vazios, year invalido, teacher_ids vazio.         | Retorna 400 e error=true.                                        |
-| schoolId invalido                      | Deve ser bloqueado antes do controller ou por permissao.                          | POST /schools/invalid-school-id/class.                                | Retorna 403 (AuthPermission) ou 400 (validacao).                 |
-| schoolId inexistente                   | Deve falhar por escola nao encontrada ou permissao.                               | POST com schoolId 000000000000000000000000.                           | Retorna 403 ou 404.                                              |
+| Payload invalido                       | Deve rejeitar por validacao.                                                      | POST com name/grade vazios, year invalido.                            | Retorna 400 e error=true.                                        |
+| schoolId invalido                      | Deve ser bloqueado por permissao/validacao.                                       | POST /schools/invalidSchoolId/class.                                  | Retorna 403.                                                     |
+| schoolId inexistente                   | Deve falhar por falta de permissao na escola inexistente.                         | POST com schoolId 000000000000000000000000.                           | Retorna 403.                                                     |
 | teacher_ids invalidos                  | Deve rejeitar por professores inexistentes ou sem role teacher.                   | POST com teacher_ids validos + inexistente.                           | Retorna 422 e error=true.                                        |
 | Payload valido                          | Deve criar turma com dados validos.                                               | POST com name, grade, year, teacher_ids e active.                     | Retorna 201, error=false, data com _id e campos do payload.       |
 | Duplicidade de turma                   | Deve rejeitar nome/grade duplicado na mesma escola.                               | Repetir POST com mesmo name/grade.                                     | Retorna 409 e error=true.                                        |
@@ -52,8 +52,8 @@ Arquivo: src/tests/routes/classRoutes.test.js
 | :------------------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------- | :------------------------------------------- |
 | Sem token                              | Deve bloquear listagem nao autenticada.                          | GET sem Authorization.                               | Retorna 401 ou 498.                           |
 | Com token valido                       | Deve listar turmas paginadas.                                    | GET com Bearer token.                                | Retorna 200, error=false e data.docs array.   |
-| schoolId invalido                      | Deve ser bloqueado antes do controller ou por permissao.         | GET /schools/invalid-school-id/class.                | Retorna 403 (AuthPermission) ou 400 (validacao). |
-| schoolId inexistente                   | Deve falhar por escola nao encontrada ou permissao.              | GET com schoolId 000000000000000000000000.           | Retorna 403 ou 404.                           |
+| schoolId invalido                      | Deve ser bloqueado por permissao/validacao.                       | GET /schools/invalidSchoolId/class.                   | Retorna 403.                                 |
+| schoolId inexistente                   | Deve falhar por falta de permissao na escola inexistente.         | GET com schoolId 000000000000000000000000.           | Retorna 403.                                 |
 
 ## GET /schools/:schoolId/class/:id - Detalhe
 
@@ -76,7 +76,7 @@ Arquivo: src/tests/routes/classRoutes.test.js
 
 | Funcionalidade           | Comportamento Esperado                                     | Verificacoes                                               | Criterios de Aceite                                      |
 | :----------------------- | :--------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
-| Exclusao valida          | Deve desativar turma existente.                            | DELETE por classId com token.                              | Retorna 200, error=false e data._id igual ao id.         |
+| Exclusao valida          | Deve desativar turma existente.                            | DELETE por classId com token.                              | Retorna 200, error=false, data.active=false.             |
 
 ## Cenarios Transversais Obrigatorios (Integracao)
 
@@ -97,7 +97,7 @@ Arquivo: src/tests/routes/classRoutes.test.js
 
 | Ponto                        | Diretriz                                                                 |
 | :--------------------------- | :----------------------------------------------------------------------- |
-| Payload dinamico             | Usar Date.now() para gerar name unico e reduzir chance de conflito.       |
-| Teacher_ids validos          | Criar teacher na escola via rota de users para obter id valido.           |
+| Soft Delete                  | O DELETE valida que o campo "active" do recurso retornado e "false".      |
+| IDs Escolares Inválidos      | O sistema tende a retornar 403 (Forbidden) via AuthPermission.            |
 | IDs validos para 404         | Usar 000000000000000000000000 para ObjectId valido inexistente.           |
-| Permissao por rota           | AuthPermission pode retornar 403 antes do controller em schoolId invalido.|
+| Unicidade                    | A suite testa explicitamente o erro 409 para turmas duplicadas.           |

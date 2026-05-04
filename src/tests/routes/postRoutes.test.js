@@ -99,7 +99,8 @@ describe('Post Routes - Integração', () => {
         .set('Authorization', `Bearer ${token}`)
         .send(payload);
 
-      expect([400, 404, 422]).toContain(response.status);
+      // AuthPermission retorna 403 se o schoolId não pertencer ao usuário
+      expect([400, 403, 404, 422]).toContain(response.status);
     });
 
     test('deve retornar 422 ao criar post com scope diferente de "all" sem target_id', async () => {
@@ -321,6 +322,52 @@ describe('Post Routes - Integração', () => {
       expect([400, 422]).toContain(response.status);
     });
 
+    test('deve retornar 409 ao vincular post a turma de outra escola', async () => {
+      if (!createdPostId) return;
+
+      // 1. Criar uma nova escola (Escola B)
+      const createSchoolResponse = await request(BASE_URL)
+        .post('/schools')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: `Escola Conflito ${Date.now()}`,
+          cnpj: `000000000001${Date.now().toString().slice(-2)}`,
+          address: { street: 'Rua B', number: '100', city: 'Cidade', state: 'SP', zip_code: '00000-000' }
+        });
+      
+      if (createSchoolResponse.status !== 201) return; // Pula se não puder criar escola
+      const otherSchoolId = createSchoolResponse.body.data._id;
+
+      // 2. Criar uma turma na Escola B
+      const createClassResponse = await request(BASE_URL)
+        .post(`/schools/${otherSchoolId}/class`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: 'Turma Conflito',
+          grade: '1A',
+          year: 2026,
+          teacher_ids: []
+        });
+
+      if (createClassResponse.status !== 201) return;
+      const otherClassId = createClassResponse.body.data._id;
+
+      // 3. Tentar atualizar o post da Escola A com a turma da Escola B
+      const response = await request(BASE_URL)
+        .patch(`/posts/${createdPostId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          target: {
+            scope: 'class',
+            target_id: otherClassId
+          }
+        });
+
+      expect(response.status).toBe(409);
+      expect(response.body).toHaveProperty('error', true);
+      expect(JSON.stringify(response.body)).toContain('escola diferente');
+    });
+
     test('deve atualizar status active', async () => {
       if (!createdPostId) {
         console.log('⚠️  createdPostId não definido, pulando teste');
@@ -454,7 +501,8 @@ describe('Post Routes - Integração', () => {
         .get('/schools/invalid-school-id/posts')
         .set('Authorization', `Bearer ${token}`);
 
-      expect([400, 422]).toContain(response.status);
+      // AuthPermission retorna 403 se o schoolId não bater com membership
+      expect([400, 403, 422]).toContain(response.status);
     });
   });
 });

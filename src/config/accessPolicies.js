@@ -49,6 +49,69 @@ const userPolicies = [
     },
   },
   {
+    pattern: /^\/schools\/([^/]+)\/posts(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'school',
+        roles: ['admin', 'teacher'],
+        schoolParam: 'schoolId',
+      },
+      POST: {
+        scope: 'school',
+        roles: ['admin', 'teacher'],
+        schoolParam: 'schoolId',
+      },
+    },
+  },
+  {
+    pattern: /^\/posts\/[^/]+\/attachments\/[^/]+(?:\/|$)/,
+    methods: {
+      DELETE: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+    },
+  },
+  {
+    pattern: /^\/posts\/[^/]+\/attachments(?:\/)?$/,
+    methods: {
+      POST: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+    },
+  },
+  {
+    pattern: /^\/posts\/[^/]+(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      PATCH: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      DELETE: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      POST: {
+        scope: 'global',
+        roles: ['admin', 'teacher', 'parent', 'student'],
+      },
+    },
+  },
+  {
+    pattern: /^\/attachments\/[^/]+(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+    },
+  },
+  {
     pattern: /^\/schools\/([^/]+)\/members(?:\/|$)/,
     methods: {
       POST: {
