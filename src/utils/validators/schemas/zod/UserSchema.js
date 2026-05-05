@@ -74,7 +74,6 @@ const UserUpdateSchema = z
       .max(100, 'O nome deve ter no máximo 100 caracteres.')
       .optional(),
     active: z.boolean().optional(),
-    memberships: z.array(MembershipSchema).optional(),
   })
   .partial();
 
@@ -152,6 +151,14 @@ const ChangePasswordSchema = z.object({
     }),
 });
 
+const UpdateMembershipRoleSchema = z.object({
+  role: z.enum(['teacher', 'parent', 'student'], {
+    errorMap: () => ({
+      message: "Role deve ser 'teacher', 'parent' ou 'student'.",
+    }),
+  }),
+});
+
 const FcmTokenSchema = z.object({
   fcm_token: z.string().min(1, 'O token FCM é obrigatório.'),
 });
@@ -167,4 +174,5 @@ export {
   MeUpdateSchema,
   ChangePasswordSchema,
   FcmTokenSchema,
+  UpdateMembershipRoleSchema,
 };
