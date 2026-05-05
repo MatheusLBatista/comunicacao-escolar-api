@@ -264,6 +264,42 @@ class UserService {
     }
     return senha;
   }
+
+  async getMe(userId) {
+    const user = await this.repository.getById(userId);
+    const obj = typeof user.toObject === 'function' ? user.toObject() : { ...user };
+    delete obj.password;
+    return obj;
+  }
+
+  async updateMe(userId, parsedData) {
+    if (parsedData.email) {
+      await this.validateEmail(parsedData.email, userId);
+    }
+    const data = await this.repository.update(userId, parsedData);
+    const obj = typeof data.toObject === 'function' ? data.toObject() : { ...data };
+    delete obj.password;
+    return obj;
+  }
+
+  async changePassword(userId, currentPassword, newPassword) {
+    const user = await this.repository.getByIdWithPassword(userId);
+
+    const senhaValida = await bcrypt.compare(currentPassword, user.password);
+    if (!senhaValida) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+        errorType: 'unauthorized',
+        field: 'current_password',
+        details: [{ path: 'current_password', message: 'Senha atual incorreta.' }],
+        customMessage: 'Senha atual incorreta.',
+      });
+    }
+
+    const saltRounds = 10;
+    const hash = await bcrypt.hash(newPassword, saltRounds);
+    await this.repository.updatePassword(userId, hash);
+  }
 }
 
 export default UserService;

@@ -130,6 +130,32 @@ const LinkToSchoolSchema = z
     path: ['student'],
   });
 
+const MeUpdateSchema = z
+  .object({
+    full_name: z
+      .string()
+      .min(1, 'Campo full_name é obrigatório.')
+      .max(100, 'O nome deve ter no máximo 100 caracteres.')
+      .optional(),
+    email: z.string().email('Formato de email inválido.').optional(),
+  })
+  .partial();
+
+const ChangePasswordSchema = z.object({
+  current_password: z.string().min(1, 'Senha atual é obrigatória.'),
+  new_password: z
+    .string()
+    .min(8, 'A nova senha deve ter pelo menos 8 caracteres.')
+    .refine((val) => passwordRegex.test(val), {
+      message:
+        'A nova senha deve conter pelo menos 1 letra, 1 número e 1 caractere especial.',
+    }),
+});
+
+const FcmTokenSchema = z.object({
+  fcm_token: z.string().min(1, 'O token FCM é obrigatório.'),
+});
+
 export {
   UserSchema,
   AdminCreateSchema,
@@ -138,4 +164,7 @@ export {
   RegisterSchema,
   StudentInputSchema,
   LinkToSchoolSchema,
+  MeUpdateSchema,
+  ChangePasswordSchema,
+  FcmTokenSchema,
 };
