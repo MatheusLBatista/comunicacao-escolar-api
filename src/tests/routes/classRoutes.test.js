@@ -18,7 +18,7 @@ const asId = (value) => {
 
 async function loginAndGetToken() {
   const response = await request(BASE_URL)
-    .post('/login')
+    .post('/auth/login')
     .send({
       email: process.env.ADMIN_EMAIL || 'admin@admin.com',
       password: process.env.ADMIN_PASSWORD || 'Senha@123',

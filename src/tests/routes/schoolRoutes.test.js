@@ -40,7 +40,7 @@ describe('School - integração de endpoints', () => {
   let schoolId;
 
   beforeAll(async () => {
-    const loginResponse = await request(BASE_URL).post('/login').send({
+    const loginResponse = await request(BASE_URL).post('/auth/login').send({
       email: 'admin@admin.com',
       password: 'Senha@123',
     });
@@ -158,25 +158,4 @@ describe('School - integração de endpoints', () => {
     expect(response.body).toHaveProperty('error', true);
   });
 
-  test.skip('deve deletar school e retornar 404 ao tentar deletar novamente', async () => {
-    const tempPayload = createSchoolPayload();
-    const createRes = await request(BASE_URL)
-      .post('/schools')
-      .set('Authorization', `Bearer ${token}`)
-      .send(tempPayload);
-
-    const tempSchoolId = createRes.body.data._id;
-    const response = await request(BASE_URL)
-      .delete(`/schools/${tempSchoolId}`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('error', false);
-    const notFoundResponse = await request(BASE_URL)
-      .delete(`/schools/${tempSchoolId}`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(notFoundResponse.status).toBe(404);
-    expect(notFoundResponse.body).toHaveProperty('error', true);
-  });
 });

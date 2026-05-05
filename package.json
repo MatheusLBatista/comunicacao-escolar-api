@@ -11,7 +11,7 @@
     "seed": "clear && node src/seeds/seeds.js",
     "start": "clear && node server.js",
     "start:production": "docker compose -f docker-compose.yml up --build --force-recreate",
-    "test": "clear && jest --coverage",
+    "test": "clear && jest --coverage --runInBand",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
