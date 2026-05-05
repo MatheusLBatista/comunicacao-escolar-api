@@ -4,7 +4,7 @@ Plataforma backend para centralizar e modernizar a comunicação entre institui�
 
 ## Tecnologias
 
-<img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" /> <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" /> <img alt="Express" src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" /> <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" /> <img alt="Socket.IO" src="https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socketdotio&logoColor=white" /> <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" /> <img alt="MinIO" src="https://img.shields.io/badge/MinIO-C72E49?style=for-the-badge&logo=minio&logoColor=white" /> <img alt="JWT" src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" /> <img alt="Zod" src="https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white" /> <img alt="Jest" src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" /> <img alt="Swagger" src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" />
+<img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" /> <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" /> <img alt="Express" src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" /> <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" /> <img alt="Socket.IO" src="https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socketdotio&logoColor=white" /> <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" /> <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" /> <img alt="MinIO" src="https://img.shields.io/badge/MinIO-C72E49?style=for-the-badge&logo=minio&logoColor=white" /> <img alt="JWT" src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" /> <img alt="Zod" src="https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white" /> <img alt="Jest" src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" /> <img alt="Swagger" src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" />
 
 ## Features
 
@@ -16,10 +16,11 @@ Plataforma backend para centralizar e modernizar a comunicação entre institui�
 - **Chat em tempo real** via Socket.IO - mensagens privadas entre professores e responsáveis.
 - **Agenda escolar** - cadastro e visualização de eventos por escola ou turma.
 - **Controle de saída** - cadastro de autorizados para retirada de alunos com registro de log.
+- **Grupos e rotas** - gestão de grupos de alunos e itinerários de transporte escolar.
 - **Armazenamento de arquivos** com MinIO (imagens de perfil, anexos).
-- **Notificações push** em tempo real para novos comunicados, mensagens e avisos urgentes.
+- **Notificações push** via Firebase Cloud Messaging para novos comunicados, mensagens e avisos urgentes.
 - **Auditoria** - logs detalhados de todas as operações com Winston.
-- **Documentação interativa** da API via Swagger UI em `/api-docs`.
+- **Documentação interativa** da API via Swagger UI em `/docs`.
 
 ## Pré-requisitos
 
@@ -47,15 +48,35 @@ Edite o arquivo `.env` com os valores adequados ao seu ambiente. As principais v
 | Variável | Descrição | Exemplo |
 | :--- | :--- | :--- |
 | `PORT` | Porta do servidor | `3010` |
+| `FRONTEND_PORT` | Porta do frontend (usada no Docker Compose) | `3001` |
 | `NODE_ENV` | Ambiente (`development` / `production`) | `development` |
+| `DEBUGLOG` | Ativa logs detalhados de rotas (`true`/`false`) | `true` |
 | `DB_URL` | URL de conexão com o MongoDB | `mongodb://localhost:27017/comunicacao-escolar` |
+| `DB_URL_TEST` | URL do banco de dados de testes | `mongodb://localhost:27017/comunicacao-escolar-test` |
 | `JWT_SECRET_ACCESS_TOKEN` | Chave secreta do access token | *(gere uma chave segura)* |
 | `JWT_SECRET_REFRESH_TOKEN` | Chave secreta do refresh token | *(gere uma chave segura)* |
+| `JWT_SECRET_PASSWORD_RECOVERY` | Chave secreta para recuperação de senha | *(gere uma chave segura)* |
+| `JWT_SECRET_INVITE` | Chave secreta para convite de usuários | *(gere uma chave segura)* |
+| `JWT_ACCESS_TOKEN_EXPIRATION` | Tempo de expiração do access token | `1d` |
+| `JWT_REFRESH_TOKEN_EXPIRATION` | Tempo de expiração do refresh token | `7d` |
 | `EMAIL_USER` | E-mail Gmail para envio de notificações | `seu@gmail.com` |
 | `EMAIL_APP_PASSWORD` | Senha de app do Gmail | *(gerada nas configurações do Google)* |
+| `COMPANY_NAME` | Nome da instituição (aparece nos e-mails) | `Comunicação Escolar` |
+| `FRONTEND_URL` | URL do frontend (para links em e-mails) | `http://localhost:3000` |
 | `MINIO_ENDPOINT` | Endpoint do MinIO | `localhost` |
+| `MINIO_PORT` | Porta da API do MinIO | `9000` |
+| `MINIO_CONSOLE_PORT` | Porta do console web do MinIO | `9001` |
 | `MINIO_ACCESS_KEY` | Chave de acesso do MinIO | `minioadmin` |
 | `MINIO_SECRET_KEY` | Chave secreta do MinIO | `minioadmin` |
+| `MINIO_BUCKET` | Nome do bucket de usuários | `usuarios` |
+| `MINIO_BUCKET_2` | Nome do bucket de itens/anexos | `itens` |
+| `MINIO_PUBLIC_URL` | URL pública de acesso ao MinIO | `http://localhost:9000` |
+| `ADMIN_NAME` | Nome do admin criado pelas seeds | `Administrador` |
+| `ADMIN_EMAIL` | E-mail do admin criado pelas seeds | `admin@admin.com` |
+| `ADMIN_PASSWORD` | Senha do admin criado pelas seeds | `Senha@123` |
+| `FIREBASE_PROJECT_ID` | ID do projeto Firebase (push notifications) | *(do console Firebase)* |
+| `FIREBASE_CLIENT_EMAIL` | E-mail da conta de serviço Firebase | *(do console Firebase)* |
+| `FIREBASE_PRIVATE_KEY` | Chave privada da conta de serviço Firebase | *(do console Firebase)* |
 
 **3. Suba a infraestrutura (MongoDB + MinIO)**
 
@@ -83,6 +104,18 @@ npm run seed
 npm run dev
 ```
 
+**Modo desenvolvimento com Docker** (hot-reload + infraestrutura em container):
+
+```bash
+npm run dev:docker
+```
+
+**Modo produção** (sem Docker):
+
+```bash
+npm run start
+```
+
 **Modo produção** (com Docker):
 
 ```bash
@@ -90,7 +123,7 @@ npm run start:production
 ```
 
 O servidor ficará disponível em `http://localhost:{PORT}`.
-A documentação Swagger estará disponível em `http://localhost:{PORT}/api-docs`.
+A documentação Swagger estará disponível em `http://localhost:{PORT}/docs`.
 
 ## Testes
 
@@ -103,6 +136,12 @@ npm run lint
 
 # Corrigir lint e formatar o código
 npm run fix
+
+# Apenas formatar o código com Prettier
+npm run format
+
+# Verificar se o código está formatado corretamente
+npm run format:check
 ```
 
 Os testes utilizam o `mongodb-memory-server`, portanto não é necessário um banco em execução para rodá-los.
@@ -111,10 +150,12 @@ Os testes utilizam o `mongodb-memory-server`, portanto não é necessário um ba
 
 ```
 src/
-├── config/          # Configurações (MinIO, Multer, Sharp)
+├── config/          # Configurações (MinIO, Multer, Sharp, Firebase, Socket.IO)
 ├── controllers/     # Controladores das rotas
+├── docs/            # Configuração do Swagger (paths, schemas, cabeçalho)
 ├── middlewares/     # Autenticação, autorização e validação
 ├── models/          # Schemas Mongoose
+├── modules/         # Módulos independentes (ex.: usuário)
 ├── repositories/    # Camada de acesso a dados
 ├── routes/          # Definição das rotas Express
 ├── seeds/           # Dados iniciais para desenvolvimento
