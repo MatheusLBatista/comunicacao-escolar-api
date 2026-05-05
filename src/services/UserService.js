@@ -198,19 +198,103 @@ class UserService {
     return atualizado;
   }
 
+  _stripSensitiveFields(userObj) {
+    const obj = typeof userObj.toObject === 'function' ? userObj.toObject() : { ...userObj };
+    delete obj.fcm_tokens;
+    delete obj.permissions;
+    delete obj.groups;
+    return obj;
+  }
+
+  async updateMembershipRole(schoolId, userId, newRole) {
+    const usuario = await this.repository.getById(userId);
+
+    const membership = Array.isArray(usuario.memberships)
+      ? usuario.memberships.find(
+          (m) => m.school_id?.toString() === schoolId,
+        )
+      : null;
+
+    if (!membership) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'membership',
+        details: [],
+        customMessage: 'O usuário não possui vínculo com esta escola.',
+      });
+    }
+
+    if (membership.role === 'admin') {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'role',
+        details: [{ path: 'role', message: 'O role de admin não pode ser alterado.' }],
+        customMessage: 'Não é permitido alterar o role de um administrador.',
+      });
+    }
+
+    if (newRole === 'admin') {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'role',
+        details: [{ path: 'role', message: 'Não é possível promover um usuário para admin.' }],
+        customMessage: 'O role admin não pode ser atribuído por este endpoint.',
+      });
+    }
+
+    membership.role = newRole;
+
+    if (newRole !== 'parent') {
+      membership.associated_students = [];
+    }
+    if (newRole !== 'student') {
+      membership.class_id = null;
+    }
+
+    const atualizado = await this.repository.update(userId, {
+      memberships: usuario.memberships,
+    });
+
+    return this._stripSensitiveFields(atualizado);
+  }
+
   async listBySchool(schoolId, query) {
     const data = await this.repository.listBySchool(schoolId, query);
+    if (Array.isArray(data?.docs)) {
+      data.docs = data.docs.map((doc) => this._stripSensitiveFields(doc));
+    }
     return data;
   }
 
-  async getById(id) {
+  async getById(id, requesterId = null) {
     const user = await this.repository.getById(id);
-    return user;
+
+    if (requesterId && requesterId.toString() !== id.toString()) {
+      const requester = await this.repository.getById(requesterId);
+      const requesterSchoolIds = new Set(
+        (requester?.memberships || []).map((m) => m?.school_id?.toString()),
+      );
+
+      const userObj = this._stripSensitiveFields(user);
+      userObj.memberships = (userObj.memberships || []).filter((m) =>
+        requesterSchoolIds.has(m?.school_id?.toString()),
+      );
+
+      return userObj;
+    }
+
+    return this._stripSensitiveFields(user);
   }
 
   async update(id, parsedData) {
     delete parsedData.password;
     delete parsedData.email;
+    delete parsedData.memberships;
+    delete parsedData.groups;
+    delete parsedData.permissions;
 
     await this.ensureUserExists(id);
 

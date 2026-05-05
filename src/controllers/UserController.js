@@ -9,6 +9,7 @@ import {
   UserUpdateSchema,
   LinkToSchoolSchema,
   StudentInputSchema,
+  UpdateMembershipRoleSchema,
 } from '../utils/validators/schemas/zod/UserSchema.js';
 import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 import { CommonResponse } from '../utils/helpers/index.js';
@@ -72,6 +73,16 @@ class UserController {
     return CommonResponse.created(res, userLimpo);
   }
 
+  async updateMembershipRole(req, res) {
+    const { schoolId, userId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    ObjectIdSchema.parse(userId);
+
+    const { role } = UpdateMembershipRoleSchema.parse(req.body);
+    const data = await this.service.updateMembershipRole(schoolId, userId, role);
+    return CommonResponse.success(res, data);
+  }
+
   async listBySchool(req, res) {
     const { schoolId } = req.params;
     ObjectIdSchema.parse(schoolId);
@@ -89,7 +100,7 @@ class UserController {
     const { id } = req.params;
     UserIdSchema.parse(id);
 
-    const data = await this.service.getById(id);
+    const data = await this.service.getById(id, req.user_id);
     return CommonResponse.success(res, data);
   }
 

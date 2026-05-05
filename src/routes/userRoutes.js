@@ -21,6 +21,12 @@ router
     AuthPermission,
     asyncWrapper(userController.linkToSchool.bind(userController)),
   )
+  .patch(
+    '/schools/:schoolId/members/:userId',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.updateMembershipRole.bind(userController)),
+  )
   .post(
     '/schools/:schoolId/members/:userId/students',
     AuthMiddleware,
