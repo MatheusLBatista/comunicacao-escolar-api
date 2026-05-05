@@ -74,6 +74,7 @@ const UserUpdateSchema = z
       .max(100, 'O nome deve ter no máximo 100 caracteres.')
       .optional(),
     active: z.boolean().optional(),
+    memberships: z.array(MembershipSchema).optional(),
   })
   .partial();
 
