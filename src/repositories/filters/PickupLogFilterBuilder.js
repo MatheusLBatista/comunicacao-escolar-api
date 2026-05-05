@@ -19,6 +19,23 @@ class PickupLogFilterBuilder {
     return this;
   }
 
+  withStudentIds(studentIds) {
+    if (Array.isArray(studentIds)) {
+      if (studentIds.length === 0) {
+        this.filters.student_id = { $in: [] };
+      } else if (!this.filters.student_id) {
+        this.filters.student_id = { $in: studentIds };
+      } else {
+        const requested = this.filters.student_id.toString();
+        this.filters.student_id = studentIds.includes(requested)
+          ? requested
+          : { $in: [] };
+      }
+    }
+
+    return this;
+  }
+
   withAuthorizationId(authorization_id) {
     if (authorization_id) {
       this.filters.authorization_id = authorization_id;
