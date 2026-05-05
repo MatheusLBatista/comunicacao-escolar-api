@@ -1,6 +1,7 @@
 import EventRepository from '../repositories/EventRepository.js';
 import SchoolRepository from '../repositories/SchoolRepository.js';
 import ClassRepository from '../repositories/ClassRepository.js';
+import UserRepository from '../repositories/UserRepository.js';
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class EventService {
@@ -8,10 +9,51 @@ class EventService {
     this.repository = new EventRepository();
     this.schoolRepository = new SchoolRepository();
     this.classRepository = new ClassRepository();
+    this.userRepository = new UserRepository();
+  }
+
+  async resolveSchoolScope(req) {
+    const userId = req?.user_id || req?.user?.id;
+    if (!userId) return {};
+
+    const user = await this.userRepository.getById(userId);
+    const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
+
+    const schoolIds = [
+      ...new Set(
+        memberships.map((m) => m?.school_id?.toString()).filter(Boolean),
+      ),
+    ];
+
+    if (!schoolIds.length) return {};
+
+    return { schoolIds };
+  }
+
+  async _assertSchoolMembership(userId, schoolId) {
+    if (!userId || !schoolId) return;
+
+    const user = await this.userRepository.getById(userId);
+    const belongs = (user.memberships || []).some(
+      (m) => m?.school_id?.toString() === schoolId?.toString(),
+    );
+
+    if (!belongs) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'school_id',
+        details: [],
+        customMessage: 'Você não tem permissão para realizar esta operação nesta escola.',
+      });
+    }
   }
 
   async create(parsedData, rawBody = {}) {
     await this.schoolRepository.findById(parsedData.school_id);
+
+    await this._assertSchoolMembership(parsedData.created_by, parsedData.school_id);
+
     await this.validateTarget(parsedData.target, parsedData.school_id);
     parsedData.target = this.normalizeTarget(parsedData.target);
     this.validateMeeting(parsedData, rawBody);
@@ -19,11 +61,14 @@ class EventService {
   }
 
   async list(req) {
-    return this.repository.list(req);
+    const accessScope = await this.resolveSchoolScope(req);
+    return this.repository.list(req, accessScope);
   }
 
-  async update(id, parsedData, rawBody = {}) {
+  async update(id, parsedData, rawBody = {}, userId = null) {
     const existingEvent = await this.repository.getById(id);
+
+    await this._assertSchoolMembership(userId, existingEvent.school_id);
 
     if (parsedData.school_id) {
       await this.schoolRepository.findById(parsedData.school_id);
