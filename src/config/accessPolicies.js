@@ -186,6 +186,16 @@ const userPolicies = [
 
 const auditLogPolicies = [
   {
+    pattern: /^\/schools\/([^/]+)\/audit-logs(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'school',
+        roles: ['admin'],
+        schoolParam: 'id',
+      },
+    },
+  },
+  {
     pattern: /^\/schools(?:\/[^/]+)?(?:\/|$)/,
     methods: {
       GET: {
@@ -203,16 +213,6 @@ const auditLogPolicies = [
       DELETE: {
         scope: 'global',
         roles: ['admin'],
-      },
-    },
-  },
-  {
-    pattern: /^\/schools\/([^/]+)\/audit-logs(?:\/|$)/,
-    methods: {
-      GET: {
-        scope: 'school',
-        roles: ['admin'],
-        schoolParam: 'id',
       },
     },
   },
@@ -323,15 +323,6 @@ const resourcePolicies = [
     },
   },
   {
-    pattern: /^\/conversations(?:\/|$)/,
-    methods: {
-      GET: {
-        scope: 'global',
-        roles: ['admin', 'teacher', 'parent'],
-      },
-    },
-  },
-  {
     pattern: /^\/conversations\/[^/]+\/messages(?:\/|$)/,
     methods: {
       GET: {
@@ -343,6 +334,15 @@ const resourcePolicies = [
         roles: ['admin', 'teacher', 'parent'],
       },
       PATCH: {
+        scope: 'global',
+        roles: ['admin', 'teacher', 'parent'],
+      },
+    },
+  },
+  {
+    pattern: /^\/conversations(?:\/|$)/,
+    methods: {
+      GET: {
         scope: 'global',
         roles: ['admin', 'teacher', 'parent'],
       },
