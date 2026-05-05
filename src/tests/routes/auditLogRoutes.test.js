@@ -14,7 +14,7 @@ const expectSuccessEnvelope = (response) => {
 
 async function loginAs(email, password) {
   const response = await request(BASE_URL)
-    .post('/login')
+    .post('/auth/login')
     .send({ email, password });
 
   expect(response.status).toBe(200);

@@ -3,6 +3,7 @@ import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import AuthPermission from '../middlewares/AuthPermission.js';
 import DailyLogController from '../controllers/DailyLogController.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
+import upload from '../config/MulterConfig.js';
 
 const router = express.Router();
 
@@ -50,6 +51,13 @@ router
     AuthMiddleware,
     AuthPermission,
     asyncWrapper(dailyLogController.delete.bind(dailyLogController)),
+  )
+  .post(
+    '/daily-logs/:id/attachments',
+    AuthMiddleware,
+    AuthPermission,
+    upload.array('files', 10),
+    asyncWrapper(dailyLogController.uploadAttachments.bind(dailyLogController)),
   );
 
 export default router;

@@ -195,6 +195,42 @@ class UserRepository {
     return user;
   }
 
+  async getByIdWithPassword(id) {
+    const user = await this.model.findById(id).select('+password');
+
+    if (!user) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'User',
+        details: [],
+        customMessage: messages.error.resourceNotFound('User'),
+      });
+    }
+
+    return user;
+  }
+
+  async addFcmToken(userId, fcmToken) {
+    const user = await this.model.findByIdAndUpdate(
+      userId,
+      { $addToSet: { fcm_tokens: fcmToken } },
+      { new: true },
+    );
+
+    if (!user) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'User',
+        details: [],
+        customMessage: messages.error.resourceNotFound('User'),
+      });
+    }
+
+    return user;
+  }
+
   async listByClass(class_id) {
     const students = await this.model.find({
       memberships: {

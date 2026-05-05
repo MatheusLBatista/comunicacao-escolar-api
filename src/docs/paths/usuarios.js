@@ -9,10 +9,10 @@ const usuariosRoutes = {
       summary: 'Cria um novo usuário admin global',
       description: `
             + Caso de uso: Criação de novo usuário admin sem vínculo inicial com escola.
-            
+
             + Regras de Negócio:
-                - Validação de campos obrigatórios (nome, email, password).  
-                - Verificação de unicidade para email.  
+                - Validação de campos obrigatórios (nome, email, password).
+                - Verificação de unicidade para email.
                 - Campo password é removido da resposta por segurança.
 
             + Resultado Esperado:
@@ -59,7 +59,7 @@ const usuariosRoutes = {
       summary: 'Criar novo usuário diretamente na escola',
       description: `
         + Caso de uso: Criar um usuário e já vinculá-lo a uma escola com uma role específica.
-        
+
         + Regras de Negócio:
             - Se o email já existir globalmente e não estiver na escola, anexa o membership.
             - Se já estiver na escola, retorna 409 Conflict.
@@ -94,7 +94,7 @@ const usuariosRoutes = {
       summary: 'Vincular usuário existente à escola',
       description: `
         + Caso de uso: Vincular um usuário já cadastrado a uma nova escola.
-        
+
         + Fluxo Especial (Cascading):
             - Se a role for 'parent', o sistema exige dados de um 'student' no payload.
             - Cria automaticamente o aluno e o vincula ao pai nesta escola.
@@ -125,6 +125,36 @@ const usuariosRoutes = {
         }
       },
       responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 409: commonResponses[409](), 404: commonResponses[404]() }
+    }
+  },
+  '/schools/{schoolId}/members/{userId}': {
+    patch: {
+      tags: ['Usuários'],
+      summary: 'Atualizar papel (role) do membro na escola',
+      description: `
+        + Caso de uso: Alterar a role de um usuário já vinculado à escola.
+        + Regras: O usuário deve ser membro da escola. A nova role deve ser válida.
+      `,
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' } },
+        { name: 'userId', in: 'path', required: true, schema: { type: 'string' } }
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['role'],
+              properties: {
+                role: { type: 'string', enum: ['admin', 'teacher', 'parent', 'student'] }
+              }
+            }
+          }
+        }
+      },
+      responses: { 200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404](), 409: commonResponses[409]() }
     }
   },
   '/schools/{schoolId}/members/{userId}/students': {
@@ -196,34 +226,6 @@ const usuariosRoutes = {
         },
         404: commonResponses[404]()
       },
-    },
-  },
-  '/users/{id}/foto': {
-    put: {
-      tags: ['Usuários'],
-      summary: 'Faz upload da foto do usuário',
-      security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
-      requestBody: {
-        required: true,
-        content: {
-          'multipart/form-data': {
-            schema: {
-              type: 'object',
-              required: ['file'],
-              properties: { file: { type: 'string', format: 'binary' } }
-            }
-          }
-        }
-      },
-      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioUploadFotoResposta') },
-    },
-    delete: {
-      tags: ['Usuários'],
-      summary: 'Deleta a foto do usuário',
-      security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
-      responses: { 200: commonResponses[200]() },
     },
   },
 };

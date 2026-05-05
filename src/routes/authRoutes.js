@@ -1,5 +1,6 @@
 import express from 'express';
 import AuthController from '../controllers/AuthController.js';
+import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
 
 const router = express.Router();
@@ -14,13 +15,18 @@ router
     '/recover',
     asyncWrapper(authController.recoverPassword.bind(authController)),
   )
-  .post(
-    '/redefinir-senha',
+  .patch(
+    '/password/reset',
     asyncWrapper(authController.updatePasswordByToken.bind(authController)),
   )
   .post('/logout', asyncWrapper(authController.logout.bind(authController)))
   .post('/revoke', asyncWrapper(authController.revoke.bind(authController)))
   .post('/refresh', asyncWrapper(authController.refresh.bind(authController)))
-  .post('/introspect', asyncWrapper(authController.pass.bind(authController)));
+  .post('/introspect', asyncWrapper(authController.pass.bind(authController)))
+  .post(
+    '/fcm-token',
+    AuthMiddleware,
+    asyncWrapper(authController.registerFcmToken.bind(authController)),
+  );
 
 export default router;

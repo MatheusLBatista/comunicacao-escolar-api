@@ -4,6 +4,7 @@ import swaggerUI from 'swagger-ui-express';
 import getSwaggerOptions from '../docs/config/head.js';
 import logRoutes from '../middlewares/LogRoutesMiddleware.js';
 import auth from './authRoutes.js';
+import me from './meRoutes.js';
 import like from './likeRoutes.js';
 import users from './userRoutes.js';
 import grupos from './groupRoutes.js';
@@ -55,9 +56,12 @@ const routes = (app) => {
     res.redirect('/docs');
   });
 
+  app.use(express.json());
+
+  app.use('/auth', auth);
+
   app.use(
-    express.json(),
-    auth,
+    me,
     users,
     grupos,
     rotas,

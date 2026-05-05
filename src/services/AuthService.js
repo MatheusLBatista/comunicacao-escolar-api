@@ -542,6 +542,11 @@ class AuthService {
 
     return { user: userComTokens };
   }
+
+  async registerFcmToken(userId, fcmToken) {
+    await this.repository.addFcmToken(userId, fcmToken);
+    return { message: 'Token FCM registrado com sucesso.' };
+  }
 }
 
 export default AuthService;

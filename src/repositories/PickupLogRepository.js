@@ -29,8 +29,11 @@ class PickupLogRepository {
     return data;
   }
 
-  async list(req) {
+  async list(req, accessScope = {}) {
     const id = req?.params?.id;
+    const scopedStudentIds = Array.isArray(accessScope?.studentIds)
+      ? accessScope.studentIds
+      : null;
     const populate = [
       'school_id',
       { path: 'student_id', select: '_id full_name email' },
@@ -44,7 +47,12 @@ class PickupLogRepository {
     ];
 
     if (id) {
-      const data = await this.model.findById(id).populate(populate);
+      const findByIdFilter = { _id: id };
+      if (scopedStudentIds) {
+        findByIdFilter.student_id = { $in: scopedStudentIds };
+      }
+
+      const data = await this.model.findOne(findByIdFilter).populate(populate);
 
       if (!data) {
         throw new CustomError({
@@ -78,6 +86,7 @@ class PickupLogRepository {
     const filterBuilder = new PickupLogFilterBuilder()
       .withSchoolId(school_id || '')
       .withStudentId(student_id || '')
+      .withStudentIds(scopedStudentIds)
       .withAuthorizationId(authorization_id || '')
       .withVerifiedBy(verified_by || '')
       .withMethod(method || '')

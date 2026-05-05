@@ -198,6 +198,35 @@ class DailyLogRepository {
 
     return data;
   }
+
+  async addAttachment(id, objectName) {
+    const data = await this.model.findByIdAndUpdate(
+      id,
+      { $push: { attachments: objectName } },
+      { new: true },
+    );
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'DailyLog',
+        details: [],
+        customMessage: messages.error.resourceNotFound('DailyLog'),
+      });
+    }
+
+    return data;
+  }
+
+  async removeAttachment(id, objectName) {
+    const data = await this.model.findByIdAndUpdate(
+      id,
+      { $pull: { attachments: objectName } },
+      { new: true },
+    );
+    return data;
+  }
 }
 
 export default DailyLogRepository;

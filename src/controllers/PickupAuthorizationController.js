@@ -13,7 +13,7 @@ class PickupAuthorizationController {
 
   async create(req, res) {
     const parsedData = PickupAuthorizationSchema.parse(req.body);
-    const data = await this.service.create(parsedData);
+    const data = await this.service.create(parsedData, req);
 
     return CommonResponse.created(res, data);
   }

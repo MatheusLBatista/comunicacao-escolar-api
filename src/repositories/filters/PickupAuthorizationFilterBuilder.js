@@ -19,6 +19,23 @@ class PickupAuthorizationFilterBuilder {
     return this;
   }
 
+  withStudentIds(studentIds) {
+    if (Array.isArray(studentIds)) {
+      if (studentIds.length === 0) {
+        this.filters.student_id = { $in: [] };
+      } else if (!this.filters.student_id) {
+        this.filters.student_id = { $in: studentIds };
+      } else {
+        const requested = this.filters.student_id.toString();
+        this.filters.student_id = studentIds.includes(requested)
+          ? requested
+          : { $in: [] };
+      }
+    }
+
+    return this;
+  }
+
   withAuthorizedBy(authorized_by) {
     if (authorized_by) {
       this.filters.authorized_by = authorized_by;

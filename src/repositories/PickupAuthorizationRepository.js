@@ -63,12 +63,21 @@ class PickupAuthorizationRepository {
     return data;
   }
 
-  async list(req) {
+  async list(req, accessScope = {}) {
     const id = req?.params?.id;
+    const scopedStudentIds = Array.isArray(accessScope?.studentIds)
+      ? accessScope.studentIds
+      : null;
 
     if (id) {
+      const findByIdFilter = { _id: id };
+
+      if (scopedStudentIds) {
+        findByIdFilter.student_id = { $in: scopedStudentIds };
+      }
+
       const data = await this.model
-        .findById(id)
+        .findOne(findByIdFilter)
         .populate('school_id')
         .populate({ path: 'student_id', select: '_id full_name email' })
         .populate({ path: 'authorized_by', select: '_id full_name email' });
@@ -101,6 +110,7 @@ class PickupAuthorizationRepository {
     const filterBuilder = new PickupAuthorizationFilterBuilder()
       .withSchoolId(school_id || '')
       .withStudentId(student_id || '')
+      .withStudentIds(scopedStudentIds)
       .withAuthorizedBy(authorized_by || '')
       .withUsed(used)
       .withActive(active);

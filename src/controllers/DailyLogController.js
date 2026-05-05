@@ -78,6 +78,14 @@ class DailyLogController {
       'Daily log marked as read.',
     );
   }
+
+  async uploadAttachments(req, res) {
+    const { id } = req.params;
+    DailyLogIdSchema.parse(id);
+
+    const data = await this.service.uploadAttachments(id, req);
+    return CommonResponse.success(res, data);
+  }
 }
 
 export default DailyLogController;

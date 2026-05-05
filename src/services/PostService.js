@@ -22,6 +22,27 @@ class PostService {
   async list(req) {
     const data = await this.repository.list(req);
 
+    if (req?.params?.id && data?.school_id) {
+      const userId = req?.user_id || req?.user?.id;
+      if (userId) {
+        const user = await this.userRepository.getById(userId);
+        const belongsToSchool = Array.isArray(user?.memberships) &&
+          user.memberships.some(
+            (m) => m?.school_id?.toString() === data.school_id.toString(),
+          );
+
+        if (!belongsToSchool) {
+          throw new CustomError({
+            statusCode: HttpStatusCodes.FORBIDDEN.code,
+            errorType: 'forbidden',
+            field: 'post',
+            details: [],
+            customMessage: 'Você não tem acesso a este anúncio.',
+          });
+        }
+      }
+    }
+
     return data;
 
   }

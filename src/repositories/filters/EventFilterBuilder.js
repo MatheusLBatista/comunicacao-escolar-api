@@ -3,6 +3,24 @@ class EventFilterBuilder {
     this.filters = {};
   }
 
+  withSchoolId(school_id) {
+    if (school_id) {
+      this.filters.school_id = school_id;
+    }
+
+    return this;
+  }
+
+  withSchoolIds(schoolIds) {
+    if (Array.isArray(schoolIds) && schoolIds.length > 0) {
+      this.filters.school_id = { $in: schoolIds };
+    } else if (Array.isArray(schoolIds) && schoolIds.length === 0) {
+      this.filters.school_id = { $in: [] };
+    }
+
+    return this;
+  }
+
   withType(type) {
     if (type) {
       this.filters.type = type;

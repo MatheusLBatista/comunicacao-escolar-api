@@ -10,6 +10,7 @@ import { LoginSchema } from '../utils/validators/schemas/zod/LoginSchema.js';
 import {
   UserUpdateSchema,
   RegisterSchema,
+  FcmTokenSchema,
 } from '../utils/validators/schemas/zod/UserSchema.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { RequestAuthorizationSchema } from '../utils/validators/schemas/zod/querys/RequestAuthorizationSchema.js';
@@ -17,37 +18,23 @@ import { EmailSchema } from '../utils/validators/schemas/zod/EmailSchema.js';
 
 import AuthService from '../services/AuthService.js';
 
-/**
- * Validação nesta aplicação segue o segue este artigo:
- * https://docs.google.com/document/d/1m2Ns1rIxpUzG5kRsgkbaQFdm7od0e7HSHfaSrrwegmM/edit?usp=sharing
- */
 class AuthController {
   constructor() {
     this.service = new AuthService();
   }
-  /**
-   * Método para fazer o login do usuário
-   */
   login = async (req, res) => {
-    // 1º validação estrutural - validar os campos passados por body
     const body = req.body || {};
     const validatedBody = LoginSchema.parse(body);
     const data = await this.service.login(validatedBody);
     return CommonResponse.success(res, data);
   };
 
-  /**
-   * Auto-cadastro: responsável ou professor cria sua própria conta
-   */
   register = async (req, res) => {
     const parsedData = RegisterSchema.parse(req.body);
     const data = await this.service.register(parsedData);
     return CommonResponse.created(res, data);
   };
 
-  /**
-   * Login via Google (token-based): recebe id_token do frontend
-   */
   googleAuth = async (req, res) => {
     const { id_token } = req.body;
     if (!id_token) {
@@ -63,9 +50,6 @@ class AuthController {
     return CommonResponse.success(res, data);
   };
 
-  /**
-   *  Metodo para recuperar a senha do usuário
-   */
   recoverPassword = async (req, res) => {
     // Validar apenas o email
     const validatedBody = EmailSchema.parse(req.body);
@@ -73,22 +57,10 @@ class AuthController {
     return CommonResponse.success(res, data);
   };
 
-  /**
-   * Atualiza a senha do próprio usuário em dois cenários NÃO autenticados:
-   *
-   * 1) Normal (token único passado na URL como query: `?token=<JWT_PASSWORD_RECOVERY>`)
-   *    + { senha } no body.
-   *    → Decodifica JWT, extrai usuarioId, salva o hash da nova senha mesmo que usuário esteja inativo.
-   *
-   * 2) Recuperação por código (envia `{ codigo_recupera_senha, senha }` no body).
-   *    → Busca usuário pelo campo `codigo_recupera_senha`, salva hash da nova senha (mesmo se inativo),
-   *      e “zera” o campo `codigo_recupera_senha`.
-   */
   async updatePasswordByToken(req, res, next) {
-    const tokenRecuperacao = req.query.token || req.params.token || null; // token de recuperação passado na URL
-    const password = req.body.password || null; // nova senha passada no body
+    const tokenRecuperacao = req.query.token || req.params.token || null;
+    const password = req.body.password || null;
 
-    // 1) Verifica se veio o token de recuperação
     if (!tokenRecuperacao) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
@@ -100,10 +72,8 @@ class AuthController {
       });
     }
 
-    // Validar a senha com o schema
     const passwordSchema = UserUpdateSchema.parse({ password: password });
 
-    // atualiza a senha
     await this.service.updatePasswordByToken(tokenRecuperacao, passwordSchema);
 
     return CommonResponse.success(
@@ -116,13 +86,9 @@ class AuthController {
   }
 
   async updatePasswordByCode(req, res, next) {
-    const password_recovery_code = req.body.password_recovery_code || null; // código de recuperação passado no body
-    const password = req.body.password || null; // new password passed in body
+    const password_recovery_code = req.body.password_recovery_code || null;
+    const password = req.body.password || null;
 
-    console.log('password_recovery_code:', password_recovery_code);
-    console.log('password:', password);
-
-    // 1) Verifica se veio o código de recuperação
     if (!password_recovery_code) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
@@ -134,10 +100,8 @@ class AuthController {
       });
     }
 
-    // Validar a senha com o schema
     const passwordSchema = UserUpdateSchema.parse({ password });
 
-    // atualiza a senha
     await this.service.updatePasswordByCode(
       password_recovery_code,
       passwordSchema,
@@ -152,29 +116,18 @@ class AuthController {
     );
   }
 
-  /**
-   * Método para fazer o refresh do token
-   */
   revoke = async (req, res) => {
-    // Extrai ID do usuario a ter o token revogado do body
     const id = req.body.id;
-    // remove o token do banco de dados e retorna uma resposta de sucesso
     const data = await this.service.revoke(id);
     return CommonResponse.success(res, null, 200, data.message);
   };
 
-  /**
-   * Método para fazer o refresh do token
-   */
   refresh = async (req, res) => {
-    // Fallback seguro: tenta pegar do body, senão do header Authorization
     const token =
       (req.body && req.body.refresh_token) ||
       req.headers.authorization?.split(' ')[1];
 
-    // Verifica se o token está presente e não é uma string inválida
     if (!token || token === 'null' || token === 'undefined') {
-      console.log('Refresh token ausente ou inválido:', token);
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'invalidRefresh',
@@ -217,18 +170,12 @@ class AuthController {
     return CommonResponse.success(res, data);
   };
 
-  /**
-   * Método para fazer o logout do usuário
-   */
   logout = async (req, res) => {
-    // Garante que req.body existe e faz fallback seguro
     const token =
       (req.body && req.body.access_token) ||
       req.headers.authorization?.split(' ')[1];
 
-    // Verifica se o token está presente e não é uma string inválida
     if (!token || token === 'null' || token === 'undefined') {
-      console.log('Token recebido:', token);
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'invalidLogout',
@@ -238,15 +185,12 @@ class AuthController {
       });
     }
 
-    // Verifica e decodifica o access token
     const decoded = await promisify(jwt.verify)(
       token,
       process.env.JWT_SECRET_ACCESS_TOKEN,
     );
 
-    // Verifica se o token decodificado contém o ID do usuário
     if (!decoded || !decoded.id) {
-      console.log('Token decodificado inválido:', decoded);
       throw new CustomError({
         statusCode: HttpStatusCodes.INVALID_TOKEN.code,
         errorType: 'notAuthorized',
@@ -255,66 +199,52 @@ class AuthController {
         customMessage: HttpStatusCodes.INVALID_TOKEN.message,
       });
     }
-    // Valida o ID do usuário
     UserIdSchema.parse(decoded.id);
 
-    // Encaminha o token para o serviço de logout
     const data = await this.service.logout(decoded.id, token);
 
-    // Retorna uma resposta de sucesso
     return CommonResponse.success(res, null, messages.success.logout);
   };
 
-  /**
-   * Método para validar o token
-   */
   pass = async (req, res) => {
-    // 1. Validação estrutural
     const bodyrequest = req.body || {};
     const validatedBody = RequestAuthorizationSchema.parse(bodyrequest);
 
-    // 2. Decodifica e verifica o JWT
-    const decoded =
-      /** @type {{ id: string, exp?: number, iat?: number, nbf?: number, client_id?: string, aud?: string }} */ (
-        await promisify(jwt.verify)(
-          validatedBody.access_token,
-          process.env.JWT_SECRET_ACCESS_TOKEN,
-        )
-      );
+    const decoded = await promisify(jwt.verify)(
+      validatedBody.access_token,
+      process.env.JWT_SECRET_ACCESS_TOKEN,
+    );
 
-    // 3. Valida ID de usuário
     UserIdSchema.parse(decoded.id);
 
-    // 4. Prepara campos de introspecção
     const now = Math.floor(Date.now() / 1000);
-    const exp = decoded.exp ?? null; // timestamp UNIX de expiração
-    const iat = decoded.iat ?? null; // timestamp UNIX de emissão
-    const nbf = decoded.nbf ?? iat; // não válido antes deste timestamp
+    const exp = decoded.exp ?? null;
+    const iat = decoded.iat ?? null;
+    const nbf = decoded.nbf ?? iat;
     const active = exp > now;
-
-    // tenta extrair o client_id do próprio token; cai em aud se necessário
     const clientId = decoded.client_id || decoded.id || decoded.aud || null;
 
-    /**
-     * 5. Prepara resposta de introspecção
-     */
     const introspection = {
-      active, // token ainda válido (não expirado)
-      client_id: clientId, // ID do cliente OAuth
-      token_type: 'Bearer', // conforme RFC 6749
-      exp, // timestamp UNIX de expiração
-      iat, // timestamp UNIX de emissão
-      nbf, // não válido antes deste timestamp
-      // …adicione aqui quaisquer campos de extensão necessários…
+      active,
+      client_id: clientId,
+      token_type: 'Bearer',
+      exp,
+      iat,
+      nbf,
     };
 
-    // 5. Retorna resposta no padrão CommonResponse
     return CommonResponse.success(
       res,
       introspection,
       HttpStatusCodes.OK.code,
       messages.authorized.default,
     );
+  };
+
+  registerFcmToken = async (req, res) => {
+    const { fcm_token } = FcmTokenSchema.parse(req.body);
+    const data = await this.service.registerFcmToken(req.user_id, fcm_token);
+    return CommonResponse.success(res, data);
   };
 }
 

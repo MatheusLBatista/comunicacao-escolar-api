@@ -20,7 +20,7 @@ const expectSuccessEnvelope = (response) => {
 };
 
 async function loginWithCredentials(email, password) {
-  const response = await request(BASE_URL).post('/login').send({
+  const response = await request(BASE_URL).post('/auth/login').send({
     email,
     password,
   });

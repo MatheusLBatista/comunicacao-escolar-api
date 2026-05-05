@@ -7,8 +7,11 @@ class EventRepository {
     this.model = EventModel;
   }
 
-  async list(req) {
+  async list(req, accessScope = {}) {
     const id = req?.params?.id;
+    const scopedSchoolIds = Array.isArray(accessScope?.schoolIds)
+      ? accessScope.schoolIds
+      : null;
     const populate = [
       { path: 'school_id', select: 'name tax_id active' },
       { path: 'created_by', select: 'full_name email active' },
@@ -25,6 +28,23 @@ class EventRepository {
           field: 'Event',
           details: [],
           customMessage: messages.error.resourceNotFound('Event'),
+        });
+      }
+
+      const schoolIdStr = data.school_id?._id
+        ? data.school_id._id.toString()
+        : data.school_id?.toString();
+
+      if (
+        scopedSchoolIds &&
+        !scopedSchoolIds.includes(schoolIdStr)
+      ) {
+        throw new CustomError({
+          statusCode: 403,
+          errorType: 'forbidden',
+          field: 'event',
+          details: [],
+          customMessage: 'Você não tem acesso a este evento.',
         });
       }
 
@@ -50,6 +70,10 @@ class EventRepository {
       .withScope(scope || '')
       .withTargetId(target_id || '')
       .withStartDateRange(start_date, end_date);
+
+    if (scopedSchoolIds) {
+      filterBuilder.withSchoolIds(scopedSchoolIds);
+    }
 
     const filters = filterBuilder.build();
 

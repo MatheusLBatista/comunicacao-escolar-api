@@ -11,7 +11,7 @@ const VALID_NONEXISTENT_ID = '000000000000000000000000';
 
 async function loginAs(email, password) {
   const response = await request(BASE_URL)
-    .post('/login')
+    .post('/auth/login')
     .send({ email, password });
   expect(response.status).toBe(200);
   const token = response.body?.data?.user?.access_token;

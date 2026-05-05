@@ -12,6 +12,42 @@ class PickupLogService {
     this.userRepository = new UserRepository();
   }
 
+  async resolveAccessScope(req) {
+    const userId = req?.user_id || req?.user?.id;
+
+    if (!userId) return {};
+
+    const user = await this.userRepository.getById(userId);
+    const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
+
+    const isAdminOrTeacher = memberships.some(
+      (m) => m?.role === 'admin' || m?.role === 'teacher',
+    );
+
+    if (isAdminOrTeacher) return {};
+
+    const schoolId = req?.query?.school_id?.toString();
+    const parentMemberships = memberships.filter((m) => {
+      if (m?.role !== 'parent') return false;
+      if (!schoolId) return true;
+      return m?.school_id?.toString() === schoolId;
+    });
+
+    if (!parentMemberships.length) return {};
+
+    const studentIds = [
+      ...new Set(
+        parentMemberships.flatMap((m) =>
+          Array.isArray(m?.associated_students)
+            ? m.associated_students.map((id) => id?.toString()).filter(Boolean)
+            : [],
+        ),
+      ),
+    ];
+
+    return { studentIds };
+  }
+
   async create(parsedData) {
     await this.validateReferences(parsedData);
     this.ensureQrCodeRequiresAuthorization(parsedData);
@@ -20,7 +56,8 @@ class PickupLogService {
   }
 
   async list(req) {
-    return this.repository.list(req);
+    const accessScope = await this.resolveAccessScope(req);
+    return this.repository.list(req, accessScope);
   }
 
   async update(id, parsedData) {

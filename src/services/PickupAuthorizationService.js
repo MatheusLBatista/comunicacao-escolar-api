@@ -10,8 +10,78 @@ class PickupAuthorizationService {
     this.userRepository = new UserRepository();
   }
 
-  async create(parsedData) {
+  async resolveAccessScope(req) {
+    const userId = req?.user_id || req?.user?.id;
+
+    if (!userId) return {};
+
+    const user = await this.userRepository.getById(userId);
+    const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
+
+    const isAdminOrTeacher = memberships.some(
+      (m) => m?.role === 'admin' || m?.role === 'teacher',
+    );
+
+    if (isAdminOrTeacher) return {};
+
+    const schoolId = req?.query?.school_id?.toString();
+    const parentMemberships = memberships.filter((m) => {
+      if (m?.role !== 'parent') return false;
+      if (!schoolId) return true;
+      return m?.school_id?.toString() === schoolId;
+    });
+
+    if (!parentMemberships.length) return {};
+
+    const studentIds = [
+      ...new Set(
+        parentMemberships.flatMap((m) =>
+          Array.isArray(m?.associated_students)
+            ? m.associated_students.map((id) => id?.toString()).filter(Boolean)
+            : [],
+        ),
+      ),
+    ];
+
+    return { studentIds };
+  }
+
+  async create(parsedData, req) {
     await this.validateReferences(parsedData);
+
+    const requesterId = req?.user_id || req?.user?.id;
+    if (requesterId && parsedData.student_id) {
+      const requester = await this.userRepository.getById(requesterId);
+      const isParent = requester.memberships?.some((m) => m?.role === 'parent');
+
+      if (isParent) {
+        const studentIdStr = parsedData.student_id?.toString();
+        const ownsStudent = (requester.memberships || [])
+          .filter((m) => m?.role === 'parent')
+          .some(
+            (m) =>
+              Array.isArray(m.associated_students) &&
+              m.associated_students.some((s) => s?.toString() === studentIdStr),
+          );
+
+        if (!ownsStudent) {
+          throw new CustomError({
+            statusCode: HttpStatusCodes.FORBIDDEN.code,
+            errorType: 'forbidden',
+            field: 'student_id',
+            details: [
+              {
+                path: 'student_id',
+                message:
+                  'Você só pode criar autorizações de saída para seus próprios filhos.',
+              },
+            ],
+            customMessage:
+              'Você não tem permissão para criar uma autorização para este aluno.',
+          });
+        }
+      }
+    }
 
     if (parsedData.valid_until <= parsedData.valid_from) {
       throw new CustomError({
@@ -105,7 +175,8 @@ class PickupAuthorizationService {
   }
 
   async list(req) {
-    return this.repository.list(req);
+    const accessScope = await this.resolveAccessScope(req);
+    return this.repository.list(req, accessScope);
   }
 
   async delete(id) {

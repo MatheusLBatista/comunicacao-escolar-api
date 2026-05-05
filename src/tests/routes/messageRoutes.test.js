@@ -24,7 +24,7 @@ const PARENT = {
 
 async function login(credentials) {
   const response = await request(BASE_URL)
-    .post('/login')
+    .post('/auth/login')
     .send({ email: credentials.email, password: credentials.password });
 
   expect(response.status).toBe(200);

@@ -13,7 +13,7 @@ describe('Grupos', () => {
   let idGrupo;
   beforeAll(async () => {
     const res = await request(BASE_URL)
-      .post('/login')
+      .post('/auth/login')
       .send({ email: 'admin@admin.com', password: 'Senha@123' });
     tokenAdmin = res.body?.data?.user?.access_token;
   });
@@ -102,7 +102,7 @@ describe('Grupos', () => {
 });
 async function logar(email, password) {
   const res = await request(BASE_URL)
-    .post('/login')
+    .post('/auth/login')
     .send({ email: email, password: password });
   return res;
 }
