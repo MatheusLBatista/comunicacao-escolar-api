@@ -49,5 +49,54 @@ const auditLogPaths = {
       },
     },
   },
+  '/schools/{id}/audit-logs/user/{userId}': {
+    get: {
+      tags: ['Audit Log'],
+      summary: 'Listar logs por usuário',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
+        { name: 'userId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do usuário' },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/AuditLogListagem'),
+        401: commonResponses[401](),
+        403: commonResponses[403](),
+      },
+    },
+  },
+  '/schools/{id}/audit-logs/student/{studentId}': {
+    get: {
+      tags: ['Audit Log'],
+      summary: 'Listar logs por aluno',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
+        { name: 'studentId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do aluno' },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/AuditLogListagem'),
+        401: commonResponses[401](),
+        403: commonResponses[403](),
+      },
+    },
+  },
+  '/schools/{id}/audit-logs/{logId}': {
+    get: {
+      tags: ['Audit Log'],
+      summary: 'Buscar log de auditoria por ID',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
+        { name: 'logId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do log' },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/AuditLogItem'),
+        401: commonResponses[401](),
+        403: commonResponses[403](),
+        404: commonResponses[404](),
+      },
+    },
+  },
 };
 export default auditLogPaths;

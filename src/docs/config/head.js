@@ -27,6 +27,7 @@ import classPaths from '../paths/class.js';
 import auditLogPaths from '../paths/auditLog.js';
 import dailyLogPaths from '../paths/dailyLog.js';
 import dailyLogTemplatePaths from '../paths/dailyLogTemplate.js';
+import mePaths from '../paths/me.js';
 
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
@@ -50,7 +51,7 @@ const getSwaggerOptions = () => {
         title: 'API Comunicação Escolar',
         version: '1.0.0',
         description:
-          'API para gestão de comunicação escolar \n\nÉ necessário autenticar com token JWT antes de utilizar a maioria das rotas. Faça isso na rota /login com um email e senha válido. Esta API conta com refresh token, que pode ser obtido na rota /refresh, e com logout, que pode ser feito na rota /logout. Para revogação de acesso use a rota /revoke. Para mais informações, acesse a documentação.',
+          'API para gestão de comunicação escolar \n\nÉ necessário autenticar com token JWT antes de utilizar a maioria das rotas. Faça isso na rota /auth/login com um email e senha válido. Esta API conta com refresh token, que pode ser obtido na rota /auth/refresh, e com logout, que pode ser feito na rota /auth/logout. Para revogação de acesso use a rota /auth/revoke. Para mais informações, acesse a documentação.',
         contact: {
           name: 'Equipe de Desenvolvimento',
           email: 'dev@comunicacao-escolar.com',
@@ -114,9 +115,14 @@ const getSwaggerOptions = () => {
           name: 'Audit Log',
           description: 'Rotas para consulta de logs de auditoria do sistema',
         },
+        {
+          name: 'Me',
+          description: 'Rotas do perfil do usuário autenticado',
+        },
       ],
       paths: {
         ...authPaths,
+        ...mePaths,
         ...usuariosPaths,
         ...gruposPaths,
         ...rotasPaths,
