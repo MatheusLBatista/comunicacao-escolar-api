@@ -292,7 +292,6 @@ class UserService {
   async update(id, parsedData) {
     delete parsedData.password;
     delete parsedData.email;
-    delete parsedData.memberships;
     delete parsedData.groups;
     delete parsedData.permissions;
 
