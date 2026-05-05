@@ -11,11 +11,20 @@ class DailyLogRepository {
     return await dailyLog.save();
   }
 
-  async list(req) {
+  async list(req, accessScope = {}) {
     const id = req?.params?.id;
+    const scopedStudentIds = Array.isArray(accessScope?.studentIds)
+      ? accessScope.studentIds
+      : null;
 
     if (id) {
-      const data = await this.model.findById(id);
+      const findByIdFilter = { _id: id };
+
+      if (scopedStudentIds) {
+        findByIdFilter.student_id = { $in: scopedStudentIds };
+      }
+
+      const data = await this.model.findOne(findByIdFilter);
 
       if (!data) {
         throw new CustomError({
@@ -51,6 +60,19 @@ class DailyLogRepository {
     if (student_id) filters.student_id = student_id;
     if (teacher_id) filters.teacher_id = teacher_id;
     if (dailylogtemplate_id) filters.dailylogtemplate_id = dailylogtemplate_id;
+
+    if (scopedStudentIds) {
+      if (scopedStudentIds.length === 0) {
+        filters.student_id = { $in: [] };
+      } else if (filters.student_id) {
+        const requestedStudentId = filters.student_id.toString();
+        filters.student_id = scopedStudentIds.includes(requestedStudentId)
+          ? requestedStudentId
+          : { $in: [] };
+      } else {
+        filters.student_id = { $in: scopedStudentIds };
+      }
+    }
 
     if (is_present === 'true' || is_present === true) {
       filters.is_present = true;
@@ -131,8 +153,18 @@ class DailyLogRepository {
     return data;
   }
 
-  async getById(id) {
-    const data = await this.model.findById(id);
+  async getById(id, accessScope = {}) {
+    const scopedStudentIds = Array.isArray(accessScope?.studentIds)
+      ? accessScope.studentIds
+      : null;
+
+    const findByIdFilter = { _id: id };
+
+    if (scopedStudentIds) {
+      findByIdFilter.student_id = { $in: scopedStudentIds };
+    }
+
+    const data = await this.model.findOne(findByIdFilter);
 
     if (!data) {
       throw new CustomError({
