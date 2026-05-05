@@ -31,9 +31,13 @@ class EventRepository {
         });
       }
 
+      const schoolIdStr = data.school_id?._id
+        ? data.school_id._id.toString()
+        : data.school_id?.toString();
+
       if (
         scopedSchoolIds &&
-        !scopedSchoolIds.includes(data.school_id?.toString())
+        !scopedSchoolIds.includes(schoolIdStr)
       ) {
         throw new CustomError({
           statusCode: 403,
