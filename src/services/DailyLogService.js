@@ -127,6 +127,8 @@ class DailyLogService {
   async uploadAttachments(id, req) {
     const files = req.files;
 
+    const accessScope = await this.resolveAccessScope(req);
+
     if (!files || files.length === 0) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -149,7 +151,7 @@ class DailyLogService {
       }
     }
 
-    await this.repository.getById(id);
+    await this.repository.getById(id, accessScope);
 
     for (const file of files) {
       const image = await compress(file.buffer);
