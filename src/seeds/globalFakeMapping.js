@@ -49,6 +49,7 @@ export const fakeMappings = {
     groups: () => [],
     permissions: () => [],
     fcm_tokens: () => [],
+    avatar_url: () => null,
     memberships: () => [],
     class_id: () => new mongoose.Types.ObjectId(),
     unique_token: () =>
