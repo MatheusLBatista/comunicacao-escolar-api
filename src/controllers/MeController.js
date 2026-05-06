@@ -34,6 +34,16 @@ class MeController {
       'Senha alterada com sucesso.',
     );
   }
+
+  async uploadAvatar(req, res) {
+    const data = await this.service.uploadAvatar(req.user_id, req.file);
+    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Avatar atualizado com sucesso.');
+  }
+
+  async deleteAvatar(req, res) {
+    const data = await this.service.deleteAvatar(req.user_id);
+    return CommonResponse.success(res, data, HttpStatusCodes.OK.code, 'Avatar removido com sucesso.');
+  }
 }
 
 export default MeController;

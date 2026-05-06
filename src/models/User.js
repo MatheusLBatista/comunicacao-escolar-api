@@ -55,6 +55,10 @@ class User {
           },
         ],
         fcm_tokens: [{ type: String }],
+        avatar_url: {
+          type: String,
+          default: null,
+        },
         memberships: [
           {
             school_id: {

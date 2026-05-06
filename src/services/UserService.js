@@ -1,10 +1,13 @@
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 import UserRepository from '../repositories/UserRepository.js';
 import {
   CustomError,
   HttpStatusCodes,
   messages,
 } from '../utils/helpers/index.js';
+import minioClient from '../config/MinIO.js';
+import compress from '../config/SharpConfig.js';
 
 class UserService {
   constructor() {
@@ -382,6 +385,65 @@ class UserService {
     const saltRounds = 10;
     const hash = await bcrypt.hash(newPassword, saltRounds);
     await this.repository.updatePassword(userId, hash);
+  }
+
+  async uploadAvatar(userId, file) {
+    if (!file) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: 'badRequest',
+        field: 'avatar',
+        details: [{ path: 'avatar', message: 'Nenhum arquivo foi enviado.' }],
+        customMessage: 'Nenhum arquivo foi enviado.',
+      });
+    }
+
+    const user = await this.repository.getById(userId);
+
+    if (user.avatar_url) {
+      const bucketPrefix = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/`;
+      const oldKey = user.avatar_url.startsWith(bucketPrefix)
+        ? user.avatar_url.slice(bucketPrefix.length)
+        : user.avatar_url.split('/').slice(-2).join('/');
+      try {
+        await minioClient.removeObject(process.env.MINIO_BUCKET, oldKey);
+      } catch (_) {
+      }
+    }
+
+    const image = await compress(file.buffer);
+    const objectName = `avatars/${new mongoose.Types.ObjectId().toString()}.${image[1].format}`;
+
+    await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
+      'Content-Type': file.mimetype,
+    });
+
+    const avatarUrl = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`;
+
+    const updated = await this.repository.update(userId, { avatar_url: avatarUrl });
+    const obj = typeof updated.toObject === 'function' ? updated.toObject() : { ...updated };
+    delete obj.password;
+    return obj;
+  }
+
+  async deleteAvatar(userId) {
+    const user = await this.repository.getById(userId);
+
+    if (user.avatar_url) {
+      const bucketPrefix = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/`;
+      const oldKey = user.avatar_url.startsWith(bucketPrefix)
+        ? user.avatar_url.slice(bucketPrefix.length)
+        : user.avatar_url.split('/').slice(-2).join('/');
+      try {
+        await minioClient.removeObject(process.env.MINIO_BUCKET, oldKey);
+      } catch (_) {
+      }
+    }
+
+    const updated = await this.repository.update(userId, { avatar_url: null });
+    const obj = typeof updated.toObject === 'function' ? updated.toObject() : { ...updated };
+    delete obj.password;
+    return obj;
   }
 }
 
