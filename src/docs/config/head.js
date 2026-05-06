@@ -36,7 +36,7 @@ const getServersInCorrectOrder = () => {
   const prodUrl = {
     url:
       process.env.SWAGGER_DEV_URL ||
-      `https://ca-comunicacao-escolar-api.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io`,
+      `https://ca-api-prod.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io`,
   };
 
   return [localUrl, prodUrl];
