@@ -125,6 +125,12 @@ npm run start:production
 O servidor ficará disponível em `http://localhost:{PORT}`.
 A documentação Swagger estará disponível em `http://localhost:{PORT}/docs`.
 
+> **Desenvolvimento com Android Studio (emulador):** para que o app acesse a API rodando localmente, execute o redirecionamento de porta via ADB:
+> ```bash
+> adb reverse tcp:PORT tcp:PORT
+> ```
+> Substitua `PORT` pelo valor definido na variável `PORT` do `.env` (ex.: `3010`).
+
 ## Testes
 
 ```bash
