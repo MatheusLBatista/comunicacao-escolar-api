@@ -68,7 +68,7 @@ class DbConnect {
         connectTimeoutMS: process.env.MONGO_CONNECT_TIMEOUT_MS
           ? parseInt(process.env.MONGO_CONNECT_TIMEOUT_MS)
           : 10000,
-        retryWrites: true,
+        retryWrites: false,
         maxPoolSize: process.env.MONGO_MAX_POOL_SIZE
           ? parseInt(process.env.MONGO_MAX_POOL_SIZE)
           : 10,
