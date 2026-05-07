@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - provision
   - deploy
 
 test-e2e:
@@ -58,6 +59,39 @@ build-docker-image:
   rules:
     - if: '$CI_COMMIT_BRANCH == "develop"'
 
+provision-azure:
+  stage: provision
+  image:
+    name: hashicorp/terraform:1.9
+    entrypoint: [""]
+  variables:
+    TF_ROOT: terraform
+    TF_ADDRESS: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/prod"
+    ARM_CLIENT_ID: $AZURE_APP_ID
+    ARM_CLIENT_SECRET: $AZURE_PASSWORD
+    ARM_TENANT_ID: $AZURE_TENANT_ID
+    ARM_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID
+
+    TF_VAR_docker_hub_user: $DOCKER_USER
+    TF_VAR_docker_hub_password: $DOCKER_PASSWORD
+    TF_VAR_image_tag: $CI_COMMIT_SHORT_SHA
+  before_script:
+    - cd $TF_ROOT
+    - terraform init
+        -backend-config="address=${TF_ADDRESS}"
+        -backend-config="lock_address=${TF_ADDRESS}/lock"
+        -backend-config="unlock_address=${TF_ADDRESS}/lock"
+        -backend-config="username=project_access_token"
+        -backend-config="password=${PROJECT_ACCESS_TOKEN}"
+        -backend-config="lock_method=POST"
+        -backend-config="unlock_method=DELETE"
+        -backend-config="retry_wait_min=5"
+  script:
+    - terraform validate
+    - terraform apply -auto-approve
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
 deploy-azure:
   stage: deploy
   image: mcr.microsoft.com/azure-cli
@@ -69,4 +103,3 @@ deploy-azure:
     - echo "Deploy automático concluído com sucesso!"
   rules:
     - if: '$CI_COMMIT_BRANCH == "develop"'
-
