@@ -82,7 +82,7 @@ export const fakeMappings = {
 
   Class: {
     name: () => `Turma ${fakebr.random.alphaNumeric(1).toUpperCase()}`,
-    grade: () => `${fakebr.random.number({ min: 1, max: 9 })} ano`,
+    shift: () => fakebr.random.arrayElement(['Manhã', 'Tarde', 'Integral']),
     year: () => new Date().getFullYear(),
     teacher_ids: () => [new mongoose.Types.ObjectId()],
     metadata: () => fakebr.lorem.sentence(),

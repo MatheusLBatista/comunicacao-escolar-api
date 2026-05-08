@@ -1,14 +1,14 @@
 const classSchemas = {
   ClassPost: {
     type: 'object',
-    required: ['name', 'grade', 'year', 'teacher_ids'],
+    required: ['name', 'shift', 'year', 'teacher_ids'],
     properties: {
       name: {
         type: 'string',
         description: 'Nome da turma',
         example: 'Turma A',
       },
-      grade: {
+      shift: {
         type: 'string',
         description: 'Serie/grau da turma',
         example: '5o ano',
@@ -53,7 +53,7 @@ const classSchemas = {
         ],
       },
       name: { type: 'string', example: 'Turma A' },
-      grade: { type: 'string', example: '5o ano' },
+      shift: { type: 'string', example: '5o ano' },
       year: { type: 'integer', example: 2026 },
       teacher_ids: {
         type: 'array',
@@ -83,7 +83,7 @@ const classSchemas = {
         description: 'Nome da turma',
         example: 'Turma A - Atualizada',
       },
-      grade: {
+      shift: {
         type: 'string',
         description: 'Serie/grau da turma',
         example: '5o ano',
@@ -142,7 +142,7 @@ const classSchemas = {
         description: 'Filtrar por nome da turma',
         example: 'Turma',
       },
-      grade: {
+      shift: {
         type: 'string',
         description: 'Filtrar por serie/grau',
         example: '5o ano',

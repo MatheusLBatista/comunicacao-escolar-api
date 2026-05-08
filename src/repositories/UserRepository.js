@@ -15,13 +15,18 @@ class UserRepository {
   }
 
   async listBySchool(schoolId, query = {}) {
-    const { full_name, email, role, active, page = 1, limit = 10 } = query;
+    const { full_name, email, role, active, page = 1, limit = 10, class_id } = query;
 
     const filterBuilder = new UserFilterBuilder()
       .withName(full_name || '')
       .withEmail(email || '')
-      .withRole(role || '', schoolId)
       .withActive(active);
+
+    if (class_id) {
+      filterBuilder.withClassId(class_id, schoolId);
+    } else {
+      filterBuilder.withRole(role || '', schoolId);
+    }
 
     const filtros = filterBuilder.build();
 

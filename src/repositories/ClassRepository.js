@@ -35,7 +35,7 @@ class ClassRepository {
       };
     }
 
-    const { name, grade, year, teacher_id, active, page = 1 } =
+    const { name, shift, year, teacher_id, active, page = 1 } =
       req?.query || {};
 
     const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
@@ -43,7 +43,7 @@ class ClassRepository {
     const filterBuilder = new ClassFilterBuilder()
       .withSchoolId(schoolId || '')
       .withName(name || '')
-      .withGrade(grade || '')
+      .withShift(shift || '')
       .withYear(year)
       .withTeacherId(teacher_id || '')
       .withActive(active);
@@ -79,18 +79,24 @@ class ClassRepository {
     return data;
   }
 
-  async existClass(school_id, name, grade, year) {
+  async existClass(school_id, name, shift, year) {
 
-    const data = this.model.findOne({school_id:school_id, name:name, grade:grade, year:year, active:true})
+    const data = this.model.findOne({school_id:school_id, name:name, shift:shift, year:year, active:true})
 
     return data
   }
 
   async update(parsedData, id) {
-  
-    const data = await this.model.findByIdAndUpdate(id, parsedData, { new: true, runValidators: true })
+    const populate = [
+      { path: 'school_id', select: 'name tax_id active' },
+      { path: 'teacher_ids', select: 'full_name email active' },
+    ];
 
-    return data
+    const data = await this.model
+      .findByIdAndUpdate(id, parsedData, { new: true, runValidators: true })
+      .populate(populate);
+
+    return data;
   }
 
   async delete(id) {

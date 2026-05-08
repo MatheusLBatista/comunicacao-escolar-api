@@ -19,9 +19,9 @@ class ClassFilterBuilder {
     return this;
   }
 
-  withGrade(grade) {
-    if (grade) {
-      this.filters.grade = { $regex: grade, $options: 'i' };
+  withShift(shift) {
+    if (shift) {
+      this.filters.shift = { $regex: shift, $options: 'i' };
     }
 
     return this;

@@ -42,6 +42,19 @@ class UserFilterBuilder {
     return this;
   }
 
+  withClassId(class_id, schoolId) {
+    if (class_id && schoolId) {
+      this.filtros.memberships = {
+        $elemMatch: {
+          school_id: schoolId,
+          role: 'student',
+          class_id: class_id,
+        },
+      };
+    }
+    return this;
+  }
+
   escapeRegex(texto) {
     return texto.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
   }

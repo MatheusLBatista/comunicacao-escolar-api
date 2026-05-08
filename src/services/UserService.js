@@ -209,6 +209,48 @@ class UserService {
     return obj;
   }
 
+  async removeStudentFromParent(schoolId, userId, studentId) {
+    const pai = await this.repository.getById(userId);
+
+    const membership = Array.isArray(pai.memberships)
+      ? pai.memberships.find(
+          (m) => m.school_id?.toString() === schoolId && m.role === 'parent',
+        )
+      : null;
+
+    if (!membership) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'membership',
+        details: [],
+        customMessage: 'Usuário não é responsável nesta escola.',
+      });
+    }
+
+    const idx = membership.associated_students.findIndex(
+      (id) => id.toString() === studentId,
+    );
+
+    if (idx === -1) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'student',
+        details: [],
+        customMessage: 'Aluno não encontrado neste responsável.',
+      });
+    }
+
+    membership.associated_students.splice(idx, 1);
+
+    const atualizado = await this.repository.update(pai._id, {
+      memberships: pai.memberships,
+    });
+
+    return this._stripSensitiveFields(atualizado);
+  }
+
   async updateMembershipRole(schoolId, userId, newRole) {
     const usuario = await this.repository.getById(userId);
 
@@ -266,9 +308,49 @@ class UserService {
 
   async listBySchool(schoolId, query) {
     const data = await this.repository.listBySchool(schoolId, query);
-    if (Array.isArray(data?.docs)) {
-      data.docs = data.docs.map((doc) => this._stripSensitiveFields(doc));
+    if (!Array.isArray(data?.docs)) return data;
+
+    const studentIds = [];
+    data.docs.forEach((doc) => {
+      const m = doc.memberships?.find(
+        (m) => m.school_id?.toString() === schoolId && m.role === 'parent',
+      );
+      if (m?.associated_students?.length > 0) {
+        m.associated_students.forEach((id) => studentIds.push(id.toString()));
+      }
+    });
+
+    let studentMap = {};
+    if (studentIds.length > 0) {
+      const students = await this.repository.findUsers(studentIds, 'student');
+      students.forEach((s) => {
+        const sm = s.memberships?.find((m) => m.role === 'student');
+        studentMap[s._id.toString()] = {
+          _id: s._id,
+          full_name: s.full_name,
+          class_id: sm?.class_id || null,
+        };
+      });
     }
+
+    data.docs = data.docs.map((doc) => {
+      const stripped = this._stripSensitiveFields(doc);
+      if (Array.isArray(stripped.memberships)) {
+        stripped.memberships = stripped.memberships.map((m) => {
+          if (m.role === 'parent' && Array.isArray(m.associated_students)) {
+            return {
+              ...m,
+              associated_students: m.associated_students
+                .map((id) => studentMap[id.toString()] || null)
+                .filter(Boolean),
+            };
+          }
+          return m;
+        });
+      }
+      return stripped;
+    });
+
     return data;
   }
 

@@ -3,9 +3,13 @@ import School from '../models/School.js';
 import User from '../models/User.js';
 
 const CLASS_TEMPLATES = [
-  { name: 'Turma A', grade: '1 ano' },
-  { name: 'Turma B', grade: '2 ano' },
-  { name: 'Turma C', grade: '3 ano' },
+  { name: 'Berçário I',   shift: 'Manhã'    },
+  { name: 'Berçário II',  shift: 'Tarde'    },
+  { name: 'Maternal I',   shift: 'Manhã'    },
+  { name: 'Maternal II',  shift: 'Tarde'    },
+  { name: 'Jardim I',     shift: 'Manhã'    },
+  { name: 'Jardim II',    shift: 'Tarde'    },
+  { name: 'Jardim III',   shift: 'Integral' },
 ];
 
 export default async function classSeed() {
@@ -72,7 +76,7 @@ export default async function classSeed() {
       classes.push({
         school_id: school._id,
         name: template.name,
-        grade: template.grade,
+        shift: template.shift,
         year,
         teacher_ids: teacherIds,
         active: true,

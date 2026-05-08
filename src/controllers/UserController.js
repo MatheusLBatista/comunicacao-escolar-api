@@ -73,6 +73,16 @@ class UserController {
     return CommonResponse.created(res, userLimpo);
   }
 
+  async removeStudentFromParent(req, res) {
+    const { schoolId, userId, studentId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    ObjectIdSchema.parse(userId);
+    ObjectIdSchema.parse(studentId);
+
+    const data = await this.service.removeStudentFromParent(schoolId, userId, studentId);
+    return CommonResponse.success(res, data);
+  }
+
   async updateMembershipRole(req, res) {
     const { schoolId, userId } = req.params;
     ObjectIdSchema.parse(schoolId);

@@ -16,7 +16,7 @@ class ClassService {
     }
 
     async create(parsedData, schoolId) {
-        const { name, grade, year } = parsedData;
+        const { name, shift, year } = parsedData;
 
         const school = await this.schoolRepository.findById(schoolId)
 
@@ -36,7 +36,7 @@ class ClassService {
         }
         // Adicionei o "await" aqui, pois a consulta de repositório deve ser assíncrona
 
-        const classExists = await this.repository.existClass(schoolId, name, grade, year);
+        const classExists = await this.repository.existClass(schoolId, name, shift, year);
 
         if (classExists) {
             throw new CustomError({
@@ -87,7 +87,7 @@ class ClassService {
 
     async update(parsedData, schoolId, id) {
 
-        const { name, year, grade } = parsedData
+        const { name, year, shift } = parsedData
 
         const turma = await this.repository.findById(id)
 
@@ -135,7 +135,7 @@ class ClassService {
             }
         }
 
-        const classExists = await this.repository.existClass(schoolId, name ? name : turma.name, grade ? grade : turma.grade, year ? year : turma.year);
+        const classExists = await this.repository.existClass(schoolId, name ? name : turma.name, shift ? shift : turma.shift, year ? year : turma.year);
         if (classExists) {
             if (classExists.id != id) {
                 throw new CustomError({

@@ -18,7 +18,7 @@ class Class {
           type: String,
           required: true,
         },
-        grade: {
+        shift: {
           type: String,
           required: true,
         },
@@ -33,11 +33,7 @@ class Class {
               ref: 'Users',
             },
           ],
-          required: true,
-          validate: [
-            (ids) => ids.length > 0,
-            'teacher_ids must contain at least one teacher id',
-          ],
+          default: [],
         },
         metadata: {
           type: String,
