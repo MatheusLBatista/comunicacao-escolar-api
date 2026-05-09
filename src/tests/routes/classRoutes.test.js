@@ -77,6 +77,7 @@ async function createClassForDelete({ token, schoolId, teacherId, seedLabel }) {
   const payload = {
     name: `${seedLabel} ${seed}`,
     grade: '6F',
+    shift: 'Matutino',
     year: 2026,
     teacher_ids: [teacherId],
     active: true,
@@ -157,6 +158,7 @@ describe('Class Routes - Integracao', () => {
       .send({
         name: `Turma Sem Token ${Date.now()}`,
         grade: '1A',
+        shift: 'Matutino',
         year: 2026,
         teacher_ids: [teacherUser.id],
       });
@@ -187,6 +189,7 @@ describe('Class Routes - Integracao', () => {
       .send({
         name: `Turma ID invalido ${Date.now()}`,
         grade: '2B',
+        shift: 'Matutino',
         year: 2026,
         teacher_ids: [teacherUser.id],
       });
@@ -202,6 +205,7 @@ describe('Class Routes - Integracao', () => {
       .send({
         name: `Turma Escola Inexistente ${Date.now()}`,
         grade: '3C',
+        shift: 'Matutino',
         year: 2026,
         teacher_ids: [teacherUser.id],
       });
@@ -217,6 +221,7 @@ describe('Class Routes - Integracao', () => {
       .send({
         name: `Turma Professor Invalido ${Date.now()}`,
         grade: '4D',
+        shift: 'Matutino',
         year: 2026,
         teacher_ids: [teacherUser.id, '507f1f77bcf86cd799439011'],
       });
@@ -229,6 +234,7 @@ describe('Class Routes - Integracao', () => {
     const payload = {
       name: `Turma Integracao ${Date.now()}`,
       grade: '5E',
+      shift: 'Matutino',
       year: 2026,
       teacher_ids: [teacherUser.id],
       active: true,
@@ -402,6 +408,7 @@ describe('Class Routes - Integracao', () => {
       .send({
         name: createdClass.name,
         grade: createdClass.grade,
+        shift: 'Matutino',
         year: 2026,
         teacher_ids: [teacherUser.id],
       });
