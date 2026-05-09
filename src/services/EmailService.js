@@ -136,12 +136,12 @@ Equipe Comunicação Escolar
             <p style="margin: 0 0 15px 0; font-size: 18px;">Olá, <strong>${nome}</strong>!</p>
             <p style="margin: 0 0 20px 0; font-size: 18px;">Você solicitou a recuperação de senha da sua conta. Use o código abaixo para redefinir sua senha.</p>
             <div style="text-align: center; margin: 30px 0;">
-                <div style="display: inline-block; padding: 16px 40px; background-color: #f0f4ff; border: 2px solid #306FCC; border-radius: 8px;">
+                <div style="display: inline-block; padding: 16px 40px; border-radius: 8px;">
                     <span style="font-size: 36px; font-weight: bold; color: #306FCC; letter-spacing: 8px;">${codigo}</span>
                 </div>
             </div>
             <div style="margin-top: 25px; border-radius: 4px;">
-                <p style="margin: 0; font-size: 18px;"><strong>Importante:</strong> Este código expira em 1 hora por segurança.</p>
+                <p style="margin: 0; font-size: 18px;"><strong>Importante:</strong> Este código expira em 5 minutos por segurança.</p>
             </div>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
                 <p style="margin: 0 0 8px 0; font-size: 16px;">Não solicitou esta recuperação? Ignore este e-mail.</p>
