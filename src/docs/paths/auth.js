@@ -577,43 +577,39 @@ const authPaths = {
   '/auth/password/reset': {
     patch: {
       tags: ['Auth'],
-      summary: 'Redefinir senha via token de recuperação',
+      summary: 'Redefinir senha via código de recuperação',
       description: `
-            + **Caso de uso**: Redefinir senha usando token enviado por email.
+            + **Caso de uso**: Redefinir senha usando o código de 4 caracteres enviado por e-mail.
 
             + **Função de Negócio**:
-                - Validar o token de recuperação de senha.
+                - Validar o código de recuperação de senha.
                 - Atualizar a senha do usuário com o novo valor fornecido.
 
             + **Regras de Negócio**:
-                - O token de recuperação deve ser informado como query parameter ou path parameter.
-                - A nova senha deve atender aos critérios de complexidade.
-                - Token deve ser válido e não expirado.
+                - O código de recuperação deve ser informado no body (password_recovery_code).
+                - O código é gerado ao chamar POST /auth/recover e tem validade de 1 hora.
+                - A nova senha deve conter pelo menos 8 caracteres, 1 letra, 1 número e 1 caractere especial.
 
             + **Resultado Esperado**:
                 - HTTP 200 OK com confirmação de atualização.
-                - Em caso de token inválido ou expirado, retorna erro 401.
+                - Em caso de código inválido ou expirado, retorna erro 401/404.
             `,
-      parameters: [
-        {
-          name: 'token',
-          in: 'query',
-          required: true,
-          schema: { type: 'string' },
-          description: 'Token de recuperação de senha recebido por email',
-        },
-      ],
       requestBody: {
         required: true,
         content: {
           'application/json': {
             schema: {
               type: 'object',
-              required: ['password'],
+              required: ['password_recovery_code', 'password'],
               properties: {
+                password_recovery_code: {
+                  type: 'string',
+                  description: 'Código de 4 caracteres recebido por e-mail',
+                  example: 'A3BK',
+                },
                 password: {
                   type: 'string',
-                  description: 'Nova senha (mínimo 8 caracteres, com maiúscula, minúscula, número e especial)',
+                  description: 'Nova senha (mínimo 8 caracteres, com letra, número e caractere especial)',
                   minLength: 8,
                   example: 'NovaSenha@456',
                 },
@@ -639,7 +635,15 @@ const authPaths = {
         },
         400: commonResponses[400](),
         401: {
-          description: 'Token inválido ou expirado',
+          description: 'Código de recuperação expirado',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthError' },
+            },
+          },
+        },
+        404: {
+          description: 'Código de recuperação inválido ou não encontrado',
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/AuthError' },

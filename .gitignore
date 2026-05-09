@@ -81,12 +81,33 @@ web_modules/
 .env.production.local
 .env.local
 
-# Terraform — secrets e estado local
-terraform/.terraform/
-terraform/terraform.tfstate
-terraform/terraform.tfstate.backup
-terraform/terraform.tfvars
-terraform/*.tfvars
+# Local .terraform directories (contains provider binaries/plugins)
+.terraform/
+
+# .tfstate files (contains sensitive infrastructure data and secrets)
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfvars files (likely contain sensitive data like API keys/passwords)
+*.tfvars
+*.tfvars.json
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore transient lock info files
+.terraform.tfstate.lock.info
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
