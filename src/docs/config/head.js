@@ -32,14 +32,21 @@ import mePaths from '../paths/me.js';
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
   const PORT = process.env.PORT;
-  const localUrl = { url: `http://localhost:${PORT}` };
-  const prodUrl = {
-    url:
-      process.env.SWAGGER_DEV_URL ||
-      `https://ca-api-prod.gentlecliff-dc643193.brazilsouth.azurecontainerapps.io`,
-  };
+  const servers = [];
 
-  return [localUrl, prodUrl];
+  if (process.env.NODE_ENV !== 'production') {
+    servers.push({ url: `http://localhost:${PORT}`, description: 'Local' });
+  }
+
+  if (process.env.API_URL) {
+    servers.push({ url: process.env.API_URL, description: 'Produção' });
+  }
+
+  if (servers.length === 0) {
+    servers.push({ url: `http://localhost:${PORT}`, description: 'Local' });
+  }
+
+  return servers;
 };
 
 // Função para obter as opções do Swagger
