@@ -58,14 +58,52 @@ build-docker-image:
   rules:
     - if: '$CI_COMMIT_BRANCH == "develop"'
 
-deploy-azure:
+deploy-aws:
   stage: deploy
-  image: mcr.microsoft.com/azure-cli
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  variables:
+    AWS_DEFAULT_REGION: "$AWS_REGION"
   script:
-    - echo "A iniciar o deploy no Azure Container Apps..."
-    - az login --service-principal -u $AZURE_APP_ID -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
-    - az containerapp update --name $AZURE_CONTAINERAPP_NAME --resource-group $AZURE_RESOURCE_GROUP --container-name api --image $DOCKER_USER/comunicacao-escolar-api:$CI_COMMIT_SHORT_SHA
-    
-    - echo "Deploy automático concluído com sucesso!"
+    - echo "Iniciando deploy na instancia $AWS_INSTANCE_ID via SSM..."
+    - |
+      COMMAND_ID=$(aws ssm send-command \
+        --instance-ids "$AWS_INSTANCE_ID" \
+        --document-name "AWS-RunShellScript" \
+        --parameters 'commands=["cd /opt/app","docker compose pull","docker compose up -d --remove-orphans","docker image prune -f","echo Deploy concluido"]' \
+        --comment "Deploy from GitLab CI" \
+        --output text \
+        --query "Command.CommandId")
+    - 'echo "SSM Command ID: $COMMAND_ID"'
+    - |
+      for i in $(seq 1 30); do
+        STATUS=$(aws ssm get-command-invocation \
+          --command-id "$COMMAND_ID" \
+          --instance-id "$AWS_INSTANCE_ID" \
+          --query "Status" \
+          --output text 2>/dev/null || echo "Pending")
+        echo "Tentativa $i/30 - Status: $STATUS"
+        if [ "$STATUS" = "Success" ]; then
+          echo "Deploy concluido com sucesso!"
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$AWS_INSTANCE_ID" \
+            --query "StandardOutputContent" \
+            --output text
+          exit 0
+        elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "TimedOut" ] || [ "$STATUS" = "Cancelled" ]; then
+          echo "Deploy falhou! Status: $STATUS"
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$AWS_INSTANCE_ID" \
+            --query "StandardErrorContent" \
+            --output text
+          exit 1
+        fi
+        sleep 10
+      done
+      echo "Timeout aguardando o comando SSM."
+      exit 1
   rules:
     - if: '$CI_COMMIT_BRANCH == "develop"'

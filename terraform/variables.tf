@@ -1,11 +1,39 @@
 // ---------------------------------------------------------------------------
+// AWS
+// ---------------------------------------------------------------------------
+variable "aws_region" {
+  description = "Região AWS onde os recursos serão criados."
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "instance_type" {
+  description = "Tipo de instância EC2. Use t3.micro para Free Tier (contas novas) ou t2.micro (contas legadas)."
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "ami_id" {
+  description = "ID da AMI para a instância EC2. Deixe vazio para usar automaticamente a Amazon Linux 2023 mais recente."
+  type        = string
+  default     = ""
+}
+
+variable "key_name" {
+  description = "Nome do key pair EC2 para acesso SSH. Deixe vazio para desativar."
+  type        = string
+  default     = ""
+}
+
+variable "ssh_allowed_cidr" {
+  description = "CIDR autorizado para SSH (porta 22) e MinIO Console (porta 9001). Restrinja ao seu IP para maior segurança."
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
+// ---------------------------------------------------------------------------
 // Base
 // ---------------------------------------------------------------------------
-variable "location" {
-  description = "Região do Azure onde os recursos serão criados."
-  type        = string
-  default     = "brazilsouth"
-}
 
 variable "environment" {
   description = "Nome do ambiente (dev, staging, prod)."
@@ -17,24 +45,6 @@ variable "prefix" {
   description = "Prefixo curto e único para nomear os recursos. Apenas letras minúsculas e números."
   type        = string
   default     = "comuesc"
-}
-
-variable "resource_group_name" {
-  description = "Nome do Resource Group (opcional — gerado automaticamente se vazio)."
-  type        = string
-  default     = ""
-}
-
-variable "cae_name" {
-  description = "Nome do Container Apps Environment já existente na subscription."
-  type        = string
-  default     = "cae-comunicacao-escolar"
-}
-
-variable "cae_resource_group" {
-  description = "Resource Group onde o Container Apps Environment existente está registrado."
-  type        = string
-  default     = "rg-comunicacao-escolar"
 }
 
 variable "mongodb_uri" {
@@ -73,6 +83,12 @@ variable "environment_name" {
   description = "Nome do ambiente exibido internamente."
   type        = string
   default     = "prod"
+}
+
+variable "cors_origin" {
+  description = "Origem permitida para CORS e Socket.IO. Use a URL do frontend ou * para qualquer origem."
+  type        = string
+  default     = "*"
 }
 
 variable "jwt_secret_access_token" {
@@ -136,46 +152,10 @@ variable "frontend_url" {
 }
 
 
-variable "minio_access_key" {
-  description = "Chave de acesso do MinIO (root user)."
-  type        = string
-  sensitive   = true
-}
-
-variable "minio_secret_key" {
-  description = "Chave secreta do MinIO (root password)."
-  type        = string
-  sensitive   = true
-}
-
-variable "minio_bucket" {
-  description = "Nome do bucket principal do MinIO."
+variable "s3_bucket" {
+  description = "Nome do bucket S3 para armazenamento de arquivos. Deve ser globalmente único na AWS."
   type        = string
   default     = "comunicacao-escolar"
-}
-
-variable "minio_bucket_2" {
-  description = "Nome do segundo bucket do MinIO."
-  type        = string
-  default     = "comunicacao-escolar-2"
-}
-
-variable "admin_password" {
-  description = "Senha do usuário admin criado pela seed."
-  type        = string
-  sensitive   = true
-}
-
-variable "admin_name" {
-  description = "Nome completo do admin."
-  type        = string
-  default     = "Administrador"
-}
-
-variable "admin_email" {
-  description = "E-mail do admin."
-  type        = string
-  default     = "admin@admin.com"
 }
 
 
@@ -192,7 +172,20 @@ variable "firebase_client_email" {
 }
 
 variable "firebase_private_key" {
-  description = "Chave privada da service account do Firebase."
+  description = "Chave privada da service account do Firebase. Use \\n para representar quebras de linha."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "swagger_user" {
+  description = "Usuário para Basic Auth do Swagger UI. Deixe vazio para desativar o Swagger em produção."
+  type        = string
+  default     = ""
+}
+
+variable "swagger_password" {
+  description = "Senha para Basic Auth do Swagger UI."
   type        = string
   sensitive   = true
   default     = ""

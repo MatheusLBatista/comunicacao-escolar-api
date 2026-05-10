@@ -1,24 +1,25 @@
-output "resource_group_name" {
-  description = "Nome do Resource Group principal."
-  value       = azurerm_resource_group.main.name
+output "ec2_instance_id" {
+  description = "ID da instância EC2 — use como AWS_INSTANCE_ID no GitLab CI/CD para deploys via SSM."
+  value       = aws_instance.main.id
 }
 
-output "container_app_environment_id" {
-  description = "ID do Container Apps Environment."
-  value       = data.azurerm_container_app_environment.main.id
-}
-
-output "minio_storage_name" {
-  description = "Nome do storage registrado no Container Apps Environment para o MinIO."
-  value       = azurerm_container_app_environment_storage.minio.name
+output "elastic_ip" {
+  description = "Elastic IP da instância EC2 (estável mesmo após reinicializações)."
+  value       = aws_eip.main.public_ip
 }
 
 output "api_url" {
   description = "URL pública da API."
-  value       = "https://${azurerm_container_app.api.ingress[0].fqdn}"
+  value       = "http://${aws_eip.main.public_ip}:${var.port}"
 }
 
-output "container_app_name" {
-  description = "Nome do Container App da API — use como AZURE_CONTAINERAPP_NAME no GitLab CI/CD."
-  value       = azurerm_container_app.api.name
+output "s3_bucket_url" {
+  description = "URL pública do bucket S3 (base para arquivos de mídia)."
+  value       = "https://s3.${var.aws_region}.amazonaws.com/${var.s3_bucket}"
 }
+
+output "ssh_command" {
+  description = "Comando SSH para acessar a instância EC2."
+  value       = var.key_name != "" ? "ssh -i ${var.key_name}.pem ec2-user@${aws_eip.main.public_ip}" : "Nenhum key pair configurado. Defina a variável key_name para habilitar SSH."
+}
+
