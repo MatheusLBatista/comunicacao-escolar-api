@@ -75,7 +75,7 @@ deploy-aws:
         --comment "Deploy from GitLab CI" \
         --output text \
         --query "Command.CommandId")
-    - echo "SSM Command ID: $COMMAND_ID"
+    - 'echo "SSM Command ID: $COMMAND_ID"'
     - |
       for i in $(seq 1 30); do
         STATUS=$(aws ssm get-command-invocation \
