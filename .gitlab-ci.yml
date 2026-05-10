@@ -1,4 +1,4 @@
-stages:
+﻿stages:
   - test
   - build
   - deploy
@@ -65,28 +65,14 @@ deploy-aws:
     entrypoint: [""]
   variables:
     AWS_DEFAULT_REGION: "$AWS_REGION"
-    IMAGE_NAME: "$DOCKER_USER/comunicacao-escolar-api"
   script:
-    - echo "Iniciando deploy na instância $AWS_INSTANCE_ID via SSM (imagem $IMAGE_NAME:$CI_COMMIT_SHORT_SHA)..."
-    - |
-      cat > /tmp/ssm-commands.json <<EOF
-      {
-        "commands": [
-          "cd /opt/app",
-          "sed -i 's|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}|' docker-compose.yml",
-          "docker compose pull",
-          "docker compose up -d --remove-orphans",
-          "docker image prune -f",
-          "echo Deploy ${CI_COMMIT_SHORT_SHA} concluido"
-        ]
-      }
-      EOF
+    - echo "Iniciando deploy na instancia $AWS_INSTANCE_ID via SSM..."
     - |
       COMMAND_ID=$(aws ssm send-command \
         --instance-ids "$AWS_INSTANCE_ID" \
         --document-name "AWS-RunShellScript" \
-        --parameters file:///tmp/ssm-commands.json \
-        --comment "Deploy $CI_COMMIT_SHORT_SHA from GitLab CI" \
+        --parameters 'commands=["cd /opt/app","docker compose pull","docker compose up -d --remove-orphans","docker image prune -f","echo Deploy concluido"]' \
+        --comment "Deploy from GitLab CI" \
         --output text \
         --query "Command.CommandId")
     - echo "SSM Command ID: $COMMAND_ID"
