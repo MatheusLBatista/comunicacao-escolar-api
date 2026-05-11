@@ -190,3 +190,9 @@ variable "swagger_password" {
   sensitive   = true
   default     = ""
 }
+
+variable "google_client_id" {
+  description = "Client ID do Google Cloud Console para autenticação OAuth (POST /auth/google). Deixe vazio para desativar."
+  type        = string
+  default     = ""
+}

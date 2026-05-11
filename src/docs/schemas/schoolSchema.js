@@ -42,7 +42,7 @@ const schoolSchemas = {
       tax_id: {
         type: 'string',
         description: 'CNPJ da escola (14 digitos)',
-        example: '12345678000190',
+        example: '98765432000100',
       },
       address: {
         $ref: '#/components/schemas/SchoolAddress',
@@ -82,7 +82,7 @@ const schoolSchemas = {
     properties: {
       _id: {
         type: 'string',
-        example: '69d2e2353536b4f57ae190bc',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       name: {
         type: 'string',

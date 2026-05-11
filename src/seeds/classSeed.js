@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Class from '../models/Class.js';
 import School from '../models/School.js';
 import User from '../models/User.js';
@@ -89,6 +90,11 @@ export default async function classSeed() {
       'Nenhuma turma foi criada: faltam professores ativos vinculados a escolas ativas.',
     );
     return { insertedCount: 0, classes: [] };
+  }
+
+  // Primeira turma (Berçário I da escola principal) — ID fixo para Swagger
+  if (classes.length > 0) {
+    classes[0]._id = new mongoose.Types.ObjectId('6647f8ec0910203040506001');
   }
 
   const result = await Class.collection.insertMany(classes);

@@ -25,7 +25,7 @@ const eventSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e2353536b4f57ae190bc',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       title: {
         type: 'string',
@@ -81,7 +81,7 @@ const eventSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e2353536b4f57ae190bc',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       title: {
         type: 'string',
@@ -132,10 +132,10 @@ const eventSchemas = {
   EventItem: {
     type: 'object',
     properties: {
-      _id: { type: 'string', example: '69d2e2f53536b4f57ae1916f' },
+      _id: { type: 'string', example: '664afbff3040506070809001' },
       school_id: {
         oneOf: [
-          { type: 'string', example: '69d2e2353536b4f57ae190bc' },
+          { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
           { type: 'object' },
         ],
       },
@@ -171,7 +171,7 @@ const eventSchemas = {
               {
                 type: 'string',
                 nullable: true,
-                example: '69d2e2353536b4f57ae1911c',
+                example: '6647f8ec0910203040506001',
               },
               { type: 'object', nullable: true },
             ],
@@ -180,7 +180,7 @@ const eventSchemas = {
       },
       created_by: {
         oneOf: [
-          { type: 'string', example: '69d2e2f53536b4f57ae19120' },
+          { type: 'string', example: '6644c5b9d6e7f80910203002' },
           { type: 'object' },
         ],
       },
@@ -247,7 +247,7 @@ const eventSchemas = {
       target_id: {
         type: 'string',
         description: 'Filtrar por turma alvo',
-        example: '69d2e2353536b4f57ae1911c',
+        example: '6647f8ec0910203040506001',
       },
       start_date: {
         type: 'string',

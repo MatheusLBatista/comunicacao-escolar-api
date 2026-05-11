@@ -102,6 +102,13 @@ swagger_user     = "admin"
 swagger_password = "SenhaSwaggerForte123!"
 
 # ------------------------------------------------------------------------------
+# Google OAuth (opcional — deixe vazio para desativar POST /auth/google)
+# ------------------------------------------------------------------------------
+# Client ID do projeto no Google Cloud Console (APIs & Services > Credentials)
+
+google_client_id = ""
+
+# ------------------------------------------------------------------------------
 # Firebase (opcional — deixe vazio para desativar push notifications)
 # ------------------------------------------------------------------------------
 

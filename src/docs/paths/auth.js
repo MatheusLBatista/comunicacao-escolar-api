@@ -327,7 +327,7 @@ const authPaths = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/TokenRequest',
+              $ref: '#/components/schemas/RevokeRequest',
             },
           },
         },

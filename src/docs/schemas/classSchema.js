@@ -22,13 +22,7 @@ const classSchemas = {
         type: 'array',
         items: { type: 'string' },
         description: 'Lista de ObjectIds dos professores',
-        example: ['69d2e2353536b4f57ae1911c'],
-      },
-      active: {
-        type: 'boolean',
-        default: true,
-        description: 'Status ativo da turma',
-        example: true,
+        example: ['6644c5b9d6e7f80910203002'],
       },
       metadata: {
         type: 'string',
@@ -44,11 +38,11 @@ const classSchemas = {
     properties: {
       _id: {
         type: 'string',
-        example: '69d2e2353536b4f57ae1911c',
+        example: '6647f8ec0910203040506001',
       },
       school_id: {
         oneOf: [
-          { type: 'string', example: '69d2e2353536b4f57ae190bc' },
+          { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
           { type: 'object' },
         ],
       },
@@ -58,7 +52,7 @@ const classSchemas = {
       teacher_ids: {
         type: 'array',
         items: { type: 'string' },
-        example: ['69d2e2353536b4f57ae1911c'],
+        example: ['6644c5b9d6e7f80910203002'],
       },
       active: { type: 'boolean', example: true },
       metadata: { type: 'string', example: 'Turno matutino' },
@@ -97,7 +91,7 @@ const classSchemas = {
         type: 'array',
         items: { type: 'string' },
         description: 'Lista de ObjectIds dos professores',
-        example: ['69d2e2353536b4f57ae1911c'],
+        example: ['6644c5b9d6e7f80910203002'],
       },
       metadata: {
         type: 'string',
@@ -155,7 +149,7 @@ const classSchemas = {
       teacher_id: {
         type: 'string',
         description: 'Filtrar por professor vinculado',
-        example: '69d2e2353536b4f57ae1911c',
+        example: '6644c5b9d6e7f80910203002',
       },
       active: {
         type: 'boolean',

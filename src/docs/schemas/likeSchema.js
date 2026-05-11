@@ -4,7 +4,7 @@ const likeSchemas = {
     properties: {
       _id: { type: 'string', example: '664f1b2c3a9d4e0012345678' },
       post_id: { type: 'string', example: '664f1b2c3a9d4e0012345679' },
-      user_id: { type: 'string', example: '000000000000000000000002' },
+      user_id: { type: 'string', example: '6643b4a8c5d6e7f809102001' },
       created_at: {
         type: 'string',
         format: 'date-time',

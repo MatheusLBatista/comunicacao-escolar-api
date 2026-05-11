@@ -34,7 +34,7 @@ const postPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
       ],
       requestBody: {
@@ -79,7 +79,7 @@ const postPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
         ...generateParameters(postSchemas.PostFiltro),
       ],
@@ -118,10 +118,9 @@ const postPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do comunicado',
+          example: '664bfc0040506070809010a1',
         },
       ],
       responses: {
@@ -163,10 +162,9 @@ const postPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do comunicado',
+          example: '664bfc0040506070809010a1',
         },
       ],
       requestBody: {
@@ -216,10 +214,9 @@ const postPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do comunicado',
+          example: '664bfc0040506070809010a1',
         },
       ],
       responses: {
@@ -279,10 +276,9 @@ const postPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do comunicado',
+          example: '664bfc0040506070809010a1',
         },
       ],
       requestBody: {
@@ -343,19 +339,17 @@ const postPaths = {
           name: 'postId',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do comunicado',
+          example: '664bfc0040506070809010a1',
         },
         {
           name: 'linkId',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'Identificador do arquivo/anexo no storage',
+          example: 'posts/664bfc0040506070809010a1/foto.jpg',
         },
       ],
       responses: {
@@ -408,10 +402,9 @@ const postPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'Identificador do arquivo/anexo no storage',
+          example: 'posts/664bfc0040506070809010a1/foto.jpg',
         },
       ],
       responses: {

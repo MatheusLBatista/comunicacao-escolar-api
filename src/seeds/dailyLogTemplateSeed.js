@@ -1,6 +1,7 @@
 import DailyLogTemplate from '../models/DailyLogTemplate.js';
 import School from '../models/School.js';
 import User from '../models/User.js';
+import mongoose from 'mongoose';
 
 function buildBaseFields() {
   return [
@@ -70,6 +71,7 @@ export default async function dailyLogTemplateSeed() {
 
   const templates = [
     {
+      _id: new mongoose.Types.ObjectId('6648f9ed1020304050607001'),
       school_id: school._id,
       student_id: null,
       fields: buildBaseFields(),

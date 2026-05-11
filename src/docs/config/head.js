@@ -12,6 +12,7 @@ import likeSchemas from '../schemas/likeSchema.js';
 import classSchemas from '../schemas/classSchema.js';
 import auditLogSchemas from '../schemas/auditLogSchema.js';
 import dailyLogSchemas from '../schemas/dailyLogSchema.js';
+import dailyLogTemplateSchemas from '../schemas/dailyLogTemplateSchema.js';
 import usuariosPaths from '../paths/usuarios.js';
 import authPaths from '../paths/auth.js';
 import gruposPaths from '../paths/grupo.js';
@@ -168,6 +169,7 @@ const getSwaggerOptions = () => {
           ...classSchemas,
           ...auditLogSchemas,
           ...dailyLogSchemas,
+          ...dailyLogTemplateSchemas,
         },
       },
       security: [

@@ -6,7 +6,7 @@ const conversationSchemas = {
       participant_id: {
         type: 'string',
         description: 'ObjectId do participante com quem se quer conversar',
-        example: '000000000000000000000002',
+        example: '6644c5b9d6e7f80910203002',
       },
       type: {
         type: 'string',
@@ -22,7 +22,7 @@ const conversationSchemas = {
     type: 'object',
     properties: {
       _id: { type: 'string', example: '664f1b2c3a9d4e0012345678' },
-      school_id: { type: 'string', example: '000000000000000000000001' },
+      school_id: { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
       participants: {
         type: 'array',
         items: { type: 'string' },
