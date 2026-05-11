@@ -124,6 +124,11 @@ const userPolicies = [
         roles: ['admin'],
         schoolParam: 'schoolId',
       },
+      DELETE: {
+        scope: 'school',
+        roles: ['admin'],
+        schoolParam: 'schoolId',
+      },
     },
   },
   {
