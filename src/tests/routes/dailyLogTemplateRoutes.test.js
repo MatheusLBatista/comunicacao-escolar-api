@@ -51,6 +51,31 @@ async function getFirstSchoolId(token) {
   return firstSchoolId;
 }
 
+async function createGlobalUser({ token, seedLabel }) {
+  const seed = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  const email = `${seedLabel.toLowerCase()}.${seed}@teste.com`;
+  const password = 'Senha@123';
+
+  const response = await request(BASE_URL)
+    .post('/users')
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      full_name: `${seedLabel} ${seed}`,
+      email,
+      password,
+      active: true,
+    });
+
+  expect(response.status).toBe(201);
+  expect(response.body?.data?._id).toBeTruthy();
+
+  return {
+    id: response.body.data._id,
+    email,
+    password,
+  };
+}
+
 async function createSchoolUser({ token, schoolId, role, seedLabel }) {
   const seed = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
   const email = `${seedLabel.toLowerCase()}.${seed}@teste.com`;
@@ -141,10 +166,8 @@ describe('DailyLogTemplate - integração de rotas', () => {
       seedLabel: 'StudentDailyLogTemplate',
     });
 
-    teacherUser = await createSchoolUser({
+    teacherUser = await createGlobalUser({
       token: adminToken,
-      schoolId,
-      role: 'teacher',
       seedLabel: 'TeacherDailyLogTemplate',
     });
 
