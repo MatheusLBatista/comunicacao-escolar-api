@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import School from '../models/School.js';
 import { fakeMappings } from './globalFakeMapping.js';
@@ -38,7 +39,22 @@ export default async function userSeed() {
   // MOCK: Create students (sem credenciais de acesso — criados internamente ao vincular responsáveis)
   const students = [];
 
-  for (let i = 0; i < 5; i++) {
+  // Primeiro aluno — ID fixo para facilitar exemplos na Swagger
+  students.push({
+    _id: new mongoose.Types.ObjectId('6646e7dbf8091020304050a1'),
+    full_name: 'Lucas Silva',
+    auth_provider: 'local',
+    active: true,
+    memberships: [
+      {
+        school_id: school._id,
+        role: 'student',
+        class_id: null,
+      },
+    ],
+  });
+
+  for (let i = 0; i < 4; i++) {
     students.push({
       full_name: fakeMappings.User.full_name(),
       auth_provider: 'local',
@@ -56,8 +72,9 @@ export default async function userSeed() {
   const createdStudents = await User.collection.insertMany(students);
   const studentIds = Object.values(createdStudents.insertedIds);
 
-  // Create admin
+  // Create admin — ID fixo para facilitar exemplos na Swagger
   const admin = {
+    _id: new mongoose.Types.ObjectId('6643b4a8c5d6e7f809102001'),
     full_name: process.env.ADMIN_NAME || 'Administrador',
     email: process.env.ADMIN_EMAIL || 'admin@admin.com',
     password: defaultPassword,
@@ -72,8 +89,9 @@ export default async function userSeed() {
     ],
   };
 
-  // Create default teacher
+  // Create default teacher — ID fixo para facilitar exemplos na Swagger
   const defaultTeacher = {
+    _id: new mongoose.Types.ObjectId('6644c5b9d6e7f80910203002'),
     full_name: process.env.TEACHER_NAME || 'Maria Teacher',
     email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
     password: await bcrypt.hash(
@@ -91,8 +109,9 @@ export default async function userSeed() {
     ],
   };
 
-  // Create default parent
+  // Create default parent — ID fixo para facilitar exemplos na Swagger
   const defaultParent = {
+    _id: new mongoose.Types.ObjectId('6645d6cae7f8091020304003'),
     full_name: process.env.PARENT_NAME || 'Ana Parent',
     email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
     password: await bcrypt.hash(process.env.PARENT_PASSWORD || 'Senha@123', 10),

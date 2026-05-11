@@ -25,7 +25,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
         ...generateParameters(classSchemas.ClassFiltro),
       ],
@@ -75,7 +75,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
       ],
       requestBody: {
@@ -120,7 +120,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
         {
           name: 'id',
@@ -128,6 +128,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ID da turma',
+          example: '6647f8ec0910203040506001',
         },
       ],
       responses: {
@@ -162,7 +163,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
         {
           name: 'id',
@@ -170,6 +171,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ID da turma',
+          example: '6647f8ec0910203040506001',
         },
       ],
       requestBody: {
@@ -214,7 +216,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
         {
           name: 'id',
@@ -222,6 +224,7 @@ const classPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ID da turma',
+          example: '6647f8ec0910203040506001',
         },
       ],
       responses: {

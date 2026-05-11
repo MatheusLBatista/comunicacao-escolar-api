@@ -31,7 +31,7 @@ const conversationPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
       ],
       requestBody: {
@@ -75,7 +75,7 @@ const conversationPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da escola',
-          example: '000000000000000000000001',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
         {
           name: 'type',
@@ -130,7 +130,7 @@ const conversationPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da conversa',
-          example: '664f1b2c3a9d4e0012345678',
+          example: '664eff007080901020301001',
         },
       ],
       responses: {
@@ -172,7 +172,7 @@ const conversationPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da conversa',
-          example: '664f1b2c3a9d4e0012345678',
+          example: '664eff007080901020301001',
         },
       ],
       requestBody: {
@@ -218,7 +218,7 @@ const conversationPaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId da conversa',
-          example: '664f1b2c3a9d4e0012345678',
+          example: '664eff007080901020301001',
         },
         {
           name: 'page',

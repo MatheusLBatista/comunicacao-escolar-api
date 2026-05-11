@@ -36,6 +36,7 @@ locals {
     var.firebase_project_id != "" ? "FIREBASE_PROJECT_ID=${var.firebase_project_id}" : "",
     var.firebase_client_email != "" ? "FIREBASE_CLIENT_EMAIL=${var.firebase_client_email}" : "",
     var.firebase_private_key != "" ? "FIREBASE_PRIVATE_KEY=${var.firebase_private_key}" : "",
+    var.google_client_id != "" ? "GOOGLE_CLIENT_ID=${var.google_client_id}" : "",
   ]))
 
   env_file_b64 = base64encode(join("\n", local.env_file_lines))

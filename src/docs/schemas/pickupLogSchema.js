@@ -7,7 +7,7 @@ const pickupLogSchemas = {
         type: 'string',
         nullable: true,
         description: 'ObjectId do responsavel que realizou a retirada',
-        example: '69d2fe8cffc1e22af72c46a7',
+        example: '6645d6cae7f8091020304003',
       },
       name: {
         type: 'string',
@@ -29,7 +29,7 @@ const pickupLogSchemas = {
         type: 'string',
         nullable: true,
         description: 'ObjectId do responsavel que realizou a retirada',
-        example: '69d2fe8cffc1e22af72c46a7',
+        example: '6645d6cae7f8091020304003',
       },
       name: {
         type: 'string',
@@ -58,19 +58,18 @@ const pickupLogSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e8bffc1e22af72c466f',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'ObjectId do aluno (membership role student)',
-        example: '69d2fe8cffc1e22af72c469c',
+        example: '6646e7dbf8091020304050a1',
       },
       authorization_id: {
         type: 'string',
         nullable: true,
-        description:
-          'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
-        example: '69d2ff5c8bc7f73f08b9fd21',
+        description: 'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
+        example: null,
       },
       picked_up_by: {
         $ref: '#/components/schemas/PickupLogPickedUpBy',
@@ -91,7 +90,7 @@ const pickupLogSchemas = {
         type: 'string',
         description:
           'ObjectId do usuario que validou a retirada (admin ou teacher)',
-        example: '69d2fe8cffc1e22af72c46aa',
+        example: '6643b4a8c5d6e7f809102001',
       },
       notes: {
         type: 'string',
@@ -114,19 +113,18 @@ const pickupLogSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e8bffc1e22af72c466f',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'ObjectId do aluno (membership role student)',
-        example: '69d2fe8cffc1e22af72c469c',
+        example: '6646e7dbf8091020304050a1',
       },
       authorization_id: {
         type: 'string',
         nullable: true,
-        description:
-          'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
-        example: '69d2ff5c8bc7f73f08b9fd21',
+        description: 'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
+        example: null,
       },
       picked_up_by: {
         $ref: '#/components/schemas/PickupLogPickedUpByPatch',
@@ -147,7 +145,7 @@ const pickupLogSchemas = {
         type: 'string',
         description:
           'ObjectId do usuario que validou a retirada (admin ou teacher)',
-        example: '69d2fe8cffc1e22af72c46aa',
+        example: '6643b4a8c5d6e7f809102001',
       },
       notes: {
         type: 'string',
@@ -168,7 +166,7 @@ const pickupLogSchemas = {
     properties: {
       _id: {
         type: 'string',
-        example: '69d2ff5c8bc7f73f08b9fd71',
+        example: '664dfe006070809010201001',
       },
       school_id: {
         oneOf: [{ type: 'string' }, { type: 'object' }],
@@ -248,22 +246,22 @@ const pickupLogSchemas = {
       school_id: {
         type: 'string',
         description: 'Filtrar por escola',
-        example: '69d2e8bffc1e22af72c466f',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'Filtrar por aluno',
-        example: '69d2fe8cffc1e22af72c469c',
+        example: '6646e7dbf8091020304050a1',
       },
       authorization_id: {
         type: 'string',
         description: 'Filtrar por autorizacao de retirada',
-        example: '69d2ff5c8bc7f73f08b9fd21',
+        example: '664cfd005060708090101001',
       },
       verified_by: {
         type: 'string',
         description: 'Filtrar por usuario verificador',
-        example: '69d2fe8cffc1e22af72c46aa',
+        example: '6643b4a8c5d6e7f809102001',
       },
       method: {
         type: 'string',

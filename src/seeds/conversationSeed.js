@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Conversation from '../models/Conversation.js';
 import School from '../models/School.js';
 import User from '../models/User.js';
@@ -61,6 +62,11 @@ export default async function conversationSeed() {
 
   if (!conversations.length) {
     return { insertedCount: 0, schoolId: school._id };
+  }
+
+  // Primeira conversa — ID fixo para facilitar exemplos na Swagger
+  if (conversations.length > 0) {
+    conversations[0]._id = new mongoose.Types.ObjectId('664eff007080901020301001');
   }
 
   const result = await Conversation.collection.insertMany(conversations);

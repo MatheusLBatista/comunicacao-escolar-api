@@ -32,7 +32,7 @@ const likePaths = {
           required: true,
           schema: { type: 'string' },
           description: 'ObjectId do comunicado',
-          example: '664f1b2c3a9d4e0012345679',
+          example: '664bfc0040506070809010a1',
         },
       ],
       requestBody: {

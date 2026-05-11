@@ -95,10 +95,9 @@ const dailyLogTemplatePaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do template',
+          example: '6648f9ed1020304050607001',
         },
       ],
       responses: {
@@ -131,10 +130,9 @@ const dailyLogTemplatePaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do template',
+          example: '6648f9ed1020304050607001',
         },
       ],
       requestBody: {
@@ -178,10 +176,9 @@ const dailyLogTemplatePaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do template',
+          example: '6648f9ed1020304050607001',
         },
       ],
       requestBody: {
@@ -220,10 +217,9 @@ const dailyLogTemplatePaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do template',
+          example: '6648f9ed1020304050607001',
         },
       ],
       responses: {

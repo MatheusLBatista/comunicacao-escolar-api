@@ -103,6 +103,7 @@ const pickupLogPaths = {
             type: 'string',
           },
           description: 'ID do log de retirada',
+          example: '664dfe006070809010201001',
         },
       ],
       responses: {
@@ -143,6 +144,7 @@ const pickupLogPaths = {
             type: 'string',
           },
           description: 'ID do log de retirada',
+          example: '664dfe006070809010201001',
         },
       ],
       requestBody: {
@@ -185,6 +187,7 @@ const pickupLogPaths = {
             type: 'string',
           },
           description: 'ID do log de retirada',
+          example: '664dfe006070809010201001',
         },
       ],
       responses: {

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import DailyLog from '../models/DailyLog.js';
 import DailyLogTemplate from '../models/DailyLogTemplate.js';
 import School from '../models/School.js';
@@ -107,6 +108,11 @@ export default async function dailyLogSeed() {
         ativo: true,
       });
     }
+  }
+
+  // Primeiro log — ID fixo para facilitar exemplos na Swagger
+  if (logs.length > 0) {
+    logs[0]._id = new mongoose.Types.ObjectId('6649faee2030405060708001');
   }
 
   const result = await DailyLog.collection.insertMany(logs);

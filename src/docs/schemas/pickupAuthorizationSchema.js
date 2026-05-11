@@ -42,17 +42,17 @@ const pickupAuthorizationSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e8bffc1e22af72c466f',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'ObjectId do aluno (membership role student)',
-        example: '69d2fe8cffc1e22af72c469c',
+        example: '6646e7dbf8091020304050a1',
       },
       authorized_by: {
         type: 'string',
         description: 'ObjectId do responsavel (membership role parent)',
-        example: '69d2fe8cffc1e22af72c46a7',
+        example: '6645d6cae7f8091020304003',
       },
       authorized_person: {
         $ref: '#/components/schemas/PickupAuthorizedPerson',
@@ -96,17 +96,17 @@ const pickupAuthorizationSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e8bffc1e22af72c466f',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'ObjectId do aluno (membership role student)',
-        example: '69d2fe8cffc1e22af72c469c',
+        example: '6646e7dbf8091020304050a1',
       },
       authorized_by: {
         type: 'string',
         description: 'ObjectId do responsavel (membership role parent)',
-        example: '69d2fe8cffc1e22af72c46a7',
+        example: '6645d6cae7f8091020304003',
       },
       authorized_person: {
         $ref: '#/components/schemas/PickupAuthorizedPerson',
@@ -147,7 +147,7 @@ const pickupAuthorizationSchemas = {
     properties: {
       _id: {
         type: 'string',
-        example: '69d2ff5c8bc7f73f08b9fd21',
+        example: '664cfd005060708090101001',
       },
       school_id: {
         oneOf: [{ type: 'string' }, { type: 'object' }],
@@ -228,17 +228,17 @@ const pickupAuthorizationSchemas = {
       school_id: {
         type: 'string',
         description: 'Filtrar por escola',
-        example: '69d2e8bffc1e22af72c466f',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'Filtrar por aluno',
-        example: '69d2fe8cffc1e22af72c469c',
+        example: '6646e7dbf8091020304050a1',
       },
       authorized_by: {
         type: 'string',
         description: 'Filtrar por responsavel',
-        example: '69d2fe8cffc1e22af72c46a7',
+        example: '6645d6cae7f8091020304003',
       },
       used: {
         type: 'boolean',

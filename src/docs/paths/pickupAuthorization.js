@@ -103,6 +103,7 @@ const pickupAuthorizationPaths = {
             type: 'string',
           },
           description: 'ID da autorização de retirada',
+          example: '664cfd005060708090101001',
         },
       ],
       responses: {
@@ -141,6 +142,7 @@ const pickupAuthorizationPaths = {
             type: 'string',
           },
           description: 'ID da autorização de retirada',
+          example: '664cfd005060708090101001',
         },
       ],
       requestBody: {
@@ -185,6 +187,7 @@ const pickupAuthorizationPaths = {
             type: 'string',
           },
           description: 'ID da autorização de retirada',
+          example: '664cfd005060708090101001',
         },
       ],
       responses: {

@@ -3,8 +3,8 @@ const auditLogSchemas = {
     type: 'object',
     properties: {
       _id: { type: 'string', example: '664f1b2c3a9d4e0012345678' },
-      school_id: { type: 'string', example: '000000000000000000000001' },
-      user_id: { type: 'string', example: '000000000000000000000002' },
+      school_id: { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
+      user_id: { type: 'string', example: '6643b4a8c5d6e7f809102001' },
       action: { type: 'string', example: 'CREATE' },
       resourceType: { type: 'string', example: 'Post' },
       resourceId: { type: 'string', example: '664f1b2c3a9d4e0012345679' },

@@ -7,9 +7,9 @@ const auditLogPaths = {
       summary: 'Listar logs de auditoria da escola',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
-        { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-        { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola', example: '6642a3f7b4c5d6e7f8091001' },
+        { name: 'page', in: 'query', schema: { type: 'integer', default: 1, example: 1 }, description: 'Número da página' },
+        { name: 'limit', in: 'query', schema: { type: 'integer', default: 10, example: 10 }, description: 'Itens por página' },
       ],
       responses: {
         200: commonResponses[200]('#/components/schemas/AuditLogListagem'),
@@ -25,7 +25,7 @@ const auditLogPaths = {
       summary: 'Resumo dos logs de auditoria',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola', example: '6642a3f7b4c5d6e7f8091001' },
       ],
       responses: {
         200: commonResponses[200](),
@@ -40,9 +40,9 @@ const auditLogPaths = {
       summary: 'Listar logs por recurso',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
-        { name: 'resourceType', in: 'path', required: true, schema: { type: 'string' } },
-        { name: 'resourceId', in: 'path', required: true, schema: { type: 'string' } },
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, example: '6642a3f7b4c5d6e7f8091001' },
+        { name: 'resourceType', in: 'path', required: true, schema: { type: 'string' }, example: 'User' },
+        { name: 'resourceId', in: 'path', required: true, schema: { type: 'string' }, example: '6643b4a8c5d6e7f809102001' },
       ],
       responses: {
         200: commonResponses[200]('#/components/schemas/AuditLogListagem'),
@@ -55,8 +55,8 @@ const auditLogPaths = {
       summary: 'Listar logs por usuário',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
-        { name: 'userId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do usuário' },
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola', example: '6642a3f7b4c5d6e7f8091001' },
+        { name: 'userId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do usuário', example: '6643b4a8c5d6e7f809102001' },
       ],
       responses: {
         200: commonResponses[200]('#/components/schemas/AuditLogListagem'),
@@ -71,8 +71,8 @@ const auditLogPaths = {
       summary: 'Listar logs por aluno',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
-        { name: 'studentId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do aluno' },
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola', example: '6642a3f7b4c5d6e7f8091001' },
+        { name: 'studentId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do aluno', example: '6646e7dbf8091020304050a1' },
       ],
       responses: {
         200: commonResponses[200]('#/components/schemas/AuditLogListagem'),
@@ -87,8 +87,8 @@ const auditLogPaths = {
       summary: 'Buscar log de auditoria por ID',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola' },
-        { name: 'logId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do log' },
+        { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'ID da escola', example: '6642a3f7b4c5d6e7f8091001' },
+        { name: 'logId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID do log de auditoria', example: '664f1b2c3a9d4e0012345671' },
       ],
       responses: {
         200: commonResponses[200]('#/components/schemas/AuditLogItem'),
