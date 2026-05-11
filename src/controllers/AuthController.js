@@ -11,6 +11,7 @@ import {
   UserUpdateSchema,
   RegisterSchema,
   FcmTokenSchema,
+  ResetPasswordByCodeSchema,
 } from '../utils/validators/schemas/zod/UserSchema.js';
 import { UserIdSchema } from '../utils/validators/schemas/zod/querys/UserQuerySchema.js';
 import { RequestAuthorizationSchema } from '../utils/validators/schemas/zod/querys/RequestAuthorizationSchema.js';
@@ -86,25 +87,11 @@ class AuthController {
   }
 
   async updatePasswordByCode(req, res, next) {
-    const password_recovery_code = req.body.password_recovery_code || null;
-    const password = req.body.password || null;
-
-    if (!password_recovery_code) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
-        errorType: 'unauthorized',
-        field: 'authentication',
-        details: [],
-        customMessage:
-          'Código de recuperação no body é obrigatório para troca da senha.',
-      });
-    }
-
-    const passwordSchema = UserUpdateSchema.parse({ password });
+    const { password_recovery_code, password } = ResetPasswordByCodeSchema.parse(req.body);
 
     await this.service.updatePasswordByCode(
       password_recovery_code,
-      passwordSchema,
+      { password },
     );
 
     return CommonResponse.success(

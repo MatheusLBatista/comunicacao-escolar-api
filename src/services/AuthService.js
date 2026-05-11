@@ -320,7 +320,7 @@ class AuthService {
       Math.random()
         .toString(36) // ex: "0.f5g9hk3j"
         .replace(/[^a-z0-9]/gi, '') // mantém só letras/números
-        .slice(0, 6) // pega os 6 primeiros (aumentado para reduzir colisões)
+        .slice(0, 4) // pega os 4 primeiros
         .toUpperCase(); // converte p/ maiúsculas
 
     let codigoRecuperaSenha = generateCode();
@@ -388,7 +388,7 @@ class AuthService {
       await EmailService.enviarEmailRecuperacaoSenha(
         userEncontrado.full_name,
         userEncontrado.email,
-        tokenUnico,
+        codigoRecuperaSenha,
       );
       console.log(
         'E-mail de recuperação enviado com sucesso para:',
