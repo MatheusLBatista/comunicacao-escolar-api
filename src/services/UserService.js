@@ -8,10 +8,13 @@ import {
 } from '../utils/helpers/index.js';
 import minioClient from '../config/MinIO.js';
 import compress from '../config/SharpConfig.js';
+import emailService from './EmailService.js';
+import SchoolRepository from '../repositories/SchoolRepository.js';
 
 class UserService {
   constructor() {
     this.repository = new UserRepository();
+    this.schoolRepository = new SchoolRepository();
   }
 
   async createAdmin(parsedData) {
@@ -155,7 +158,22 @@ class UserService {
       memberships: membershipsAtualizadas,
     });
 
-    return atualizado;
+    this.schoolRepository.findById(schoolId).then((school) => {
+      if (school && usuario.email) {
+        emailService.enviarEmailVinculo(
+          usuario.full_name,
+          usuario.email,
+          parsedData.role,
+          school.name,
+        ).catch(() => {});
+      }
+    }).catch(() => {});
+
+    return {
+      _id: atualizado._id,
+      full_name: atualizado.full_name,
+      email: atualizado.email,
+    };
   }
 
   async addStudentToParent(schoolId, userId, parsedData) {
@@ -246,6 +264,78 @@ class UserService {
 
     const atualizado = await this.repository.update(pai._id, {
       memberships: pai.memberships,
+    });
+
+    return this._stripSensitiveFields(atualizado);
+  }
+
+  async deactivateMembership(schoolId, userId) {
+    const usuario = await this.repository.getById(userId);
+    if (!usuario) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'User',
+        details: [],
+        customMessage: 'Usuário não encontrado.',
+      });
+    }
+
+    const membership = Array.isArray(usuario.memberships)
+      ? usuario.memberships.find((m) => m.school_id?.toString() === schoolId)
+      : null;
+
+    if (!membership) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'membership',
+        details: [],
+        customMessage: 'Vínculo não encontrado.',
+      });
+    }
+
+    membership.active = false;
+    membership.deactivated_at = new Date();
+
+    const atualizado = await this.repository.update(usuario._id, {
+      memberships: usuario.memberships,
+    });
+
+    return this._stripSensitiveFields(atualizado);
+  }
+
+  async activateMembership(schoolId, userId) {
+    const usuario = await this.repository.getById(userId);
+    if (!usuario) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'User',
+        details: [],
+        customMessage: 'Usuário não encontrado.',
+      });
+    }
+
+    const membership = Array.isArray(usuario.memberships)
+      ? usuario.memberships.find((m) => m.school_id?.toString() === schoolId)
+      : null;
+
+    if (!membership) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'membership',
+        details: [],
+        customMessage: 'Vínculo não encontrado.',
+      });
+    }
+
+    membership.active = true;
+    membership.deactivated_at = null;
+
+    const atualizado = await this.repository.update(usuario._id, {
+      memberships: usuario.memberships,
     });
 
     return this._stripSensitiveFields(atualizado);

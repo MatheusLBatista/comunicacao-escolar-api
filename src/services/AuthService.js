@@ -158,8 +158,38 @@ class AuthService {
     const userAtualizado = await this.repository.getById(usuario._id);
     const obj = userAtualizado.toObject ? userAtualizado.toObject() : { ...userAtualizado };
     delete obj.password;
+    await this._populateAssociatedStudents(obj);
 
     return { user: { access_token, refresh_token, ...obj } };
+  }
+
+  async _populateAssociatedStudents(userObj) {
+    if (!Array.isArray(userObj.memberships)) return;
+    const studentIds = userObj.memberships
+      .filter((m) => m.role === 'parent')
+      .flatMap((m) => m.associated_students ?? []);
+    if (studentIds.length === 0) return;
+    const students = await this.repository.findUsers(studentIds, 'student');
+    const studentMap = {};
+    students.forEach((s) => {
+      const sm = s.memberships?.find((m) => m.role === 'student');
+      studentMap[s._id.toString()] = {
+        _id: s._id,
+        full_name: s.full_name,
+        class_id: sm?.class_id ?? null,
+      };
+    });
+    userObj.memberships = userObj.memberships.map((m) => {
+      if (m.role === 'parent' && Array.isArray(m.associated_students)) {
+        return {
+          ...m,
+          associated_students: m.associated_students
+            .map((id) => studentMap[id.toString()] ?? null)
+            .filter(Boolean),
+        };
+      }
+      return m;
+    });
   }
 
   async login(body) {
@@ -255,6 +285,7 @@ class AuthService {
     const userLogado = await this.repository.getByEmail(body.email);
     delete userLogado.password;
     const userObjeto = userLogado.toObject();
+    await this._populateAssociatedStudents(userObjeto);
 
     // Retornar o usuário com os tokens
     return { user: { access_token, refresh_token, ...userObjeto } };

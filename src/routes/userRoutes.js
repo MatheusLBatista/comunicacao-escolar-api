@@ -27,6 +27,18 @@ router
     AuthPermission,
     asyncWrapper(userController.updateMembershipRole.bind(userController)),
   )
+  .delete(
+    '/schools/:schoolId/members/:userId',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.deactivateMembership.bind(userController)),
+  )
+  .post(
+    '/schools/:schoolId/members/:userId/restore',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.activateMembership.bind(userController)),
+  )
   .post(
     '/schools/:schoolId/members/:userId/students',
     AuthMiddleware,
