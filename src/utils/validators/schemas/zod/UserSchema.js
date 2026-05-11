@@ -164,6 +164,17 @@ const FcmTokenSchema = z.object({
   fcm_token: z.string().min(1, 'O token FCM é obrigatório.'),
 });
 
+const ResetPasswordByCodeSchema = z.object({
+  password_recovery_code: z.string().min(1, 'Código de recuperação é obrigatório.'),
+  password: z
+    .string()
+    .min(8, 'A senha deve ter pelo menos 8 caracteres.')
+    .refine((val) => passwordRegex.test(val), {
+      message:
+        'A senha deve conter pelo menos 1 letra, 1 número e 1 caractere especial.',
+    }),
+});
+
 export {
   UserSchema,
   AdminCreateSchema,
@@ -176,4 +187,5 @@ export {
   ChangePasswordSchema,
   FcmTokenSchema,
   UpdateMembershipRoleSchema,
+  ResetPasswordByCodeSchema,
 };

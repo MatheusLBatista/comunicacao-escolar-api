@@ -36,8 +36,37 @@ const routes = (app) => {
     next();
   };
 
+  const swaggerBasicAuth = (req, res, next) => {
+    const swaggerUser = process.env.SWAGGER_USER;
+    const swaggerPass = process.env.SWAGGER_PASSWORD;
+
+    // Se não configurado, bloqueia em produção
+    if (!swaggerUser || !swaggerPass) {
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(404).send('Not found');
+      }
+      return next();
+    }
+
+    const authHeader = req.headers.authorization || '';
+    const [scheme, encoded] = authHeader.split(' ');
+
+    if (scheme !== 'Basic' || !encoded) {
+      res.set('WWW-Authenticate', 'Basic realm="API Docs"');
+      return res.status(401).send('Autenticação necessária para acessar a documentação.');
+    }
+
+    const [user, pass] = Buffer.from(encoded, 'base64').toString().split(':');
+    if (user !== swaggerUser || pass !== swaggerPass) {
+      res.set('WWW-Authenticate', 'Basic realm="API Docs"');
+      return res.status(401).send('Credenciais inválidas.');
+    }
+
+    next();
+  };
+
   app.get('/', (req, res) => {
-    res.redirect('/docs');
+    res.status(200).json({ status: 'ok' });
   });
 
   const swaggerDocs = swaggerJsDoc(getSwaggerOptions());
@@ -45,14 +74,14 @@ const routes = (app) => {
     explorer: true,
   });
 
-  app.get('/docs.json', allowSwaggerUI, (req, res) => {
+  app.get('/docs.json', swaggerBasicAuth, allowSwaggerUI, (req, res) => {
     res.json(swaggerDocs);
   });
 
-  app.use('/docs', allowSwaggerUI, swaggerUI.serve);
-  app.get('/docs', allowSwaggerUI, swaggerUIHandler);
+  app.use('/docs', swaggerBasicAuth, allowSwaggerUI, swaggerUI.serve);
+  app.get('/docs', swaggerBasicAuth, allowSwaggerUI, swaggerUIHandler);
 
-  app.get('/api-docs', (req, res) => {
+  app.get('/api-docs', swaggerBasicAuth, (req, res) => {
     res.redirect('/docs');
   });
 

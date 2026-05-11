@@ -93,6 +93,22 @@ class UserController {
     return CommonResponse.success(res, data);
   }
 
+  async deactivateMembership(req, res) {
+    const { schoolId, userId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    ObjectIdSchema.parse(userId);
+    const data = await this.service.deactivateMembership(schoolId, userId);
+    return CommonResponse.success(res, data);
+  }
+
+  async activateMembership(req, res) {
+    const { schoolId, userId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    ObjectIdSchema.parse(userId);
+    const data = await this.service.activateMembership(schoolId, userId);
+    return CommonResponse.success(res, data);
+  }
+
   async listBySchool(req, res) {
     const { schoolId } = req.params;
     ObjectIdSchema.parse(schoolId);

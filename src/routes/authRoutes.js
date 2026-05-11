@@ -17,7 +17,7 @@ router
   )
   .patch(
     '/password/reset',
-    asyncWrapper(authController.updatePasswordByToken.bind(authController)),
+    asyncWrapper(authController.updatePasswordByCode.bind(authController)),
   )
   .post('/logout', asyncWrapper(authController.logout.bind(authController)))
   .post('/revoke', asyncWrapper(authController.revoke.bind(authController)))

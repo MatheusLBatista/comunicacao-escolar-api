@@ -34,10 +34,16 @@ class UserFilterBuilder {
         $elemMatch: {
           school_id: schoolId,
           role: role,
+          active: { $ne: false },
         },
       };
     } else if (schoolId) {
-      this.filtros['memberships.school_id'] = schoolId;
+      this.filtros.memberships = {
+        $elemMatch: {
+          school_id: schoolId,
+          active: { $ne: false },
+        },
+      };
     }
     return this;
   }
@@ -49,6 +55,7 @@ class UserFilterBuilder {
           school_id: schoolId,
           role: 'student',
           class_id: class_id,
+          active: { $ne: false },
         },
       };
     }

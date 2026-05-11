@@ -1,0 +1,111 @@
+# ==============================================================================
+# terraform.tfvars.example
+#
+# Copie este arquivo para terraform.tfvars e preencha os valores.
+# O arquivo terraform.tfvars está no .gitignore e NUNCA deve ser commitado.
+#
+#   cp terraform.tfvars.example terraform.tfvars
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# AWS
+# ------------------------------------------------------------------------------
+
+# Região onde todos os recursos serão criados
+aws_region = "us-east-1"
+
+# t2.micro → Free Tier em contas criadas antes de 2024
+# t3.micro → Free Tier em contas mais novas
+instance_type = "t2.micro"
+
+# Nome do key pair criado no painel AWS EC2 > Key Pairs (para acesso SSH)
+# Deixe "" para desabilitar SSH (acesso via SSM continua funcionando)
+key_name = "meu-key-pair"
+
+# Restrinja ao seu IP para maior segurança: "203.0.113.10/32"
+# ou "0.0.0.0/0" para acesso aberto (não recomendado em produção)
+ssh_allowed_cidr = "0.0.0.0/0"
+
+# Deixe "" para usar automaticamente a Amazon Linux 2023 mais recente
+ami_id = ""
+
+# ------------------------------------------------------------------------------
+# Projeto
+# ------------------------------------------------------------------------------
+
+environment = "prod"
+prefix      = "comuesc"
+
+# ------------------------------------------------------------------------------
+# MongoDB Atlas
+# ------------------------------------------------------------------------------
+
+mongodb_uri = "mongodb+srv://USUARIO:SENHA@cluster0.xxxxx.mongodb.net/comunicacao-escolar?retryWrites=true&w=majority"
+
+# ------------------------------------------------------------------------------
+# Docker Hub
+# ------------------------------------------------------------------------------
+
+docker_hub_user     = "seu-usuario-dockerhub"
+docker_hub_password = "seu-access-token-dockerhub"
+image_tag           = "latest"
+
+# ------------------------------------------------------------------------------
+# API
+# ------------------------------------------------------------------------------
+
+port             = 3010
+environment_name = "prod"
+frontend_url     = "https://comunicacaoescolar.app"
+cors_origin      = "*"
+
+# ------------------------------------------------------------------------------
+# JWT — gere com: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+# ------------------------------------------------------------------------------
+
+jwt_secret_access_token      = "GERE_UM_SECRET_ALEATORIO_AQUI"
+jwt_secret_refresh_token     = "GERE_UM_SECRET_ALEATORIO_AQUI"
+jwt_secret_password_recovery = "GERE_UM_SECRET_ALEATORIO_AQUI"
+jwt_secret_invite            = "GERE_UM_SECRET_ALEATORIO_AQUI"
+jwt_access_token_expiration  = "1d"
+jwt_refresh_token_expiration = "7d"
+
+# ------------------------------------------------------------------------------
+# E-mail (Gmail com App Password)
+# ------------------------------------------------------------------------------
+
+email_user         = "seuemail@gmail.com"
+email_app_password = "xxxx xxxx xxxx xxxx"
+company_name       = "Comunicação Escolar"
+
+# ------------------------------------------------------------------------------
+# MinIO
+# ------------------------------------------------------------------------------
+
+minio_access_key = "GERE_UMA_CHAVE_AQUI"
+minio_secret_key = "GERE_UMA_SENHA_LONGA_AQUI"
+minio_bucket     = "comunicacao-escolar"
+minio_bucket_2   = "comunicacao-escolar-2"
+
+# ------------------------------------------------------------------------------
+# Admin (seed inicial)
+# ------------------------------------------------------------------------------
+
+
+
+# ------------------------------------------------------------------------------
+# Swagger UI (Basic Auth)
+# Deixe vazio para desativar o /docs em produção
+# ------------------------------------------------------------------------------
+
+swagger_user     = "admin"
+swagger_password = "SenhaSwaggerForte123!"
+
+# ------------------------------------------------------------------------------
+# Firebase (opcional — deixe vazio para desativar push notifications)
+# ------------------------------------------------------------------------------
+
+firebase_project_id   = ""
+firebase_client_email = ""
+# Use \n para representar quebras de linha dentro da chave privada
+firebase_private_key  = ""

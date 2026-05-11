@@ -83,6 +83,14 @@ class User {
                 ref: 'Users',
               },
             ],
+            active: {
+              type: Boolean,
+              default: true,
+            },
+            deactivated_at: {
+              type: Date,
+              default: null,
+            },
           },
         ],
         // Campos de infraestrutura de autenticação
