@@ -93,10 +93,9 @@ const eventPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do evento',
+          example: '664afbff3040506070809001',
         },
       ],
       responses: {
@@ -129,10 +128,9 @@ const eventPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do evento',
+          example: '664afbff3040506070809001',
         },
       ],
       requestBody: {
@@ -171,10 +169,9 @@ const eventPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do evento',
+          example: '664afbff3040506070809001',
         },
       ],
       responses: {

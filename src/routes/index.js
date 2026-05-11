@@ -72,6 +72,15 @@ const routes = (app) => {
   const swaggerDocs = swaggerJsDoc(getSwaggerOptions());
   const swaggerUIHandler = swaggerUI.setup(swaggerDocs, {
     explorer: true,
+    swaggerOptions: {
+      operationsSorter: (a, b) => {
+        const isDeleteA = a.get('method') === 'delete';
+        const isDeleteB = b.get('method') === 'delete';
+        if (isDeleteA && !isDeleteB) return 1;
+        if (!isDeleteA && isDeleteB) return -1;
+        return 0;
+      },
+    },
   });
 
   app.get('/docs.json', swaggerBasicAuth, allowSwaggerUI, (req, res) => {

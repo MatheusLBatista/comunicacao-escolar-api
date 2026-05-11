@@ -114,10 +114,9 @@ const gruposRoutes = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do grupo',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       responses: {
@@ -156,10 +155,9 @@ const gruposRoutes = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do grupo',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {
@@ -208,10 +206,9 @@ const gruposRoutes = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do grupo',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {
@@ -259,10 +256,9 @@ const gruposRoutes = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do grupo',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       responses: {
@@ -304,10 +300,9 @@ const gruposRoutes = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID do grupo',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import PickupLog from '../models/PickupLog.js';
 import PickupAuthorization from '../models/PickupAuthorization.js';
 import User from '../models/User.js';
@@ -91,6 +92,7 @@ export default async function pickupLogSeed() {
   );
 
   pickupLogs.push({
+    _id: new mongoose.Types.ObjectId('664dfe006070809010201001'),
     school_id: defaultSchool._id,
     student_id: defaultStudent._id,
     authorization_id: defaultAuthorization?._id || null,

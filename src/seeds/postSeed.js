@@ -96,6 +96,11 @@ export default async function postSeed(schools, users) {
     return { insertedCount: 0, posts: [] };
   }
 
+  // Primeiro post — ID fixo para facilitar exemplos na Swagger
+  if (posts.length > 0) {
+    posts[0]._id = new mongoose.Types.ObjectId('664bfc0040506070809010a1');
+  }
+
   const result = await Post.collection.insertMany(posts);
 
   console.log(`Seeded ${result.insertedCount} posts.`);

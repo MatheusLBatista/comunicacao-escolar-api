@@ -118,6 +118,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       responses: {
@@ -160,6 +161,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {
@@ -212,6 +214,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {
@@ -263,6 +266,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       responses: {

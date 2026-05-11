@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Event from '../models/Event.js';
 import User from '../models/User.js';
 import Class from '../models/Class.js';
@@ -105,6 +106,11 @@ export default async function eventSeed(schools, users) {
       'Nenhum evento foi criado: não há usuários com papel admin/teacher nas escolas recebidas.',
     );
     return { insertedCount: 0, events: [] };
+  }
+
+  // Primeiro evento — ID fixo para facilitar exemplos na Swagger
+  if (events.length > 0) {
+    events[0]._id = new mongoose.Types.ObjectId('664afbff3040506070809001');
   }
 
   const result = await Event.collection.insertMany(events);

@@ -36,7 +36,7 @@ const dailyLogTemplateSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e2353536b4f57ae190bc',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
@@ -68,13 +68,13 @@ const dailyLogTemplateSchemas = {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
-        example: '69d2e2353536b4f57ae190bc',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         nullable: true,
         description: 'ObjectId do aluno; null para template geral',
-        example: '69d2e2f53536b4f57ae19120',
+        example: '6646e7dbf8091020304050a1',
       },
       fields: {
         type: 'array',
@@ -97,11 +97,11 @@ const dailyLogTemplateSchemas = {
     properties: {
       _id: {
         type: 'string',
-        example: '69d2e2f53536b4f57ae1916f',
+        example: '6648f9ed1020304050607001',
       },
       school_id: {
         oneOf: [
-          { type: 'string', example: '69d2e2353536b4f57ae190bc' },
+          { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
           { type: 'object' },
         ],
       },
@@ -168,12 +168,12 @@ const dailyLogTemplateSchemas = {
       school_id: {
         type: 'string',
         description: 'Filtrar por escola',
-        example: '69d2e2353536b4f57ae190bc',
+        example: '6642a3f7b4c5d6e7f8091001',
       },
       student_id: {
         type: 'string',
         description: 'Filtrar por aluno especifico',
-        example: '69d2e2f53536b4f57ae19120',
+        example: '6646e7dbf8091020304050a1',
       },
       ativo: {
         type: 'boolean',

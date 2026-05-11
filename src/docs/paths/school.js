@@ -91,10 +91,9 @@ const schoolPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID da escola',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
       ],
       responses: {
@@ -125,10 +124,9 @@ const schoolPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
+          schema: { type: 'string' },
           description: 'ID da escola',
+          example: '6642a3f7b4c5d6e7f8091001',
         },
       ],
       requestBody: {
@@ -158,6 +156,8 @@ const schoolPaths = {
       description: `
             + Caso de uso: Excluir uma escola pelo identificador.
 
+            + Nota: Use o ID \`6642a3f7b4c5d6e7f8091099\` (Escola Demo Delete), criada no seed exclusivamente para este fim, para não remover a escola principal.
+
             + Resultado Esperado:
                 - HTTP 200 OK com os dados da escola removida.
             `,
@@ -167,10 +167,9 @@ const schoolPaths = {
           name: 'id',
           in: 'path',
           required: true,
-          schema: {
-            type: 'string',
-          },
-          description: 'ID da escola',
+          schema: { type: 'string' },
+          description: 'ID da escola. Use 6642a3f7b4c5d6e7f8091099 (Escola Demo Delete) para não remover a escola principal.',
+          example: '6642a3f7b4c5d6e7f8091099',
         },
       ],
       responses: {

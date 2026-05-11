@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import PickupAuthorization from '../models/PickupAuthorization.js';
 import { fakeMappings } from './globalFakeMapping.js';
 import User from '../models/User.js';
@@ -45,6 +46,7 @@ export default async function pickupAuthorizationSeed() {
   const defaultParent = parents[0];
 
   const defaultAuthorization = {
+    _id: new mongoose.Types.ObjectId('664cfd005060708090101001'),
     school_id: defaultSchool._id,
     student_id: defaultStudent._id,
     authorized_by: defaultParent._id,

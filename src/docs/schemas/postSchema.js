@@ -13,7 +13,7 @@ const postSchemas = {
         type: 'string',
         nullable: true,
         description: 'ObjectId da turma quando scope for class',
-        example: null,
+        example: "6642a3f7b4c5d6e7f8091001",
       },
     },
   },
@@ -55,8 +55,8 @@ const postSchemas = {
     type: 'object',
     properties: {
       _id: { type: 'string', example: '664f1b2c3a9d4e0012345678' },
-      school_id: { type: 'string', example: '000000000000000000000001' },
-      author_id: { type: 'string', example: '000000000000000000000002' },
+      school_id: { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
+      author_id: { type: 'string', example: '6643b4a8c5d6e7f809102001' },
       title: {
         type: 'string',
         example: 'Comunicado de reunião pedagógica',
@@ -88,7 +88,7 @@ const postSchemas = {
         type: 'array',
         items: { type: 'string' },
         description: 'Array de IDs dos usuários que curtiram este comunicado',
-        example: ['000000000000000000000003', '000000000000000000000004'],
+        example: ['6644c5b9d6e7f80910203002', '6645d6cae7f8091020304003'],
       },
       created_at: {
         type: 'string',
@@ -160,7 +160,7 @@ const postSchemas = {
       author_id: {
         type: 'string',
         description: 'Filtrar por autor',
-        example: '000000000000000000000002',
+        example: '6643b4a8c5d6e7f809102001',
       },
       title: {
         type: 'string',
@@ -181,7 +181,7 @@ const postSchemas = {
       target_id: {
         type: 'string',
         description: 'Filtrar por target_id',
-        example: '000000000000000000000010',
+        example: '6647f8ec0910203040506001',
       },
       active: {
         type: 'boolean',

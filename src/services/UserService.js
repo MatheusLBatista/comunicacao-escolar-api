@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import UserRepository from '../repositories/UserRepository.js';
+import GroupModel from '../models/Group.js';
 import {
   CustomError,
   HttpStatusCodes,
@@ -39,6 +40,10 @@ class UserService {
 
     const data = await this.repository.create(userData);
     return data;
+  }
+
+  async getBasicUserGroup() {
+    return GroupModel.findOne({ nome: 'BasicUser' }).lean();
   }
 
   async createAtSchool(schoolId, parsedData) {
@@ -87,6 +92,12 @@ class UserService {
       active: parsedData.active ?? true,
       memberships: [membership],
     };
+
+    const basicUserGroup = await this.getBasicUserGroup();
+    if (basicUserGroup) {
+      userData.groups = [basicUserGroup._id];
+      userData.permissions = basicUserGroup.permissions || [];
+    }
 
     const data = await this.repository.create(userData);
     return data;
