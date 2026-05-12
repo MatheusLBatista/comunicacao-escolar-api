@@ -235,6 +235,31 @@ const auditLogPolicies = [
 
 const resourcePolicies = [
   {
+    pattern: /^\/daily-log-templates(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'global',
+        roles: ['admin'],
+      },
+      POST: {
+        scope: 'global',
+        roles: ['admin'],
+      },
+      PATCH: {
+        scope: 'global',
+        roles: ['admin'],
+      },
+      PUT: {
+        scope: 'global',
+        roles: ['admin'],
+      },
+      DELETE: {
+        scope: 'global',
+        roles: ['admin'],
+      },
+    },
+  },
+  {
     pattern: /^\/daily-logs(?:\/|$)/,
     methods: {
       GET: {
