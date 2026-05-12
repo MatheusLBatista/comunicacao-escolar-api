@@ -239,23 +239,23 @@ const resourcePolicies = [
     methods: {
       GET: {
         scope: 'global',
-        roles: ['admin'],
+        roles: ['admin', 'teacher'],
       },
       POST: {
         scope: 'global',
-        roles: ['admin'],
+        roles: ['admin', 'teacher'],
       },
       PATCH: {
         scope: 'global',
-        roles: ['admin'],
+        roles: ['admin', 'teacher'],
       },
       PUT: {
         scope: 'global',
-        roles: ['admin'],
+        roles: ['admin', 'teacher'],
       },
       DELETE: {
         scope: 'global',
-        roles: ['admin'],
+        roles: ['admin', 'teacher'],
       },
     },
   },
