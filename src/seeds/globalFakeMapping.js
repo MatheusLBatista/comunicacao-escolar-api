@@ -114,6 +114,7 @@ export const fakeMappings = {
   },
 
   DailyLogTemplate: {
+    name: () => 'Diário de Bordo',
     fields: () => [
       {
         key: 'mood_status',

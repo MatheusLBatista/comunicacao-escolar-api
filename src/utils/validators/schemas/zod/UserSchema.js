@@ -175,6 +175,10 @@ const ResetPasswordByCodeSchema = z.object({
     }),
 });
 
+const MoveStudentClassSchema = z.object({
+  class_id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'class_id inválido'),
+});
+
 export {
   UserSchema,
   AdminCreateSchema,
@@ -188,4 +192,5 @@ export {
   FcmTokenSchema,
   UpdateMembershipRoleSchema,
   ResetPasswordByCodeSchema,
+  MoveStudentClassSchema,
 };

@@ -280,6 +280,64 @@ class UserService {
     return this._stripSensitiveFields(atualizado);
   }
 
+  async moveStudentToClass(schoolId, parentId, studentId, classId) {
+    const pai = await this.repository.getById(parentId);
+
+    const membership = Array.isArray(pai.memberships)
+      ? pai.memberships.find(
+          (m) => m.school_id?.toString() === schoolId && m.role === 'parent',
+        )
+      : null;
+
+    if (!membership) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'membership',
+        details: [],
+        customMessage: 'Usuário não é responsável nesta escola.',
+      });
+    }
+
+    const isChild = membership.associated_students.some(
+      (id) => id.toString() === studentId,
+    );
+
+    if (!isChild) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'student',
+        details: [],
+        customMessage: 'Aluno não encontrado neste responsável.',
+      });
+    }
+
+    const aluno = await this.repository.getById(studentId);
+    const studentMembership = Array.isArray(aluno.memberships)
+      ? aluno.memberships.find(
+          (m) => m.school_id?.toString() === schoolId && m.role === 'student',
+        )
+      : null;
+
+    if (!studentMembership) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'resourceNotFound',
+        field: 'student',
+        details: [],
+        customMessage: 'Matrícula do aluno não encontrada.',
+      });
+    }
+
+    studentMembership.class_id = classId;
+    const atualizado = await this.repository.update(aluno._id, {
+      memberships: aluno.memberships,
+    });
+
+    return this._stripSensitiveFields(atualizado);
+  }
+
   async deactivateMembership(schoolId, userId) {
     const usuario = await this.repository.getById(userId);
     if (!usuario) {
@@ -308,6 +366,24 @@ class UserService {
 
     membership.active = false;
     membership.deactivated_at = new Date();
+
+    if (membership.role === 'parent' && membership.associated_students?.length > 0) {
+      await Promise.allSettled(
+        membership.associated_students.map(async (studentId) => {
+          const aluno = await this.repository.getById(studentId.toString());
+          if (!aluno) return;
+          const studentMembership = Array.isArray(aluno.memberships)
+            ? aluno.memberships.find(
+                (m) => m.school_id?.toString() === schoolId && m.role === 'student',
+              )
+            : null;
+          if (studentMembership) {
+            studentMembership.class_id = null;
+            await this.repository.update(aluno._id, { memberships: aluno.memberships });
+          }
+        }),
+      );
+    }
 
     const atualizado = await this.repository.update(usuario._id, {
       memberships: usuario.memberships,

@@ -45,6 +45,12 @@ router
     AuthPermission,
     asyncWrapper(userController.addStudentToParent.bind(userController)),
   )
+  .patch(
+    '/schools/:schoolId/members/:userId/students/:studentId',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.moveStudentToClass.bind(userController)),
+  )
   .delete(
     '/schools/:schoolId/members/:userId/students/:studentId',
     AuthMiddleware,

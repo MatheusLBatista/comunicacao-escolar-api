@@ -10,6 +10,7 @@ import {
   LinkToSchoolSchema,
   StudentInputSchema,
   UpdateMembershipRoleSchema,
+  MoveStudentClassSchema,
 } from '../utils/validators/schemas/zod/UserSchema.js';
 import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 import { CommonResponse } from '../utils/helpers/index.js';
@@ -80,6 +81,17 @@ class UserController {
     ObjectIdSchema.parse(studentId);
 
     const data = await this.service.removeStudentFromParent(schoolId, userId, studentId);
+    return CommonResponse.success(res, data);
+  }
+
+  async moveStudentToClass(req, res) {
+    const { schoolId, userId, studentId } = req.params;
+    ObjectIdSchema.parse(schoolId);
+    ObjectIdSchema.parse(userId);
+    ObjectIdSchema.parse(studentId);
+
+    const { class_id } = MoveStudentClassSchema.parse(req.body);
+    const data = await this.service.moveStudentToClass(schoolId, userId, studentId, class_id);
     return CommonResponse.success(res, data);
   }
 

@@ -24,6 +24,7 @@ const TemplateFieldSchema = z
 
 const DailyLogTemplateSchema = z.object({
   school_id: ObjectIdSchema,
+  name: z.string().min(1, 'Nome do template é obrigatório.').trim(),
   student_id: z.union([ObjectIdSchema, z.null()]).optional(),
   fields: z
     .array(TemplateFieldSchema)
