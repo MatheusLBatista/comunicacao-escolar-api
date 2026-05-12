@@ -115,6 +115,7 @@ async function createDailyLogTemplate({
     .set('Authorization', `Bearer ${token}`)
     .send({
       school_id: schoolId,
+      name: `${labelSeed} ${seed}`,
       student_id: studentId,
       fields: [
         {
@@ -229,6 +230,7 @@ describe('DailyLogTemplate - integração de rotas', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
         school_id: schoolId,
+        name: 'Template Participacao',
         fields: [
           {
             key: 'participation',
