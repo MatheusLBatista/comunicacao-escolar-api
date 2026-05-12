@@ -31,12 +31,17 @@ const dailyLogTemplateSchemas = {
 
   DailyLogTemplatePost: {
     type: 'object',
-    required: ['school_id', 'fields'],
+    required: ['school_id', 'name', 'fields'],
     properties: {
       school_id: {
         type: 'string',
         description: 'ObjectId da escola',
         example: '6642a3f7b4c5d6e7f8091001',
+      },
+      name: {
+        type: 'string',
+        description: 'Nome do template',
+        example: 'Template de Humor Diario',
       },
       student_id: {
         type: 'string',
@@ -69,6 +74,11 @@ const dailyLogTemplateSchemas = {
         type: 'string',
         description: 'ObjectId da escola',
         example: '6642a3f7b4c5d6e7f8091001',
+      },
+      name: {
+        type: 'string',
+        description: 'Nome do template',
+        example: 'Template de Humor Diario',
       },
       student_id: {
         type: 'string',
@@ -104,6 +114,10 @@ const dailyLogTemplateSchemas = {
           { type: 'string', example: '6642a3f7b4c5d6e7f8091001' },
           { type: 'object' },
         ],
+      },
+      name: {
+        type: 'string',
+        example: 'Template de Humor Diario',
       },
       student_id: {
         oneOf: [
