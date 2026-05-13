@@ -124,11 +124,7 @@ const LinkToSchoolSchema = z
     message: 'Informe user_id ou email do usuário a ser vinculado.',
     path: ['user_id'],
   })
-  .refine((data) => data.role !== 'parent' || data.student, {
-    message:
-      'Ao vincular um responsável, é obrigatório informar os dados do aluno (campo student).',
-    path: ['student'],
-  });
+;
 
 const MeUpdateSchema = z
   .object({

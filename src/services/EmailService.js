@@ -192,6 +192,44 @@ Equipe Edu Connect
 
     return await this.enviarEmail(email, subject, text, html);
   }
+
+  async enviarEmailConviteEscola(email, schoolName, role) {
+    const roleLabel = role === 'teacher' ? 'professor(a)' : 'responsável';
+    const subject = `Você foi convidado(a) para a ${schoolName}`;
+
+    const text = `
+Olá!
+
+O administrador da escola ${schoolName} cadastrou o seu e-mail no sistema Edu Connect como ${roleLabel}.
+
+Para acessar o aplicativo, baixe o Edu Connect e crie sua conta usando este endereço de e-mail: ${email}
+
+Equipe Edu Connect
+    `.trim();
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h1 style="color: #306FCC; font-size: 24px; margin-bottom: 20px; margin-top: 0;">Você foi convidado(a)!</h1>
+            <p style="margin: 0 0 15px 0; font-size: 18px;">O administrador da escola <strong>${schoolName}</strong> cadastrou seu e-mail no sistema Edu Connect como <strong>${roleLabel}</strong>.</p>
+            <p style="margin: 0 0 20px 0; font-size: 18px;">Para acessar, baixe o aplicativo <strong>Edu Connect</strong> e crie sua conta usando este e-mail:</p>
+            <div style="background: #f0f4ff; border-radius: 6px; padding: 14px; text-align: center; margin: 20px 0;">
+                <p style="margin: 0; font-size: 20px; font-weight: bold; color: #306FCC;">${email}</p>
+            </div>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+                <p style="margin: 0; font-size: 16px; color: #999;">Equipe Edu Connect</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+    `.trim();
+
+    return await this.enviarEmail(email, subject, text, html);
+  }
 }
 
 export default new EmailService();

@@ -70,32 +70,37 @@ class AuthService {
 
   async register(data) {
     const existente = await this.repository.getByEmail(data.email);
-    if (existente) {
+
+    if (!existente) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'email',
+        details: [],
+        customMessage: 'E-mail não cadastrado no sistema. Entre em contato com o administrador da escola.',
+      });
+    }
+
+    if (existente.active) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
         errorType: 'duplicateEntry',
         field: 'email',
-        details: [{ path: 'email', message: 'Email já está em uso.' }],
-        customMessage: 'Email já está em uso.',
+        details: [{ path: 'email', message: 'Esta conta já está ativa. Faça login.' }],
+        customMessage: 'Esta conta já está ativa. Faça login.',
       });
     }
 
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(data.password, saltRounds);
 
-    const userData = {
+    await this.repository.update(existente._id, {
       full_name: data.full_name,
-      email: data.email,
       password: passwordHash,
-      auth_provider: 'local',
       active: true,
-      memberships: [],
-    };
+    });
 
-    const usuario = await this.repository.create(userData);
-    const obj = usuario.toObject ? usuario.toObject() : { ...usuario };
-    delete obj.password;
-    return obj;
+    return { message: 'Conta ativada com sucesso!' };
   }
 
   async googleAuth(idToken) {
@@ -135,16 +140,13 @@ class AuthService {
     }
 
     if (!usuario) {
-      // Cria nova conta via Google
-      const userData = {
-        full_name: name,
-        email: email || null,
-        google_id: googleId,
-        auth_provider: 'google',
-        active: true,
-        memberships: [],
-      };
-      usuario = await this.repository.create(userData);
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'email',
+        details: [],
+        customMessage: 'E-mail não cadastrado no sistema. Entre em contato com o administrador da escola.',
+      });
     } else if (!usuario.google_id) {
       // Conta local existente: vincula o google_id
       await this.repository.update(usuario._id, { google_id: googleId, auth_provider: 'google' });
@@ -159,6 +161,16 @@ class AuthService {
     const obj = userAtualizado.toObject ? userAtualizado.toObject() : { ...userAtualizado };
     delete obj.password;
     await this._populateAssociatedStudents(obj);
+
+    if (!obj.memberships || obj.memberships.length === 0) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'membership',
+        details: [],
+        customMessage: 'Sua conta não está vinculada a nenhuma escola. Entre em contato com o administrador.',
+      });
+    }
 
     return { user: { access_token, refresh_token, ...obj } };
   }
@@ -202,6 +214,16 @@ class AuthService {
         field: 'Email',
         details: [],
         customMessage: messages.error.unauthorized('Senha ou Email'),
+      });
+    }
+
+    if (!userEncontrado.active) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'active',
+        details: [],
+        customMessage: 'Conta pendente de ativação. Registre-se no aplicativo para criar sua senha.',
       });
     }
 
@@ -286,6 +308,16 @@ class AuthService {
     delete userLogado.password;
     const userObjeto = userLogado.toObject();
     await this._populateAssociatedStudents(userObjeto);
+
+    if (!userObjeto.memberships || userObjeto.memberships.length === 0) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'membership',
+        details: [],
+        customMessage: 'Sua conta não está vinculada a nenhuma escola. Entre em contato com o administrador.',
+      });
+    }
 
     // Retornar o usuário com os tokens
     return { user: { access_token, refresh_token, ...userObjeto } };

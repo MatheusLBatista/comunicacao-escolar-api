@@ -107,7 +107,6 @@ class UserService {
   }
 
   async linkToSchool(schoolId, parsedData) {
-    // Localiza o usuário por user_id ou email
     let usuario;
     if (parsedData.user_id) {
       usuario = await this.repository.getById(parsedData.user_id);
@@ -115,33 +114,22 @@ class UserService {
       usuario = await this.repository.getByEmail(parsedData.email);
     }
 
-    if (!usuario) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.NOT_FOUND.code,
-        errorType: 'resourceNotFound',
-        field: 'User',
-        details: [],
-        customMessage: 'Usuário não encontrado.',
-      });
-    }
-
-    // Verifica se já é membro desta escola
-    const jaMembro = Array.isArray(usuario.memberships) &&
-      usuario.memberships.some((m) => m.school_id?.toString() === schoolId);
-    if (jaMembro) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.CONFLICT.code,
-        errorType: 'duplicateEntry',
-        field: 'school_id',
-        details: [{ path: 'school_id', message: 'Usuário já vinculado a esta escola.' }],
-        customMessage: 'Usuário já vinculado a esta escola.',
-      });
+    if (usuario) {
+      const jaMembro = Array.isArray(usuario.memberships) &&
+        usuario.memberships.some((m) => m.school_id?.toString() === schoolId);
+      if (jaMembro) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.CONFLICT.code,
+          errorType: 'duplicateEntry',
+          field: 'school_id',
+          details: [{ path: 'school_id', message: 'Usuário já vinculado a esta escola.' }],
+          customMessage: 'Usuário já vinculado a esta escola.',
+        });
+      }
     }
 
     let studentId = null;
-
-    if (parsedData.role === 'parent') {
-      // Cria o aluno vinculado a esta escola
+    if (parsedData.role === 'parent' && parsedData.student) {
       const alunoData = {
         full_name: parsedData.student.full_name,
         auth_provider: 'local',
@@ -161,8 +149,27 @@ class UserService {
     const membership = {
       school_id: schoolId,
       role: parsedData.role,
-      ...(parsedData.role === 'parent' && { associated_students: [studentId] }),
+      associated_students: studentId ? [studentId] : [],
     };
+
+    if (!usuario) {
+      const email = parsedData.email;
+      const pendente = await this.repository.create({
+        full_name: email.split('@')[0],
+        email,
+        auth_provider: 'local',
+        active: false,
+        memberships: [membership],
+      });
+
+      this.schoolRepository.findById(schoolId).then((school) => {
+        if (school) {
+          emailService.enviarEmailConviteEscola(email, school.name, parsedData.role).catch(() => {});
+        }
+      }).catch(() => {});
+
+      return { _id: pendente._id, full_name: pendente.full_name, email: pendente.email };
+    }
 
     const membershipsAtualizadas = [...(usuario.memberships || []), membership];
     const atualizado = await this.repository.update(usuario._id, {
