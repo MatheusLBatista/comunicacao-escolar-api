@@ -126,14 +126,17 @@ class UserService {
     }
 
     // Verifica se já é membro desta escola
-    const jaMembro = Array.isArray(usuario.memberships) &&
+    const jaMembro =
+      Array.isArray(usuario.memberships) &&
       usuario.memberships.some((m) => m.school_id?.toString() === schoolId);
     if (jaMembro) {
       throw new CustomError({
         statusCode: HttpStatusCodes.CONFLICT.code,
         errorType: 'duplicateEntry',
         field: 'school_id',
-        details: [{ path: 'school_id', message: 'Usuário já vinculado a esta escola.' }],
+        details: [
+          { path: 'school_id', message: 'Usuário já vinculado a esta escola.' },
+        ],
         customMessage: 'Usuário já vinculado a esta escola.',
       });
     }
@@ -169,16 +172,21 @@ class UserService {
       memberships: membershipsAtualizadas,
     });
 
-    this.schoolRepository.findById(schoolId).then((school) => {
-      if (school && usuario.email) {
-        emailService.enviarEmailVinculo(
-          usuario.full_name,
-          usuario.email,
-          parsedData.role,
-          school.name,
-        ).catch(() => {});
-      }
-    }).catch(() => {});
+    this.schoolRepository
+      .findById(schoolId)
+      .then((school) => {
+        if (school && usuario.email) {
+          emailService
+            .enviarEmailVinculo(
+              usuario.full_name,
+              usuario.email,
+              parsedData.role,
+              school.name,
+            )
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
 
     return {
       _id: atualizado._id,
@@ -202,8 +210,7 @@ class UserService {
         errorType: 'resourceNotFound',
         field: 'User',
         details: [],
-        customMessage:
-          'Usuário não é responsável nesta escola.',
+        customMessage: 'Usuário não é responsável nesta escola.',
       });
     }
 
@@ -231,7 +238,10 @@ class UserService {
   }
 
   _stripSensitiveFields(userObj) {
-    const obj = typeof userObj.toObject === 'function' ? userObj.toObject() : { ...userObj };
+    const obj =
+      typeof userObj.toObject === 'function'
+        ? userObj.toObject()
+        : { ...userObj };
     delete obj.fcm_tokens;
     delete obj.permissions;
     delete obj.groups;
@@ -367,19 +377,25 @@ class UserService {
     membership.active = false;
     membership.deactivated_at = new Date();
 
-    if (membership.role === 'parent' && membership.associated_students?.length > 0) {
+    if (
+      membership.role === 'parent' &&
+      membership.associated_students?.length > 0
+    ) {
       await Promise.allSettled(
         membership.associated_students.map(async (studentId) => {
           const aluno = await this.repository.getById(studentId.toString());
           if (!aluno) return;
           const studentMembership = Array.isArray(aluno.memberships)
             ? aluno.memberships.find(
-                (m) => m.school_id?.toString() === schoolId && m.role === 'student',
+                (m) =>
+                  m.school_id?.toString() === schoolId && m.role === 'student',
               )
             : null;
           if (studentMembership) {
             studentMembership.class_id = null;
-            await this.repository.update(aluno._id, { memberships: aluno.memberships });
+            await this.repository.update(aluno._id, {
+              memberships: aluno.memberships,
+            });
           }
         }),
       );
@@ -432,9 +448,7 @@ class UserService {
     const usuario = await this.repository.getById(userId);
 
     const membership = Array.isArray(usuario.memberships)
-      ? usuario.memberships.find(
-          (m) => m.school_id?.toString() === schoolId,
-        )
+      ? usuario.memberships.find((m) => m.school_id?.toString() === schoolId)
       : null;
 
     if (!membership) {
@@ -452,7 +466,9 @@ class UserService {
         statusCode: HttpStatusCodes.FORBIDDEN.code,
         errorType: 'forbidden',
         field: 'role',
-        details: [{ path: 'role', message: 'O role de admin não pode ser alterado.' }],
+        details: [
+          { path: 'role', message: 'O role de admin não pode ser alterado.' },
+        ],
         customMessage: 'Não é permitido alterar o role de um administrador.',
       });
     }
@@ -462,7 +478,12 @@ class UserService {
         statusCode: HttpStatusCodes.FORBIDDEN.code,
         errorType: 'forbidden',
         field: 'role',
-        details: [{ path: 'role', message: 'Não é possível promover um usuário para admin.' }],
+        details: [
+          {
+            path: 'role',
+            message: 'Não é possível promover um usuário para admin.',
+          },
+        ],
         customMessage: 'O role admin não pode ser atribuído por este endpoint.',
       });
     }
@@ -497,7 +518,7 @@ class UserService {
       }
     });
 
-    let studentMap = {};
+    const studentMap = {};
     if (studentIds.length > 0) {
       const students = await this.repository.findUsers(studentIds, 'student');
       students.forEach((s) => {
@@ -612,7 +633,8 @@ class UserService {
 
   async getMe(userId) {
     const user = await this.repository.getById(userId);
-    const obj = typeof user.toObject === 'function' ? user.toObject() : { ...user };
+    const obj =
+      typeof user.toObject === 'function' ? user.toObject() : { ...user };
     delete obj.password;
     return obj;
   }
@@ -622,7 +644,8 @@ class UserService {
       await this.validateEmail(parsedData.email, userId);
     }
     const data = await this.repository.update(userId, parsedData);
-    const obj = typeof data.toObject === 'function' ? data.toObject() : { ...data };
+    const obj =
+      typeof data.toObject === 'function' ? data.toObject() : { ...data };
     delete obj.password;
     return obj;
   }
@@ -636,7 +659,9 @@ class UserService {
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
         errorType: 'unauthorized',
         field: 'current_password',
-        details: [{ path: 'current_password', message: 'Senha atual incorreta.' }],
+        details: [
+          { path: 'current_password', message: 'Senha atual incorreta.' },
+        ],
         customMessage: 'Senha atual incorreta.',
       });
     }
@@ -666,21 +691,30 @@ class UserService {
         : user.avatar_url.split('/').slice(-2).join('/');
       try {
         await minioClient.removeObject(process.env.MINIO_BUCKET, oldKey);
-      } catch (_) {
-      }
+      } catch (_) {}
     }
 
     const image = await compress(file.buffer);
     const objectName = `avatars/${new mongoose.Types.ObjectId().toString()}.${image[1].format}`;
 
-    await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
-      'Content-Type': file.mimetype,
-    });
+    await minioClient.putObject(
+      process.env.MINIO_BUCKET,
+      objectName,
+      image[0],
+      {
+        'Content-Type': file.mimetype,
+      },
+    );
 
     const avatarUrl = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`;
 
-    const updated = await this.repository.update(userId, { avatar_url: avatarUrl });
-    const obj = typeof updated.toObject === 'function' ? updated.toObject() : { ...updated };
+    const updated = await this.repository.update(userId, {
+      avatar_url: avatarUrl,
+    });
+    const obj =
+      typeof updated.toObject === 'function'
+        ? updated.toObject()
+        : { ...updated };
     delete obj.password;
     return obj;
   }
@@ -695,12 +729,14 @@ class UserService {
         : user.avatar_url.split('/').slice(-2).join('/');
       try {
         await minioClient.removeObject(process.env.MINIO_BUCKET, oldKey);
-      } catch (_) {
-      }
+      } catch (_) {}
     }
 
     const updated = await this.repository.update(userId, { avatar_url: null });
-    const obj = typeof updated.toObject === 'function' ? updated.toObject() : { ...updated };
+    const obj =
+      typeof updated.toObject === 'function'
+        ? updated.toObject()
+        : { ...updated };
     delete obj.password;
     return obj;
   }

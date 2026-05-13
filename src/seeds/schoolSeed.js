@@ -34,7 +34,10 @@ export default async function schoolSeed() {
     active: true,
   };
 
-  const result = await School.collection.insertMany([defaultSchool, deleteSchool]);
+  const result = await School.collection.insertMany([
+    defaultSchool,
+    deleteSchool,
+  ]);
 
   console.log(`Main school: ${defaultSchool.name} (${defaultSchool._id})`);
   console.log(`Delete school: ${deleteSchool.name} (${deleteSchool._id})`);

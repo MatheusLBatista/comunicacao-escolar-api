@@ -21,7 +21,11 @@ export default async function likeSeed() {
     const likesPerPost = Math.floor(Math.random() * users.length) + 1;
     const selectedUsers = new Set();
 
-    for (let i = 0; i < likesPerPost && selectedUsers.size < users.length; i++) {
+    for (
+      let i = 0;
+      i < likesPerPost && selectedUsers.size < users.length;
+      i++
+    ) {
       const randomUserIndex = Math.floor(Math.random() * users.length);
       const userId = users[randomUserIndex]._id;
 

@@ -12,7 +12,7 @@ class Post {
         },
         author_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
           required: true,
         },
         title: {

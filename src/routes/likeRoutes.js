@@ -8,6 +8,11 @@ const router = express.Router();
 
 const likeController = new LikeController();
 
-router.post('/posts/:id/like', AuthMiddleware, AuthPermission, asyncWrapper(likeController.toggleLike.bind(likeController)));
+router.post(
+  '/posts/:id/like',
+  AuthMiddleware,
+  AuthPermission,
+  asyncWrapper(likeController.toggleLike.bind(likeController)),
+);
 
 export default router;

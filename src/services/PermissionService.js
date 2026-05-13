@@ -130,7 +130,8 @@ class PermissionService {
         policy.pattern.test(pathNorm),
       );
       if (matchedPolicy) {
-        const rule = matchedPolicy.methods[methodUpper] || matchedPolicy.methods['*'];
+        const rule =
+          matchedPolicy.methods[methodUpper] || matchedPolicy.methods['*'];
         if (rule?.allowSelf && params?.id === user._id.toString()) {
           return true;
         }

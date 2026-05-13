@@ -553,7 +553,10 @@ const authPaths = {
                 type: 'object',
                 properties: {
                   data: { $ref: '#/components/schemas/LoginResponse' },
-                  message: { type: 'string', example: 'Requisição bem-sucedida' },
+                  message: {
+                    type: 'string',
+                    example: 'Requisição bem-sucedida',
+                  },
                   errors: { type: 'array', example: [] },
                 },
               },
@@ -609,7 +612,8 @@ const authPaths = {
                 },
                 password: {
                   type: 'string',
-                  description: 'Nova senha (mínimo 8 caracteres, com letra, número e caractere especial)',
+                  description:
+                    'Nova senha (mínimo 8 caracteres, com letra, número e caractere especial)',
                   minLength: 8,
                   example: 'NovaSenha@456',
                 },
@@ -626,7 +630,10 @@ const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
-                  message: { type: 'string', example: 'Senha atualizada com sucesso.' },
+                  message: {
+                    type: 'string',
+                    example: 'Senha atualizada com sucesso.',
+                  },
                   errors: { type: 'array', example: [] },
                 },
               },
@@ -685,7 +692,8 @@ const authPaths = {
               properties: {
                 fcm_token: {
                   type: 'string',
-                  description: 'Token FCM do dispositivo para notificações push',
+                  description:
+                    'Token FCM do dispositivo para notificações push',
                   example: 'fGZ9T4K3R2e:APA91bH...',
                 },
               },
@@ -701,7 +709,10 @@ const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
-                  message: { type: 'string', example: 'Token FCM registrado com sucesso.' },
+                  message: {
+                    type: 'string',
+                    example: 'Token FCM registrado com sucesso.',
+                  },
                   errors: { type: 'array', example: [] },
                 },
               },

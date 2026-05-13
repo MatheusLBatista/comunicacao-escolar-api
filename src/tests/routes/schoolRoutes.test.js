@@ -157,5 +157,4 @@ describe('School - integração de endpoints', () => {
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', true);
   });
-
 });

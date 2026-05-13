@@ -73,7 +73,8 @@ const authSchemas = {
     properties: {
       refresh_token: {
         type: 'string',
-        description: 'Refresh token real obtido na resposta do /auth/login. Substitua pelo valor retornado no campo refresh_token após o login.',
+        description:
+          'Refresh token real obtido na resposta do /auth/login. Substitua pelo valor retornado no campo refresh_token após o login.',
         example: 'Cole aqui o refresh_token retornado pelo /auth/login',
       },
     },
@@ -88,12 +89,14 @@ const authSchemas = {
     properties: {
       id: {
         type: 'string',
-        description: 'ID (ObjectId) do usuário cujos tokens devem ser revogados',
+        description:
+          'ID (ObjectId) do usuário cujos tokens devem ser revogados',
         example: '6643b4a8c5d6e7f809102001',
       },
     },
     required: ['id'],
-    description: 'Schema para revogação de todos os tokens de um usuário pelo ID.',
+    description:
+      'Schema para revogação de todos os tokens de um usuário pelo ID.',
   },
 
   // Schema para introspect (validação de token)
@@ -102,7 +105,8 @@ const authSchemas = {
     properties: {
       access_token: {
         type: 'string',
-        description: 'Access token JWT real obtido no /auth/login. Substitua pelo access_token da sua sessão.',
+        description:
+          'Access token JWT real obtido no /auth/login. Substitua pelo access_token da sua sessão.',
         example: 'Cole aqui o access_token retornado pelo /auth/login',
       },
     },

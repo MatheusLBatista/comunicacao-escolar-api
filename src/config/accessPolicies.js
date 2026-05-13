@@ -37,9 +37,9 @@ const userPolicies = [
         schoolParam: 'schoolId',
       },
       PATCH: {
-        scope:'school',
-        roles:['admin'],
-        schoolParam: 'schoolId'
+        scope: 'school',
+        roles: ['admin'],
+        schoolParam: 'schoolId',
       },
       DELETE: {
         scope: 'school',
@@ -398,6 +398,12 @@ const rolePolicies = [
   ...resourcePolicies,
 ];
 
-export { groupPolicies, routePolicies, userPolicies, auditLogPolicies, resourcePolicies };
+export {
+  groupPolicies,
+  routePolicies,
+  userPolicies,
+  auditLogPolicies,
+  resourcePolicies,
+};
 
 export default rolePolicies;

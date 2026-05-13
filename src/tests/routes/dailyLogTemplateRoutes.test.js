@@ -210,16 +210,18 @@ describe('DailyLogTemplate - integração de rotas', () => {
   });
 
   test('deve bloquear a criacao sem token', async () => {
-    const response = await request(BASE_URL).post('/daily-log-templates').send({
-      school_id: schoolId,
-      fields: [
-        {
-          key: 'mood',
-          label: 'Disposicao',
-          type: 'text',
-        },
-      ],
-    });
+    const response = await request(BASE_URL)
+      .post('/daily-log-templates')
+      .send({
+        school_id: schoolId,
+        fields: [
+          {
+            key: 'mood',
+            label: 'Disposicao',
+            type: 'text',
+          },
+        ],
+      });
 
     expect([401, 498]).toContain(response.status);
   });
@@ -352,7 +354,9 @@ describe('DailyLogTemplate - integração de rotas', () => {
     expect(activeResponse.status).toBe(200);
     expectSuccessEnvelope(activeResponse);
     expect(
-      (activeResponse.body?.data?.docs || []).every((doc) => doc.ativo === true),
+      (activeResponse.body?.data?.docs || []).every(
+        (doc) => doc.ativo === true,
+      ),
     ).toBe(true);
 
     const inactiveResponse = await request(BASE_URL)

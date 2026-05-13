@@ -4,7 +4,6 @@ import User from '../models/User.js';
 import Event from '../models/Event.js';
 import DailyLog from '../models/DailyLog.js';
 import Conversation from '../models/Conversation.js';
-import Message from '../models/Message.js';
 
 const ACTIONS = ['view', 'download', 'export'];
 const RESOURCE_TYPES = [
@@ -26,9 +25,7 @@ export default async function auditLogSeed(schools, users) {
   const schoolIds = extractSchoolIds(schools, users);
 
   if (schoolIds.length === 0) {
-    console.log(
-      'Nenhuma escola válida encontrada para criação de audit logs.',
-    );
+    console.log('Nenhuma escola válida encontrada para criação de audit logs.');
     return { insertedCount: 0, auditLogs: [] };
   }
 
@@ -232,7 +229,13 @@ function await_objectId() {
 function await_mongoose() {
   // Use dynamic import workaround - but we already have mongoose IDs from DB
   // For seeds, we'll use a simpler approach
-  return { Types: { ObjectId: function() { return new (require('mongoose')).Types.ObjectId(); } } };
+  return {
+    Types: {
+      ObjectId: function () {
+        return new (require('mongoose').Types.ObjectId)();
+      },
+    },
+  };
 }
 
 function pickStudentId(resourceType, resourceData, dailyLogs, students) {
@@ -252,9 +255,7 @@ function pickStudentId(resourceType, resourceData, dailyLogs, students) {
   }
 
   if (resourceType === 'daily_log') {
-    const dl = dailyLogs.find(
-      (d) => String(d._id) === String(resourceData.id),
-    );
+    const dl = dailyLogs.find((d) => String(d._id) === String(resourceData.id));
     if (dl?.student_id) return dl.student_id;
   }
 

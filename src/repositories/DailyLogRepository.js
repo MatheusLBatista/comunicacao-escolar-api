@@ -16,6 +16,11 @@ class DailyLogRepository {
     const scopedStudentIds = Array.isArray(accessScope?.studentIds)
       ? accessScope.studentIds
       : null;
+    const populate = [
+      { path: 'student_id', select: '_id full_name avatar_url' },
+      { path: 'teacher_id', select: '_id full_name avatar_url' },
+      { path: 'school_id', select: '_id name' },
+    ];
 
     if (id) {
       const findByIdFilter = { _id: id };
@@ -24,7 +29,7 @@ class DailyLogRepository {
         findByIdFilter.student_id = { $in: scopedStudentIds };
       }
 
-      const data = await this.model.findOne(findByIdFilter);
+      const data = await this.model.findOne(findByIdFilter).populate(populate);
 
       if (!data) {
         throw new CustomError({
@@ -36,7 +41,9 @@ class DailyLogRepository {
         });
       }
 
-      return data;
+      return {
+        ...data.toObject(),
+      };
     }
 
     const {
@@ -108,6 +115,7 @@ class DailyLogRepository {
       page: parseInt(page, 10),
       limit,
       sort: { date: -1, created_at: -1 },
+      populate,
     };
 
     const result = await this.model.paginate(filters, options);
@@ -157,6 +165,11 @@ class DailyLogRepository {
     const scopedStudentIds = Array.isArray(accessScope?.studentIds)
       ? accessScope.studentIds
       : null;
+    const populate = [
+      { path: 'student_id', select: '_id full_name avatar_url' },
+      { path: 'teacher_id', select: '_id full_name avatar_url' },
+      { path: 'school_id', select: '_id name' },
+    ];
 
     const findByIdFilter = { _id: id };
 
@@ -164,7 +177,7 @@ class DailyLogRepository {
       findByIdFilter.student_id = { $in: scopedStudentIds };
     }
 
-    const data = await this.model.findOne(findByIdFilter);
+    const data = await this.model.findOne(findByIdFilter).populate(populate);
 
     if (!data) {
       throw new CustomError({
@@ -176,7 +189,9 @@ class DailyLogRepository {
       });
     }
 
-    return data;
+    return {
+      ...data.toObject(),
+    };
   }
 
   async markAsRead(id) {
