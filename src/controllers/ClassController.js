@@ -1,82 +1,81 @@
-import ClassService from "../services/ClassService.js"
-import CommonResponse from "../utils/helpers/CommonResponse.js"
-import { ClassSchemaInput } from "../utils/validators/schemas/zod/ClassSchema.js"
-import ObjectIdSchema from "../utils/validators/schemas/zod/ObjectIdSchema.js"
-import { ClassQuerySchema } from "../utils/validators/schemas/zod/querys/ClassQuerySchema.js"
+import ClassService from '../services/ClassService.js';
+import CommonResponse from '../utils/helpers/CommonResponse.js';
+import { ClassSchemaInput } from '../utils/validators/schemas/zod/ClassSchema.js';
+import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
+import { ClassQuerySchema } from '../utils/validators/schemas/zod/querys/ClassQuerySchema.js';
 
 class ClassController {
-    constructor() {
-        this.service = new ClassService()
+  constructor() {
+    this.service = new ClassService();
+  }
+
+  async list(req, res) {
+    const { id } = req.params;
+
+    const { schoolId } = req.params;
+
+    ObjectIdSchema.parse(schoolId);
+
+    if (id) {
+      ObjectIdSchema.parse(id);
     }
 
-    async list(req, res) {
+    const query = req.query || {};
 
-        const { id } = req.params
-
-        const { schoolId } = req.params
-
-        ObjectIdSchema.parse(schoolId)
-
-        if (id) {
-            ObjectIdSchema.parse(id)
-        }
-
-        const query = req.query || {};
-
-        if (Object.keys(query).length !== 0) {
-            await ClassQuerySchema.safeParseAsync(query);
-        }
-
-        const data = await this.service.list(req)
-
-        return CommonResponse.success(res, data, 200)
+    if (Object.keys(query).length !== 0) {
+      await ClassQuerySchema.safeParseAsync(query);
     }
 
-    async create(req, res) {
-        const body = req.body
+    const data = await this.service.list(req);
 
-        const { schoolId } = req.params
+    return CommonResponse.success(res, data, 200);
+  }
 
-        const parsedData = ClassSchemaInput.parse(body)
+  async create(req, res) {
+    const body = req.body;
 
-        ObjectIdSchema.parse(schoolId)
+    const { schoolId } = req.params;
 
-        const data = await this.service.create(parsedData, schoolId)
+    const parsedData = ClassSchemaInput.parse(body);
 
-        return CommonResponse.success(res, data, 201)
-    }
+    ObjectIdSchema.parse(schoolId);
 
-    async update(req, res) {
-        const body = req.body
+    const data = await this.service.create(parsedData, schoolId);
 
-        const { schoolId } = req.params
+    return CommonResponse.success(res, data, 201);
+  }
 
-        const {id} = req.params
+  async update(req, res) {
+    const body = req.body;
 
-        ObjectIdSchema.parse(schoolId)
+    const { schoolId } = req.params;
 
-        ObjectIdSchema.parse(id)
+    const { id } = req.params;
 
-        const parsedData = ClassSchemaInput.parse(body)
+    ObjectIdSchema.parse(schoolId);
 
-        const data = await this.service.update(parsedData, schoolId, id)
+    ObjectIdSchema.parse(id);
 
-        return CommonResponse.success(res, data, 200)
-    }
+    const parsedData = ClassSchemaInput.parse(body);
 
-    async delete(req, res) {
-        const {schoolId} = req.params
+    const data = await this.service.update(parsedData, schoolId, id);
 
-        const {id} = req.params
+    return CommonResponse.success(res, data, 200);
+  }
 
-        ObjectIdSchema.parse(schoolId)
+  async delete(req, res) {
+    const { schoolId } = req.params;
 
-        ObjectIdSchema.parse(id)
+    const { id } = req.params;
 
-        const data = await this.service.delete(id)
+    ObjectIdSchema.parse(schoolId);
 
-        return CommonResponse.success(res, data, 200)
-    }
+    ObjectIdSchema.parse(id);
+
+    const data = await this.service.delete(id);
+
+    return CommonResponse.success(res, data, 200);
+  }
 }
 
-export default ClassController
+export default ClassController;

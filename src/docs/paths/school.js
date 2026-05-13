@@ -168,7 +168,8 @@ const schoolPaths = {
           in: 'path',
           required: true,
           schema: { type: 'string' },
-          description: 'ID da escola. Use 6642a3f7b4c5d6e7f8091099 (Escola Demo Delete) para não remover a escola principal.',
+          description:
+            'ID da escola. Use 6642a3f7b4c5d6e7f8091099 (Escola Demo Delete) para não remover a escola principal.',
           example: '6642a3f7b4c5d6e7f8091099',
         },
       ],

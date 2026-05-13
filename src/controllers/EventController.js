@@ -36,7 +36,12 @@ class EventController {
     objectIdSchema.parse(id);
 
     const parsedData = EventUpdateSchema.parse(req.body);
-    const data = await this.service.update(id, parsedData, req.body, req.user_id);
+    const data = await this.service.update(
+      id,
+      parsedData,
+      req.body,
+      req.user_id,
+    );
 
     return CommonResponse.success(
       res,

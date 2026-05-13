@@ -87,12 +87,12 @@ class AuthController {
   }
 
   async updatePasswordByCode(req, res, next) {
-    const { password_recovery_code, password } = ResetPasswordByCodeSchema.parse(req.body);
+    const { password_recovery_code, password } =
+      ResetPasswordByCodeSchema.parse(req.body);
 
-    await this.service.updatePasswordByCode(
-      password_recovery_code,
-      { password },
-    );
+    await this.service.updatePasswordByCode(password_recovery_code, {
+      password,
+    });
 
     return CommonResponse.success(
       res,

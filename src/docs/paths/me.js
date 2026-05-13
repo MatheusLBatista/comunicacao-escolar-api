@@ -104,7 +104,8 @@ const mePaths = {
                 },
                 new_password: {
                   type: 'string',
-                  description: 'Nova senha (mínimo 8 caracteres, com maiúscula, minúscula, número e especial)',
+                  description:
+                    'Nova senha (mínimo 8 caracteres, com maiúscula, minúscula, número e especial)',
                   minLength: 8,
                   example: 'NovaSenha@456',
                 },
@@ -121,7 +122,10 @@ const mePaths = {
               schema: {
                 type: 'object',
                 properties: {
-                  message: { type: 'string', example: 'Senha alterada com sucesso.' },
+                  message: {
+                    type: 'string',
+                    example: 'Senha alterada com sucesso.',
+                  },
                   errors: { type: 'array', example: [] },
                 },
               },

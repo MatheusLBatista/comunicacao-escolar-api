@@ -4,13 +4,13 @@ import School from '../models/School.js';
 import User from '../models/User.js';
 
 const CLASS_TEMPLATES = [
-  { name: 'Berçário I',   shift: 'Manhã'    },
-  { name: 'Berçário II',  shift: 'Tarde'    },
-  { name: 'Maternal I',   shift: 'Manhã'    },
-  { name: 'Maternal II',  shift: 'Tarde'    },
-  { name: 'Jardim I',     shift: 'Manhã'    },
-  { name: 'Jardim II',    shift: 'Tarde'    },
-  { name: 'Jardim III',   shift: 'Integral' },
+  { name: 'Berçário I', shift: 'Manhã' },
+  { name: 'Berçário II', shift: 'Tarde' },
+  { name: 'Maternal I', shift: 'Manhã' },
+  { name: 'Maternal II', shift: 'Tarde' },
+  { name: 'Jardim I', shift: 'Manhã' },
+  { name: 'Jardim II', shift: 'Tarde' },
+  { name: 'Jardim III', shift: 'Integral' },
 ];
 
 export default async function classSeed() {

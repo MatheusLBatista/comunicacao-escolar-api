@@ -16,7 +16,12 @@ class AuditLogRepository {
       { path: 'student_id', select: 'full_name email active' },
     ];
 
-    if (logId && !req?.params?.resourceType && !req?.params?.userId && !req?.params?.studentId) {
+    if (
+      logId &&
+      !req?.params?.resourceType &&
+      !req?.params?.userId &&
+      !req?.params?.studentId
+    ) {
       const data = await this.model.findById(logId).populate(populate);
 
       if (!data) {
@@ -84,7 +89,11 @@ class AuditLogRepository {
 
   async summary(req) {
     const schoolId = req?.params?.id;
-    const { start_date, end_date, group_by = 'resource_type' } = req?.query || {};
+    const {
+      start_date,
+      end_date,
+      group_by = 'resource_type',
+    } = req?.query || {};
 
     const matchStage = { school_id: new mongoose.Types.ObjectId(schoolId) };
 

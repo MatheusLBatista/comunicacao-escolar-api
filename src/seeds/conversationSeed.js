@@ -66,7 +66,9 @@ export default async function conversationSeed() {
 
   // Primeira conversa — ID fixo para facilitar exemplos na Swagger
   if (conversations.length > 0) {
-    conversations[0]._id = new mongoose.Types.ObjectId('664eff007080901020301001');
+    conversations[0]._id = new mongoose.Types.ObjectId(
+      '664eff007080901020301001',
+    );
   }
 
   const result = await Conversation.collection.insertMany(conversations);

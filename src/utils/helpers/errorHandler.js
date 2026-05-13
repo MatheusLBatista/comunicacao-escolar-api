@@ -112,10 +112,10 @@ const errorHandler = (err, req, res, next) => {
   // Tratamento para erros de upload de arquivo (Multer).
   if (err instanceof MulterError) {
     const multerErrorMessages = {
-      'LIMIT_FILE_SIZE': 'Arquivo muito grande',
-      'LIMIT_FILE_COUNT': 'Muitos arquivos enviados',
-      'FILE_TOO_LARGE': 'Arquivo excede o tamanho máximo',
-      'LIMIT_PART_COUNT': 'Muitas partes no formulário',
+      LIMIT_FILE_SIZE: 'Arquivo muito grande',
+      LIMIT_FILE_COUNT: 'Muitos arquivos enviados',
+      FILE_TOO_LARGE: 'Arquivo excede o tamanho máximo',
+      LIMIT_PART_COUNT: 'Muitas partes no formulário',
     };
 
     const errorMessage = multerErrorMessages[err.code] || err.message;
@@ -165,8 +165,6 @@ const errorHandler = (err, req, res, next) => {
     : [{ message: err.message, stack: err.stack }];
 
   return CommonResponse.error(res, 500, 'serverError', null, detalhes);
-
-
 };
 
 export default errorHandler;

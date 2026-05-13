@@ -1,12 +1,11 @@
 import UserFilterBuilder from './filters/UserFilterBuilder.js';
 import UserModel from '../models/User.js';
-import mongoose from 'mongoose';
 import { CustomError, messages } from '../utils/helpers/index.js';
-import ClassModel from '../models/Class.js'
+import ClassModel from '../models/Class.js';
 class UserRepository {
   constructor({ userModel = UserModel } = {}) {
     this.model = userModel;
-    this.class =  ClassModel;
+    this.class = ClassModel;
   }
 
   async create(data) {
@@ -15,7 +14,15 @@ class UserRepository {
   }
 
   async listBySchool(schoolId, query = {}) {
-    const { full_name, email, role, active, page = 1, limit = 10, class_id } = query;
+    const {
+      full_name,
+      email,
+      role,
+      active,
+      page = 1,
+      limit = 10,
+      class_id,
+    } = query;
 
     const filterBuilder = new UserFilterBuilder()
       .withName(full_name || '')
@@ -107,7 +114,9 @@ class UserRepository {
   }
 
   async getByGoogleId(googleId) {
-    return await this.model.findOne({ google_id: googleId }).select('+google_id');
+    return await this.model
+      .findOne({ google_id: googleId })
+      .select('+google_id');
   }
 
   async getByEmail(email, idIgnorado = null) {
@@ -241,28 +250,27 @@ class UserRepository {
       memberships: {
         $elemMatch: {
           class_id: class_id,
-          role: 'student'
-        }
-      }
+          role: 'student',
+        },
+      },
     });
 
-    const studentIds = students.map(student => student._id);
+    const studentIds = students.map((student) => student._id);
 
     const parents = await this.model.find({
       memberships: {
         $elemMatch: {
           role: 'parent',
-          associated_students: { $in: studentIds }
-        }
-      }
+          associated_students: { $in: studentIds },
+        },
+      },
     });
-
 
     const classDoc = await this.class.findById(class_id);
     const teacherIds = classDoc ? classDoc.teacher_ids : [];
 
     const teachers = await this.model.find({
-      _id: { $in: teacherIds }
+      _id: { $in: teacherIds },
     });
 
     return [...parents, ...teachers];
@@ -280,7 +288,7 @@ class UserRepository {
           role: role,
         },
       },
-      active:true
+      active: true,
     });
 
     return data;

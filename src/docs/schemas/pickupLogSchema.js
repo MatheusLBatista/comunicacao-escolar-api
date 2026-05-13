@@ -68,7 +68,8 @@ const pickupLogSchemas = {
       authorization_id: {
         type: 'string',
         nullable: true,
-        description: 'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
+        description:
+          'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
         example: null,
       },
       picked_up_by: {
@@ -123,7 +124,8 @@ const pickupLogSchemas = {
       authorization_id: {
         type: 'string',
         nullable: true,
-        description: 'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
+        description:
+          'ObjectId da autorizacao de retirada (obrigatorio quando method=qr_code)',
         example: null,
       },
       picked_up_by: {

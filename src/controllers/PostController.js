@@ -71,51 +71,46 @@ class PostController {
   }
 
   async delete(req, res) {
-    const {id} = req.params ||  {}
-    const userId = req.user_id
-    ObjectIdSchema.parse(id)
+    const { id } = req.params || {};
+    const userId = req.user_id;
+    ObjectIdSchema.parse(id);
 
-    await this.service.delete(id, userId)
+    await this.service.delete(id, userId);
 
-    return CommonResponse.success(res,{message: "Anúncio deletado com sucesso"})
+    return CommonResponse.success(res, {
+      message: 'Anúncio deletado com sucesso',
+    });
   }
 
   async uploadFoto(req, res) {
-
-    const {id} = req.params || {}
+    const { id } = req.params || {};
 
     UserIdSchema.parse(id);
 
-    const data = await this.service.uploadFoto(req, id)
+    const data = await this.service.uploadFoto(req, id);
 
-    return CommonResponse.created(res, data)
+    return CommonResponse.created(res, data);
   }
 
   async deleteFoto(req, res) {
+    const { linkId } = req.params || {};
 
-    const {linkId} = req.params || {}
+    const { postId } = req.params || {};
 
-    const {postId} = req.params || {}
- 
+    UserIdSchema.parse(postId);
 
-    UserIdSchema.parse(postId)
+    const data = await this.service.deleteFoto(req, postId, linkId);
 
-    
-    const data = await this.service.deleteFoto(req, postId, linkId)
-
-    return CommonResponse.success(res, data)
-
+    return CommonResponse.success(res, data);
   }
 
   async getFoto(req, res) {
+    const { id } = req.params || {};
 
-    const {id} = req.params || {}
-
-    const data = await this.service.getFoto(id)
-    res.setHeader('Content-Type',data.content_type)
-    return res.send(data.buffer)
+    const data = await this.service.getFoto(id);
+    res.setHeader('Content-Type', data.content_type);
+    return res.send(data.buffer);
   }
-
 }
 
 export default PostController;

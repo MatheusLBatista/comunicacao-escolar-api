@@ -212,8 +212,7 @@ export const fakeMappings = {
   },
 
   AuditLog: {
-    user_role: () =>
-      fakebr.random.arrayElement(['admin', 'teacher', 'parent']),
+    user_role: () => fakebr.random.arrayElement(['admin', 'teacher', 'parent']),
     action: () => fakebr.random.arrayElement(['view', 'download', 'export']),
     resource_type: () =>
       fakebr.random.arrayElement([

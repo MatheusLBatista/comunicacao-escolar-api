@@ -215,9 +215,14 @@ describe('DailyLog - integração de rotas', () => {
     expect(asId(response.body.data.school_id)).toBe(schoolId);
     expect(asId(response.body.data.student_id)).toBe(studentId);
     expect(asId(response.body.data.teacher_id)).toBe(teacherId);
-    expect(asId(response.body.data.dailylogtemplate_id)).toBe(dailyLogTemplateId);
+    expect(asId(response.body.data.dailylogtemplate_id)).toBe(
+      dailyLogTemplateId,
+    );
     expect(response.body.data).toHaveProperty('is_present', true);
-    expect(response.body.data).toHaveProperty('observation', payload.observation);
+    expect(response.body.data).toHaveProperty(
+      'observation',
+      payload.observation,
+    );
     expect(response.body.data).toHaveProperty('ativo', true);
 
     createdDailyLogId = response.body.data._id;
@@ -311,7 +316,10 @@ describe('DailyLog - integração de rotas', () => {
     expectSuccessEnvelope(response);
     expect(response.body.data).toHaveProperty('_id', createdDailyLogId);
     expect(response.body.data).toHaveProperty('is_present', false);
-    expect(response.body.data).toHaveProperty('observation', payload.observation);
+    expect(response.body.data).toHaveProperty(
+      'observation',
+      payload.observation,
+    );
   });
 
   test('deve atualizar daily log por PUT (mesmo handler de PATCH)', async () => {

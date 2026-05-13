@@ -152,7 +152,9 @@ describe('Post Routes - Integração', () => {
 
   describe('GET /schools/:schoolId/posts - Listar comunicados', () => {
     test('deve retornar 401 ao listar posts sem token', async () => {
-      const response = await request(BASE_URL).get(`/schools/${schoolId}/posts`);
+      const response = await request(BASE_URL).get(
+        `/schools/${schoolId}/posts`,
+      );
 
       expect([401, 498]).toContain(response.status);
     });
@@ -204,7 +206,7 @@ describe('Post Routes - Integração', () => {
   describe('GET /posts/:id - Buscar comunicado por ID', () => {
     test('deve retornar 401 sem token', async () => {
       const response = await request(BASE_URL).get(
-        `/posts/${createdPostId || '507f1f77bcf86cd799439013'}`
+        `/posts/${createdPostId || '507f1f77bcf86cd799439013'}`,
       );
 
       expect([401, 498]).toContain(response.status);
@@ -332,9 +334,15 @@ describe('Post Routes - Integração', () => {
         .send({
           name: `Escola Conflito ${Date.now()}`,
           cnpj: `000000000001${Date.now().toString().slice(-2)}`,
-          address: { street: 'Rua B', number: '100', city: 'Cidade', state: 'SP', zip_code: '00000-000' }
+          address: {
+            street: 'Rua B',
+            number: '100',
+            city: 'Cidade',
+            state: 'SP',
+            zip_code: '00000-000',
+          },
         });
-      
+
       if (createSchoolResponse.status !== 201) return; // Pula se não puder criar escola
       const otherSchoolId = createSchoolResponse.body.data._id;
 
@@ -346,7 +354,7 @@ describe('Post Routes - Integração', () => {
           name: 'Turma Conflito',
           grade: '1A',
           year: 2026,
-          teacher_ids: []
+          teacher_ids: [],
         });
 
       if (createClassResponse.status !== 201) return;
@@ -359,8 +367,8 @@ describe('Post Routes - Integração', () => {
         .send({
           target: {
             scope: 'class',
-            target_id: otherClassId
-          }
+            target_id: otherClassId,
+          },
         });
 
       expect(response.status).toBe(409);
@@ -394,7 +402,7 @@ describe('Post Routes - Integração', () => {
   describe('DELETE /posts/:id - Deletar comunicado', () => {
     test('deve retornar 401 sem token', async () => {
       const response = await request(BASE_URL).delete(
-        `/posts/${createdPostId || '507f1f77bcf86cd799439013'}`
+        `/posts/${createdPostId || '507f1f77bcf86cd799439013'}`,
       );
 
       expect([401, 498]).toContain(response.status);
@@ -470,7 +478,9 @@ describe('Post Routes - Integração', () => {
 
   describe('GET /schools/:schoolId/posts - Listar comunicados da escola (redundante)', () => {
     test('deve retornar 401 sem token', async () => {
-      const response = await request(BASE_URL).get(`/schools/${schoolId}/posts`);
+      const response = await request(BASE_URL).get(
+        `/schools/${schoolId}/posts`,
+      );
 
       expect([401, 498]).toContain(response.status);
     });

@@ -115,9 +115,7 @@ describe('Class Routes - Integracao', () => {
   });
 
   test('deve retornar 401/498 ao listar turmas sem token', async () => {
-    const response = await request(BASE_URL).get(
-      `/schools/${schoolId}/class`,
-    );
+    const response = await request(BASE_URL).get(`/schools/${schoolId}/class`);
 
     expect([401, 498]).toContain(response.status);
   });
