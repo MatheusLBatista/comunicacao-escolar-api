@@ -37,28 +37,32 @@ router.patch(
   asyncWrapper(postController.update.bind(postController)),
 );
 
-router.delete('/posts/:id',
+router.delete(
+  '/posts/:id',
   AuthMiddleware,
   AuthPermission,
-  asyncWrapper(postController.delete.bind(postController))
-)
+  asyncWrapper(postController.delete.bind(postController)),
+);
 
-router.post('/posts/:id/attachments',
+router.post(
+  '/posts/:id/attachments',
   AuthMiddleware,
   AuthPermission,
   upload.array('files', 10),
-  asyncWrapper(postController.uploadFoto.bind(postController))
-)
+  asyncWrapper(postController.uploadFoto.bind(postController)),
+);
 
-router.delete('/posts/:postId/attachments/:linkId',
+router.delete(
+  '/posts/:postId/attachments/:linkId',
   AuthMiddleware,
   AuthPermission,
-  asyncWrapper(postController.deleteFoto.bind(postController))
-)
+  asyncWrapper(postController.deleteFoto.bind(postController)),
+);
 
-router.get('/attachments/:id', 
+router.get(
+  '/attachments/:id',
   AuthMiddleware,
   AuthPermission,
-  asyncWrapper(postController.getFoto.bind(postController))
-)
+  asyncWrapper(postController.getFoto.bind(postController)),
+);
 export default router;

@@ -19,7 +19,7 @@ class DailyLogTemplate {
         // Quando preenchido, o template é exclusivo para acompanhamento de um aluno específico
         student_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
           default: null,
         },
         fields: [

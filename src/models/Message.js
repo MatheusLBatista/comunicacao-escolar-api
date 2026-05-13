@@ -24,7 +24,7 @@ class Message {
           {
             user_id: {
               type: mongoose.Schema.Types.ObjectId,
-              ref: 'usuarios',
+              ref: 'Users',
             },
             at: { type: Date },
           },

@@ -35,10 +35,7 @@ class EventRepository {
         ? data.school_id._id.toString()
         : data.school_id?.toString();
 
-      if (
-        scopedSchoolIds &&
-        !scopedSchoolIds.includes(schoolIdStr)
-      ) {
+      if (scopedSchoolIds && !scopedSchoolIds.includes(schoolIdStr)) {
         throw new CustomError({
           statusCode: 403,
           errorType: 'forbidden',

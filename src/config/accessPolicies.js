@@ -37,9 +37,9 @@ const userPolicies = [
         schoolParam: 'schoolId',
       },
       PATCH: {
-        scope:'school',
-        roles:['admin'],
-        schoolParam: 'schoolId'
+        scope: 'school',
+        roles: ['admin'],
+        schoolParam: 'schoolId',
       },
       DELETE: {
         scope: 'school',
@@ -235,6 +235,31 @@ const auditLogPolicies = [
 
 const resourcePolicies = [
   {
+    pattern: /^\/daily-log-templates(?:\/|$)/,
+    methods: {
+      GET: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      POST: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      PATCH: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      PUT: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+      DELETE: {
+        scope: 'global',
+        roles: ['admin', 'teacher'],
+      },
+    },
+  },
+  {
     pattern: /^\/daily-logs(?:\/|$)/,
     methods: {
       GET: {
@@ -373,6 +398,12 @@ const rolePolicies = [
   ...resourcePolicies,
 ];
 
-export { groupPolicies, routePolicies, userPolicies, auditLogPolicies, resourcePolicies };
+export {
+  groupPolicies,
+  routePolicies,
+  userPolicies,
+  auditLogPolicies,
+  resourcePolicies,
+};
 
 export default rolePolicies;

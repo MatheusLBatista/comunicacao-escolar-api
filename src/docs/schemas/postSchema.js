@@ -13,7 +13,7 @@ const postSchemas = {
         type: 'string',
         nullable: true,
         description: 'ObjectId da turma quando scope for class',
-        example: "6642a3f7b4c5d6e7f8091001",
+        example: '6642a3f7b4c5d6e7f8091001',
       },
     },
   },
@@ -81,7 +81,8 @@ const postSchemas = {
       },
       totalLikes: {
         type: 'number',
-        description: 'Total de curtidas do comunicado (duplicado para compatibilidade)',
+        description:
+          'Total de curtidas do comunicado (duplicado para compatibilidade)',
         example: 5,
       },
       user_liked: {

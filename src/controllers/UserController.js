@@ -54,7 +54,9 @@ class UserController {
     const parsedData = LinkToSchoolSchema.parse(req.body);
     const data = await this.service.linkToSchool(schoolId, parsedData);
 
-    const userLimpo = data.toObject ? data.toObject() : { ...(data._doc || data) };
+    const userLimpo = data.toObject
+      ? data.toObject()
+      : { ...(data._doc || data) };
     delete userLimpo.password;
 
     return CommonResponse.created(res, userLimpo);
@@ -66,9 +68,15 @@ class UserController {
     ObjectIdSchema.parse(userId);
 
     const parsedData = StudentInputSchema.parse(req.body);
-    const data = await this.service.addStudentToParent(schoolId, userId, parsedData);
+    const data = await this.service.addStudentToParent(
+      schoolId,
+      userId,
+      parsedData,
+    );
 
-    const userLimpo = data.toObject ? data.toObject() : { ...(data._doc || data) };
+    const userLimpo = data.toObject
+      ? data.toObject()
+      : { ...(data._doc || data) };
     delete userLimpo.password;
 
     return CommonResponse.created(res, userLimpo);
@@ -80,7 +88,11 @@ class UserController {
     ObjectIdSchema.parse(userId);
     ObjectIdSchema.parse(studentId);
 
-    const data = await this.service.removeStudentFromParent(schoolId, userId, studentId);
+    const data = await this.service.removeStudentFromParent(
+      schoolId,
+      userId,
+      studentId,
+    );
     return CommonResponse.success(res, data);
   }
 
@@ -91,7 +103,12 @@ class UserController {
     ObjectIdSchema.parse(studentId);
 
     const { class_id } = MoveStudentClassSchema.parse(req.body);
-    const data = await this.service.moveStudentToClass(schoolId, userId, studentId, class_id);
+    const data = await this.service.moveStudentToClass(
+      schoolId,
+      userId,
+      studentId,
+      class_id,
+    );
     return CommonResponse.success(res, data);
   }
 
@@ -101,7 +118,11 @@ class UserController {
     ObjectIdSchema.parse(userId);
 
     const { role } = UpdateMembershipRoleSchema.parse(req.body);
-    const data = await this.service.updateMembershipRole(schoolId, userId, role);
+    const data = await this.service.updateMembershipRole(
+      schoolId,
+      userId,
+      role,
+    );
     return CommonResponse.success(res, data);
   }
 

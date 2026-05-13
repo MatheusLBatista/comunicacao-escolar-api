@@ -3,12 +3,11 @@ import SchoolRepository from '../repositories/SchoolRepository.js';
 import ClassRepository from '../repositories/ClassRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 import { firebaseMessaging } from '../config/Firebase.js';
-import { CommonResponse, CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
+import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 import compress from '../config/SharpConfig.js';
 import mongoose from 'mongoose';
 import minioClient from '../config/MinIO.js';
 import 'dotenv/config';
-import Post from '../models/Post.js';
 import User from '../models/User.js';
 
 class PostService {
@@ -26,7 +25,8 @@ class PostService {
       const userId = req?.user_id || req?.user?.id;
       if (userId) {
         const user = await this.userRepository.getById(userId);
-        const belongsToSchool = Array.isArray(user?.memberships) &&
+        const belongsToSchool =
+          Array.isArray(user?.memberships) &&
           user.memberships.some(
             (m) => m?.school_id?.toString() === data.school_id.toString(),
           );
@@ -44,7 +44,6 @@ class PostService {
     }
 
     return data;
-
   }
 
   async create(parsedData, userId, schoolId) {
@@ -102,18 +101,24 @@ class PostService {
           customMessage: 'class_id não foi encontrado.',
         });
       }
-      const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId })
-      const users = await this.userRepository.listByClass(parsedData.target.target_id)
+      const data = await this.repository.create({
+        ...parsedData,
+        author_id: userId,
+        school_id: schoolId,
+      });
+      const users = await this.userRepository.listByClass(
+        parsedData.target.target_id,
+      );
 
-      const fcmTokens = []
+      const fcmTokens = [];
 
       if (users && Array.isArray(users)) {
         for (const doc of users) {
           if (doc instanceof User || doc.fcm_tokens) {
             if (doc.fcm_tokens && doc.fcm_tokens.length > 0) {
               doc.fcm_tokens.forEach((token) => {
-                fcmTokens.push(token)
-              })
+                fcmTokens.push(token);
+              });
             }
           }
         }
@@ -124,54 +129,55 @@ class PostService {
           tokens: fcmTokens,
           notification: {
             title: 'Novo Anúncio na sua Turma',
-            body: parsedData.title || `Um novo anúncio foi publicado para a turma ${turma.name || ''}`.trim()
+            body:
+              parsedData.title ||
+              `Um novo anúncio foi publicado para a turma ${turma.name || ''}`.trim(),
           },
           data: {
             type: 'announcement',
-            postId: data._id.toString()
-          }
-        }
+            postId: data._id.toString(),
+          },
+        };
 
         try {
-          const response = await firebaseMessaging.sendEachForMulticast(message)
-          console.log(`Notificações enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`)
+          const response =
+            await firebaseMessaging.sendEachForMulticast(message);
+          console.log(
+            `Notificações enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`,
+          );
 
           if (response.failureCount > 0) {
             response.responses.forEach((resp, idx) => {
               if (!resp.success) {
-                console.error(`Token falhou: ${fcmTokens[idx]}`)
+                console.error(`Token falhou: ${fcmTokens[idx]}`);
               }
-            })
+            });
           }
         } catch (error) {
-          console.error('Erro ao enviar notificação Firebase:', error)
+          console.error('Erro ao enviar notificação Firebase:', error);
         }
       }
 
-
-
-      return data
-
+      return data;
     }
 
-    const data = await this.repository.create({ ...parsedData, author_id: userId, school_id: schoolId });
+    const data = await this.repository.create({
+      ...parsedData,
+      author_id: userId,
+      school_id: schoolId,
+    });
 
-    const users = await this.userRepository.listBySchool(schoolId)
+    const users = await this.userRepository.listBySchool(schoolId);
 
-    const fcmTokens = []
+    const fcmTokens = [];
 
     if (users?.docs && Array.isArray(users.docs)) {
-
       for (const doc of users.docs) {
-
         if (doc instanceof User) {
-
           if (doc.fcm_tokens.length > 0) {
-
             doc.fcm_tokens.forEach((token) => {
-
-              fcmTokens.push(token)
-            })
+              fcmTokens.push(token);
+            });
           }
         }
       }
@@ -182,30 +188,32 @@ class PostService {
         tokens: fcmTokens,
         notification: {
           title: 'Novo Anúncio',
-          body: parsedData.title || 'Um novo anúncio foi publicado na sua escola'
+          body:
+            parsedData.title || 'Um novo anúncio foi publicado na sua escola',
         },
         data: {
           type: 'announcement',
-          postId: data._id.toString()
-        }
-      }
+          postId: data._id.toString(),
+        },
+      };
 
       try {
-        const response = await firebaseMessaging.sendEachForMulticast(message)
-        console.log(`Notificações enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`)
+        const response = await firebaseMessaging.sendEachForMulticast(message);
+        console.log(
+          `Notificações enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`,
+        );
 
         if (response.failureCount > 0) {
           response.responses.forEach((resp, idx) => {
             if (!resp.success) {
-              console.error(`Token falhou: ${fcmTokens[idx]}`)
+              console.error(`Token falhou: ${fcmTokens[idx]}`);
             }
-          })
+          });
         }
       } catch (error) {
-        console.error('Erro ao enviar notificação Firebase:', error)
+        console.error('Erro ao enviar notificação Firebase:', error);
       }
     }
-
 
     return data;
   }
@@ -213,44 +221,35 @@ class PostService {
   async update(id, parsedData, userId) {
     const user = await this.userRepository.getById(userId);
 
+    const clearParsed = await this.verifyRelation(id, parsedData);
 
-    const clearParsed = await this.verifyRelation(id, parsedData)
-
-    if (user.memberships.some(user => user.role === "admin")) {
-
-      const data = await this.repository.update(id, clearParsed)
-
+    if (user.memberships.some((user) => user.role === 'admin')) {
+      const data = await this.repository.update(id, clearParsed);
 
       return data;
     }
 
-    const data = await this.repository.update(id, clearParsed, userId)
-
+    const data = await this.repository.update(id, clearParsed, userId);
 
     return data;
   }
 
-
   async delete(id, userId) {
+    const user = await this.userRepository.getById(userId);
 
-    const user = await this.userRepository.getById(userId)
+    if (user.memberships.some((user) => user.role === 'admin')) {
+      await this.repository.delete(id);
 
-    if (user.memberships.some(user => user.role === "admin")) {
-
-      await this.repository.delete(id)
-
-      return
+      return;
     }
 
-    await this.repository.delete(id, userId)
+    await this.repository.delete(id, userId);
 
-    return
+    return;
   }
 
   async verifyRelation(id, parsedData) {
-
-    if (parsedData.target?.scope && parsedData.target.scope != "all") {
-
+    if (parsedData.target?.scope && parsedData.target.scope != 'all') {
       if (!parsedData.target.target_id) {
         throw new CustomError({
           statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -263,11 +262,13 @@ class PostService {
             },
           ],
           customMessage: 'class_id/target_id não foi encontrado.',
-        })
+        });
       }
 
-      const turma = await this.classRepository.findById(parsedData.target.target_id)
-      const post = await this.repository.getById(id)
+      const turma = await this.classRepository.findById(
+        parsedData.target.target_id,
+      );
+      const post = await this.repository.getById(id);
       if (!turma) {
         throw new CustomError({
           statusCode: HttpStatusCodes.NOT_FOUND.code,
@@ -280,7 +281,7 @@ class PostService {
             },
           ],
           customMessage: 'class_id/target_id não foi encontrado.',
-        })
+        });
       }
 
       if (post.school_id !== turma.school_id) {
@@ -291,146 +292,153 @@ class PostService {
           details: [
             {
               path: 'class',
-              message: 'A turma selecionada pertence a uma escola diferente do anúncio.',
+              message:
+                'A turma selecionada pertence a uma escola diferente do anúncio.',
             },
           ],
-          customMessage: 'Não é possível vincular o anúncio a uma turma de outra escola.',
+          customMessage:
+            'Não é possível vincular o anúncio a uma turma de outra escola.',
         });
       }
-      return parsedData
+      return parsedData;
     }
 
     if (parsedData.target) {
-      delete parsedData.target
+      delete parsedData.target;
     }
 
-    return parsedData
+    return parsedData;
   }
 
   async uploadFoto(req, id) {
-
-
-
-    const userId = req.user_id
-
+    const userId = req.user_id;
 
     const files = req.files;
     if (!files) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
-        errorType: "badRequest",
-        field: "Foto",
-        details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
-        customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
-      })
+        errorType: 'badRequest',
+        field: 'Foto',
+        details: [
+          {
+            path: 'Foto',
+            message: 'Nenhum arquivo foi enviado ou o arquivo está vazio.',
+          },
+        ],
+        customMessage: 'Nenhum arquivo foi enviado ou o arquivo está vazio.',
+      });
     }
 
     if (files.length == 0) {
       throw new CustomError({
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
-        errorType: "badRequest",
-        field: "Foto",
-        details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
-        customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
-      })
+        errorType: 'badRequest',
+        field: 'Foto',
+        details: [
+          {
+            path: 'Foto',
+            message: 'Nenhum arquivo foi enviado ou o arquivo está vazio.',
+          },
+        ],
+        customMessage: 'Nenhum arquivo foi enviado ou o arquivo está vazio.',
+      });
     }
 
     for (const file of files) {
-      if (file.size > (10 * 1024 * 1024)) {
+      if (file.size > 10 * 1024 * 1024) {
         throw new CustomError({
           statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
           errorType: 'payloadTooLarge',
-          field: "Imagem",
-          details: [{ path: "Imagem", message: "Arquivo é superior a 10 MB" }],
-          customMessage: "O arquivo é maior do que 10 MB."
+          field: 'Imagem',
+          details: [{ path: 'Imagem', message: 'Arquivo é superior a 10 MB' }],
+          customMessage: 'O arquivo é maior do que 10 MB.',
         });
       }
     }
 
-    const post = await this.repository.getById(id)
+    const post = await this.repository.getById(id);
     if (!post) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
         errorType: 'notFound',
-        field: "post",
-        details: [{ path: "post", message: "anuncio não encontrado." }],
-        customMessage: "post não encontrado."
+        field: 'post',
+        details: [{ path: 'post', message: 'anuncio não encontrado.' }],
+        customMessage: 'post não encontrado.',
       });
     }
 
-
     for (const file of files) {
-      const image = await compress(file.buffer)
+      const image = await compress(file.buffer);
 
-      const obj = new mongoose.Types.ObjectId().toString()
+      const obj = new mongoose.Types.ObjectId().toString();
 
-      const objectName = `${obj.toString()}.${image[1].format}`
+      const objectName = `${obj.toString()}.${image[1].format}`;
 
       // let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
 
-      await this.repository.uploadFoto(id, objectName, userId)
+      await this.repository.uploadFoto(id, objectName, userId);
 
       try {
-        await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
-          'Content-Type': file.mimetype,
-        })
-
+        await minioClient.putObject(
+          process.env.MINIO_BUCKET,
+          objectName,
+          image[0],
+          {
+            'Content-Type': file.mimetype,
+          },
+        );
       } catch (error) {
-        await this.repository.deletaFoto(id, objectName, userId)
-        throw new Error(error)
+        await this.repository.deletaFoto(id, objectName, userId);
+        throw new Error(error);
       }
-
     }
-    const data = await this.repository.getById(id)
+    const data = await this.repository.getById(id);
 
-    return data
-
+    return data;
   }
 
   async getFoto(id) {
-
     try {
-      const foto = await minioClient.getObject(process.env.MINIO_BUCKET, id)
+      const foto = await minioClient.getObject(process.env.MINIO_BUCKET, id);
 
-      const data = await this.constructorBuffer(foto)
+      const data = await this.constructorBuffer(foto);
 
-      return { buffer: data, content_type: foto.headers['content-type'] }
+      return { buffer: data, content_type: foto.headers['content-type'] };
     } catch (error) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
-        errorType: "notFound",
-        field: "attachments",
-        details: [{ path: "attachments", message: "Foto não encontrada" }],
-        customMessage: `Nenhuma foto com o ${id} encontrada`
-      })
+        errorType: 'notFound',
+        field: 'attachments',
+        details: [{ path: 'attachments', message: 'Foto não encontrada' }],
+        customMessage: `Nenhuma foto com o ${id} encontrada`,
+      });
     }
   }
 
   // Constrói o buffer da imagem
   async constructorBuffer(foto) {
-    const chunks = []
+    const chunks = [];
     const imagem = new Promise((resolve, reject) => {
       try {
         foto.on('data', (chunk) => {
-          chunks.push(chunk)
-        })
+          chunks.push(chunk);
+        });
         foto.on('end', () => {
-          const imagemBuffer = Buffer.concat(chunks)
-          resolve(imagemBuffer)
-        })
+          const imagemBuffer = Buffer.concat(chunks);
+          resolve(imagemBuffer);
+        });
       } catch (err) {
-        reject(err)
+        reject(err);
       }
+    });
 
-    })
-
-    return await imagem
+    return await imagem;
   }
 
   async deleteFoto(req, postId, linkId) {
-    const userId = req.user_id
+    const userId = req.user_id;
 
-    const post = await this.repository.getById(postId)
+    const post = await this.repository.getById(postId);
 
     if (!post || post.active === false) {
       throw new CustomError({
@@ -439,22 +447,26 @@ class PostService {
         field: 'post',
         details: [{ path: 'post', message: 'Anuncio nao encontrado.' }],
         customMessage: 'Anuncio nao encontrado.',
-      })
+      });
     }
 
-    const user = await this.userRepository.getById(userId)
-    const isAdmin = user?.memberships?.some((membership) => membership.role === 'admin')
+    const user = await this.userRepository.getById(userId);
+    const isAdmin = user?.memberships?.some(
+      (membership) => membership.role === 'admin',
+    );
 
     if (!isAdmin) {
-      const isOwner = post.author_id?.toString() === userId?.toString()
+      const isOwner = post.author_id?.toString() === userId?.toString();
       if (!isOwner) {
         throw new CustomError({
           statusCode: HttpStatusCodes.FORBIDDEN.code,
           errorType: 'forbidden',
           field: 'post',
-          details: [{ path: 'post', message: 'Permissao negada para remover anexo.' }],
+          details: [
+            { path: 'post', message: 'Permissao negada para remover anexo.' },
+          ],
           customMessage: 'Permissao negada para remover anexo.',
-        })
+        });
       }
     }
 
@@ -462,7 +474,7 @@ class PostService {
       postId,
       linkId,
       userId: isAdmin ? null : userId,
-    })
+    });
 
     if (!foto) {
       throw new CustomError({
@@ -471,12 +483,12 @@ class PostService {
         field: 'attachments',
         details: [{ path: 'attachments', message: 'Foto nao encontrada.' }],
         customMessage: 'Foto nao encontrada.',
-      })
+      });
     }
 
-    await this.repository.deletaFoto(postId, linkId, isAdmin ? null : userId)
+    await this.repository.deletaFoto(postId, linkId, isAdmin ? null : userId);
 
-    return { message: 'Foto removida com sucesso.' }
+    return { message: 'Foto removida com sucesso.' };
   }
 }
 

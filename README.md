@@ -45,38 +45,38 @@ cp .env.example .env
 
 Edite o arquivo `.env` com os valores adequados ao seu ambiente. As principais variáveis são:
 
-| Variável | Descrição | Exemplo |
-| :--- | :--- | :--- |
-| `PORT` | Porta do servidor | `3010` |
-| `FRONTEND_PORT` | Porta do frontend (usada no Docker Compose) | `3001` |
-| `NODE_ENV` | Ambiente (`development` / `production`) | `development` |
-| `DEBUGLOG` | Ativa logs detalhados de rotas (`true`/`false`) | `true` |
-| `DB_URL` | URL de conexão com o MongoDB | `mongodb://localhost:27017/comunicacao-escolar` |
-| `DB_URL_TEST` | URL do banco de dados de testes | `mongodb://localhost:27017/comunicacao-escolar-test` |
-| `JWT_SECRET_ACCESS_TOKEN` | Chave secreta do access token | *(gere uma chave segura)* |
-| `JWT_SECRET_REFRESH_TOKEN` | Chave secreta do refresh token | *(gere uma chave segura)* |
-| `JWT_SECRET_PASSWORD_RECOVERY` | Chave secreta para recuperação de senha | *(gere uma chave segura)* |
-| `JWT_SECRET_INVITE` | Chave secreta para convite de usuários | *(gere uma chave segura)* |
-| `JWT_ACCESS_TOKEN_EXPIRATION` | Tempo de expiração do access token | `1d` |
-| `JWT_REFRESH_TOKEN_EXPIRATION` | Tempo de expiração do refresh token | `7d` |
-| `EMAIL_USER` | E-mail Gmail para envio de notificações | `seu@gmail.com` |
-| `EMAIL_APP_PASSWORD` | Senha de app do Gmail | *(gerada nas configurações do Google)* |
-| `COMPANY_NAME` | Nome da instituição (aparece nos e-mails) | `Comunicação Escolar` |
-| `FRONTEND_URL` | URL do frontend (para links em e-mails) | `http://localhost:3000` |
-| `MINIO_ENDPOINT` | Endpoint do MinIO | `localhost` |
-| `MINIO_PORT` | Porta da API do MinIO | `9000` |
-| `MINIO_CONSOLE_PORT` | Porta do console web do MinIO | `9001` |
-| `MINIO_ACCESS_KEY` | Chave de acesso do MinIO | `minioadmin` |
-| `MINIO_SECRET_KEY` | Chave secreta do MinIO | `minioadmin` |
-| `MINIO_BUCKET` | Nome do bucket de usuários | `usuarios` |
-| `MINIO_BUCKET_2` | Nome do bucket de itens/anexos | `itens` |
-| `MINIO_PUBLIC_URL` | URL pública de acesso ao MinIO | `http://localhost:9000` |
-| `ADMIN_NAME` | Nome do admin criado pelas seeds | `Administrador` |
-| `ADMIN_EMAIL` | E-mail do admin criado pelas seeds | `admin@admin.com` |
-| `ADMIN_PASSWORD` | Senha do admin criado pelas seeds | `Senha@123` |
-| `FIREBASE_PROJECT_ID` | ID do projeto Firebase (push notifications) | *(do console Firebase)* |
-| `FIREBASE_CLIENT_EMAIL` | E-mail da conta de serviço Firebase | *(do console Firebase)* |
-| `FIREBASE_PRIVATE_KEY` | Chave privada da conta de serviço Firebase | *(do console Firebase)* |
+| Variável                       | Descrição                                       | Exemplo                                              |
+| :----------------------------- | :---------------------------------------------- | :--------------------------------------------------- |
+| `PORT`                         | Porta do servidor                               | `3010`                                               |
+| `FRONTEND_PORT`                | Porta do frontend (usada no Docker Compose)     | `3001`                                               |
+| `NODE_ENV`                     | Ambiente (`development` / `production`)         | `development`                                        |
+| `DEBUGLOG`                     | Ativa logs detalhados de rotas (`true`/`false`) | `true`                                               |
+| `DB_URL`                       | URL de conexão com o MongoDB                    | `mongodb://localhost:27017/comunicacao-escolar`      |
+| `DB_URL_TEST`                  | URL do banco de dados de testes                 | `mongodb://localhost:27017/comunicacao-escolar-test` |
+| `JWT_SECRET_ACCESS_TOKEN`      | Chave secreta do access token                   | _(gere uma chave segura)_                            |
+| `JWT_SECRET_REFRESH_TOKEN`     | Chave secreta do refresh token                  | _(gere uma chave segura)_                            |
+| `JWT_SECRET_PASSWORD_RECOVERY` | Chave secreta para recuperação de senha         | _(gere uma chave segura)_                            |
+| `JWT_SECRET_INVITE`            | Chave secreta para convite de usuários          | _(gere uma chave segura)_                            |
+| `JWT_ACCESS_TOKEN_EXPIRATION`  | Tempo de expiração do access token              | `1d`                                                 |
+| `JWT_REFRESH_TOKEN_EXPIRATION` | Tempo de expiração do refresh token             | `7d`                                                 |
+| `EMAIL_USER`                   | E-mail Gmail para envio de notificações         | `seu@gmail.com`                                      |
+| `EMAIL_APP_PASSWORD`           | Senha de app do Gmail                           | _(gerada nas configurações do Google)_               |
+| `COMPANY_NAME`                 | Nome da instituição (aparece nos e-mails)       | `Comunicação Escolar`                                |
+| `FRONTEND_URL`                 | URL do frontend (para links em e-mails)         | `http://localhost:3000`                              |
+| `MINIO_ENDPOINT`               | Endpoint do MinIO                               | `localhost`                                          |
+| `MINIO_PORT`                   | Porta da API do MinIO                           | `9000`                                               |
+| `MINIO_CONSOLE_PORT`           | Porta do console web do MinIO                   | `9001`                                               |
+| `MINIO_ACCESS_KEY`             | Chave de acesso do MinIO                        | `minioadmin`                                         |
+| `MINIO_SECRET_KEY`             | Chave secreta do MinIO                          | `minioadmin`                                         |
+| `MINIO_BUCKET`                 | Nome do bucket de usuários                      | `usuarios`                                           |
+| `MINIO_BUCKET_2`               | Nome do bucket de itens/anexos                  | `itens`                                              |
+| `MINIO_PUBLIC_URL`             | URL pública de acesso ao MinIO                  | `http://localhost:9000`                              |
+| `ADMIN_NAME`                   | Nome do admin criado pelas seeds                | `Administrador`                                      |
+| `ADMIN_EMAIL`                  | E-mail do admin criado pelas seeds              | `admin@admin.com`                                    |
+| `ADMIN_PASSWORD`               | Senha do admin criado pelas seeds               | `Senha@123`                                          |
+| `FIREBASE_PROJECT_ID`          | ID do projeto Firebase (push notifications)     | _(do console Firebase)_                              |
+| `FIREBASE_CLIENT_EMAIL`        | E-mail da conta de serviço Firebase             | _(do console Firebase)_                              |
+| `FIREBASE_PRIVATE_KEY`         | Chave privada da conta de serviço Firebase      | _(do console Firebase)_                              |
 
 **3. Suba a infraestrutura (MongoDB + MinIO)**
 
@@ -126,9 +126,11 @@ O servidor ficará disponível em `http://localhost:{PORT}`.
 A documentação Swagger estará disponível em `http://localhost:{PORT}/docs`.
 
 > **Desenvolvimento com Android Studio (emulador):** para que o app acesse a API rodando localmente, execute o redirecionamento de porta via ADB:
+>
 > ```bash
 > adb reverse tcp:PORT tcp:PORT
 > ```
+>
 > Substitua `PORT` pelo valor definido na variável `PORT` do `.env` (ex.: `3010`).
 
 ## Testes
@@ -172,11 +174,11 @@ src/
 
 ## Equipe
 
-| Nome | Papel | Contato |
-| :--- | :--- | :--- |
-| Arthur Gomes | Desenvolvedor | piclekrick@gmail.com |
-| Matheus Batista | Desenvolvedor | matheusifro2020@gmail.com |
-| Silvio Ribeiro | Desenvolvedor | silviohuan@gmail.com |
+| Nome            | Papel         | Contato                     |
+| :-------------- | :------------ | :-------------------------- |
+| Arthur Gomes    | Desenvolvedor | piclekrick@gmail.com        |
+| Matheus Batista | Desenvolvedor | matheusifro2020@gmail.com   |
+| Silvio Ribeiro  | Desenvolvedor | silviohuan@gmail.com        |
 | Vinícius Moraes | Desenvolvedor | viniciusmoraesvha@gmail.com |
 
 **Cliente:** Gilberto Pereira da Silva - gilberto.silva@ifro.edu.br

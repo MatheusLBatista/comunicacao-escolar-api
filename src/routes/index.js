@@ -18,7 +18,7 @@ import conversation from './conversationRoutes.js';
 import pickupAuthorization from './pickupAuthorizationRoutes.js';
 import pickupLog from './pickupLogRoutes.js';
 import auditLog from './auditLogRoutes.js';
-import turma from './classRoutes.js'
+import turma from './classRoutes.js';
 
 import dotenv from 'dotenv';
 
@@ -53,7 +53,9 @@ const routes = (app) => {
 
     if (scheme !== 'Basic' || !encoded) {
       res.set('WWW-Authenticate', 'Basic realm="API Docs"');
-      return res.status(401).send('Autenticação necessária para acessar a documentação.');
+      return res
+        .status(401)
+        .send('Autenticação necessária para acessar a documentação.');
     }
 
     const [user, pass] = Buffer.from(encoded, 'base64').toString().split(':');
@@ -113,7 +115,7 @@ const routes = (app) => {
     pickupLog,
     auditLog,
     like,
-    turma
+    turma,
   );
 
   app.use((req, res) => {

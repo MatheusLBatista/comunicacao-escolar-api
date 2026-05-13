@@ -35,8 +35,14 @@ class ClassRepository {
       };
     }
 
-    const { name, shift, year, teacher_id, active, page = 1 } =
-      req?.query || {};
+    const {
+      name,
+      shift,
+      year,
+      teacher_id,
+      active,
+      page = 1,
+    } = req?.query || {};
 
     const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
 
@@ -67,10 +73,10 @@ class ClassRepository {
   }
 
   async create(data) {
-    const turma = await this.model.insertOne(data)
-    console.log(turma)
+    const turma = await this.model.insertOne(data);
+    console.log(turma);
 
-    return turma
+    return turma;
   }
 
   async findById(id) {
@@ -80,10 +86,15 @@ class ClassRepository {
   }
 
   async existClass(school_id, name, shift, year) {
+    const data = this.model.findOne({
+      school_id: school_id,
+      name: name,
+      shift: shift,
+      year: year,
+      active: true,
+    });
 
-    const data = this.model.findOne({school_id:school_id, name:name, shift:shift, year:year, active:true})
-
-    return data
+    return data;
   }
 
   async update(parsedData, id) {
@@ -100,19 +111,22 @@ class ClassRepository {
   }
 
   async delete(id) {
-
-    const data = await this.model.findOneAndUpdate({_id:id, active:true}, {$set: {active:false}}, {new:true})
-    console.log(data)
-    if(!data) {
+    const data = await this.model.findOneAndUpdate(
+      { _id: id, active: true },
+      { $set: { active: false } },
+      { new: true },
+    );
+    console.log(data);
+    if (!data) {
       throw new CustomError({
         statusCode: 404,
         errorType: 'resourceNotFound',
         field: 'Class',
         details: [],
         customMessage: messages.error.resourceNotFound('Class'),
-      })
+      });
     }
-    return data
+    return data;
   }
 }
 

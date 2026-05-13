@@ -9,8 +9,16 @@ const router = express.Router();
 const meController = new MeController();
 
 router
-  .get('/me', AuthMiddleware, asyncWrapper(meController.getMe.bind(meController)))
-  .patch('/me', AuthMiddleware, asyncWrapper(meController.updateMe.bind(meController)))
+  .get(
+    '/me',
+    AuthMiddleware,
+    asyncWrapper(meController.getMe.bind(meController)),
+  )
+  .patch(
+    '/me',
+    AuthMiddleware,
+    asyncWrapper(meController.updateMe.bind(meController)),
+  )
   .patch(
     '/me/password',
     AuthMiddleware,

@@ -134,7 +134,12 @@ class DailyLogService {
         statusCode: HttpStatusCodes.BAD_REQUEST.code,
         errorType: 'badRequest',
         field: 'files',
-        details: [{ path: 'files', message: 'Nenhum arquivo foi enviado ou o arquivo está vazio.' }],
+        details: [
+          {
+            path: 'files',
+            message: 'Nenhum arquivo foi enviado ou o arquivo está vazio.',
+          },
+        ],
         customMessage: 'Nenhum arquivo foi enviado ou o arquivo está vazio.',
       });
     }
@@ -161,9 +166,14 @@ class DailyLogService {
       await this.repository.addAttachment(id, objectName);
 
       try {
-        await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
-          'Content-Type': file.mimetype,
-        });
+        await minioClient.putObject(
+          process.env.MINIO_BUCKET,
+          objectName,
+          image[0],
+          {
+            'Content-Type': file.mimetype,
+          },
+        );
       } catch (error) {
         await this.repository.removeAttachment(id, objectName);
         throw new Error(error);

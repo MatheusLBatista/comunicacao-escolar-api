@@ -40,8 +40,8 @@ const upload = multer({
       }
       cb(null, true);
     } catch (error) {
-      if(error instanceof MulterError) {
-        cb(error.stack, false)
+      if (error instanceof MulterError) {
+        cb(error.stack, false);
       }
       cb(error, false);
     }

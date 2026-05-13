@@ -231,13 +231,16 @@ const postPaths = {
                   data: {
                     type: 'object',
                     properties: {
-                      message: { type: 'string', example: 'Anúncio deletado com sucesso' }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                      message: {
+                        type: 'string',
+                        example: 'Anúncio deletado com sucesso',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         400: commonResponses[400](),
         401: commonResponses[401](),
@@ -295,7 +298,8 @@ const postPaths = {
                     type: 'string',
                     format: 'binary',
                   },
-                  description: 'Arquivos de imagem para anexo (máx. 10 arquivos)',
+                  description:
+                    'Arquivos de imagem para anexo (máx. 10 arquivos)',
                 },
               },
             },
@@ -364,13 +368,16 @@ const postPaths = {
                   data: {
                     type: 'object',
                     properties: {
-                      message: { type: 'string', example: 'Foto removida com sucesso.' }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                      message: {
+                        type: 'string',
+                        example: 'Foto removida com sucesso.',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         400: commonResponses[400](),
         401: commonResponses[401](),

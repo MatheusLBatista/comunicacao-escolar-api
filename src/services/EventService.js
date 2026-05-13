@@ -17,7 +17,9 @@ class EventService {
     if (!userId) return {};
 
     const user = await this.userRepository.getById(userId);
-    const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
+    const memberships = Array.isArray(user?.memberships)
+      ? user.memberships
+      : [];
 
     const schoolIds = [
       ...new Set(
@@ -44,7 +46,8 @@ class EventService {
         errorType: 'forbidden',
         field: 'school_id',
         details: [],
-        customMessage: 'Você não tem permissão para realizar esta operação nesta escola.',
+        customMessage:
+          'Você não tem permissão para realizar esta operação nesta escola.',
       });
     }
   }
@@ -52,7 +55,10 @@ class EventService {
   async create(parsedData, rawBody = {}) {
     await this.schoolRepository.findById(parsedData.school_id);
 
-    await this._assertSchoolMembership(parsedData.created_by, parsedData.school_id);
+    await this._assertSchoolMembership(
+      parsedData.created_by,
+      parsedData.school_id,
+    );
 
     await this.validateTarget(parsedData.target, parsedData.school_id);
     parsedData.target = this.normalizeTarget(parsedData.target);

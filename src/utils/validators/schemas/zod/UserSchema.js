@@ -101,9 +101,7 @@ const StudentInputSchema = z.object({
     .string()
     .min(1, 'Campo full_name do aluno é obrigatório.')
     .max(100, 'O nome do aluno deve ter no máximo 100 caracteres.'),
-  class_id: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, 'class_id inválido'),
+  class_id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'class_id inválido'),
 });
 
 const LinkToSchoolSchema = z
@@ -161,7 +159,9 @@ const FcmTokenSchema = z.object({
 });
 
 const ResetPasswordByCodeSchema = z.object({
-  password_recovery_code: z.string().min(1, 'Código de recuperação é obrigatório.'),
+  password_recovery_code: z
+    .string()
+    .min(1, 'Código de recuperação é obrigatório.'),
   password: z
     .string()
     .min(8, 'A senha deve ter pelo menos 8 caracteres.')

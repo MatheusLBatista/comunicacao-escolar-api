@@ -7,19 +7,19 @@ class DailyLog {
       {
         school_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'escolas',
+          ref: 'Schools',
           required: true,
           index: true,
         },
         student_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
           required: true,
           index: true,
         },
         teacher_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
           required: true,
         },
         dailylogtemplate_id: {

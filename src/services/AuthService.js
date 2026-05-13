@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
-import firebaseApp, { firebaseMessaging } from '../config/Firebase.js';
 import {
   CustomError,
   HttpStatusCodes,
@@ -110,7 +109,8 @@ class AuthService {
         errorType: 'serverError',
         field: 'Google OAuth',
         details: [],
-        customMessage: 'Autenticação com Google não está configurada no servidor.',
+        customMessage:
+          'Autenticação com Google não está configurada no servidor.',
       });
     }
 
@@ -149,16 +149,23 @@ class AuthService {
       });
     } else if (!usuario.google_id) {
       // Conta local existente: vincula o google_id
-      await this.repository.update(usuario._id, { google_id: googleId, auth_provider: 'google' });
+      await this.repository.update(usuario._id, {
+        google_id: googleId,
+        auth_provider: 'google',
+      });
       usuario = await this.repository.getById(usuario._id);
     }
 
     const access_token = await this.TokenUtil.generateAccessToken(usuario._id);
-    const refresh_token = await this.TokenUtil.generateRefreshToken(usuario._id);
+    const refresh_token = await this.TokenUtil.generateRefreshToken(
+      usuario._id,
+    );
     await this.repository.storeTokens(usuario._id, access_token, refresh_token);
 
     const userAtualizado = await this.repository.getById(usuario._id);
-    const obj = userAtualizado.toObject ? userAtualizado.toObject() : { ...userAtualizado };
+    const obj = userAtualizado.toObject
+      ? userAtualizado.toObject()
+      : { ...userAtualizado };
     delete obj.password;
     await this._populateAssociatedStudents(obj);
 

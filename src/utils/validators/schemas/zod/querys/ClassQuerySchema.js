@@ -1,3 +1,6 @@
-import { ClassSchema } from "../ClassSchema.js";
+import { ClassSchema } from '../ClassSchema.js';
 
-export const ClassQuerySchema = ClassSchema.omit({id:true, school_id:true}).partial()
+export const ClassQuerySchema = ClassSchema.omit({
+  id: true,
+  school_id: true,
+}).partial();

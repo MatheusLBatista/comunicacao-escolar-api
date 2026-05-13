@@ -2,17 +2,17 @@
 
 ## Stakeholders
 
-| Nome | Cargo/Papel | Contato |
-| :---- | :---- | :---- |
+| Nome                      | Cargo/Papel       | Contato                    |
+| :------------------------ | :---------------- | :------------------------- |
 | Gilberto Pereira da Silva | Professor/Cliente | gilberto.silva@ifro.edu.br |
 
 ## Equipe de Desenvolvimento
 
-| Nome | Cargo/Papel | Contato |
-| :---- | :---- | :---- |
-| Arthur Gomes | Desenvolvedor | piclekrick@gmail.com |
-| Matheus Batista | Desenvolvedor | matheusifro2020@gmail.com |
-| Silvio Ribeiro | Desenvolvedor | silviohuan@gmail.com |
+| Nome            | Cargo/Papel   | Contato                     |
+| :-------------- | :------------ | :-------------------------- |
+| Arthur Gomes    | Desenvolvedor | piclekrick@gmail.com        |
+| Matheus Batista | Desenvolvedor | matheusifro2020@gmail.com   |
+| Silvio Ribeiro  | Desenvolvedor | silviohuan@gmail.com        |
 | Vinícius Moraes | Desenvolvedor | viniciusmoraesvha@gmail.com |
 
 ---
@@ -39,13 +39,13 @@
 
 ## Resumo do Projeto
 
-| Campo | Descrição |
-| :---- | :---- |
-| **Nome** | Comunicação Escolar |
-| **Principal objetivo** | Desenvolver uma plataforma que centralize e facilite a comunicação entre escolas, professores e responsáveis, em torno da vida escolar dos alunos. |
+| Campo                    | Descrição                                                                                                                                                        |
+| :----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nome**                 | Comunicação Escolar                                                                                                                                              |
+| **Principal objetivo**   | Desenvolver uma plataforma que centralize e facilite a comunicação entre escolas, professores e responsáveis, em torno da vida escolar dos alunos.               |
 | **Benefícios esperados** | Melhorar o fluxo de informações escolares, reduzir o uso de meios informais de comunicação e aumentar o engajamento dos responsáveis na vida escolar dos alunos. |
-| **Início previsto** | 10/02/2026 |
-| **Término previsto** | 23/06/2026 |
+| **Início previsto**      | 10/02/2026                                                                                                                                                       |
+| **Término previsto**     | 23/06/2026                                                                                                                                                       |
 
 ---
 
@@ -59,7 +59,7 @@ O objetivo deste documento é detalhar a concepção, arquitetura, requisitos e 
 
 ### Concepção do Sistema
 
-A ideia para o desenvolvimento do sistema partiu da necessidade identificada de unificar, em uma única plataforma, os diversos canais de comunicação utilizados pelas escolas com as famílias dos alunos,  como grupos de WhatsApp, e-mails e bilhetes físicos. O sistema propõe centralizar funcionalidades como registro de rotina diária dos alunos com templates configuráveis, mural de avisos, chat privado entre professor e responsável, agenda escolar, controle de saída com autorização e notificações em tempo real, garantindo isolamento total de dados entre diferentes instituições.
+A ideia para o desenvolvimento do sistema partiu da necessidade identificada de unificar, em uma única plataforma, os diversos canais de comunicação utilizados pelas escolas com as famílias dos alunos, como grupos de WhatsApp, e-mails e bilhetes físicos. O sistema propõe centralizar funcionalidades como registro de rotina diária dos alunos com templates configuráveis, mural de avisos, chat privado entre professor e responsável, agenda escolar, controle de saída com autorização e notificações em tempo real, garantindo isolamento total de dados entre diferentes instituições.
 
 ---
 
@@ -69,11 +69,11 @@ Plataforma mobile com o objetivo de ser o canal oficial de comunicação entre e
 
 ### Usuários do Sistema (Atores)
 
-| Ator | Descrição |
-| :---- | :---- |
-| Administrador | Gerencia a escola cadastrada na plataforma, podendo criar e gerenciar usuários, configurar turmas, templates de comunicados e demais configurações institucionais. Tem visibilidade total sobre as operações da escola. |
-| Professor | Pode registrar a rotina diária dos alunos seguindo templates configurados, publicar avisos no mural (direcionados à escola inteira ou a turmas específicas), conversar com responsáveis via chat e gerenciar eventos na agenda escolar. |
-| Responsável | Acompanha os comunicados diários de seus filhos, confirma leitura, interage com professores via chat, visualiza o mural de avisos, consulta a agenda escolar e gerencia autorizações de retirada dos alunos. |
+| Ator          | Descrição                                                                                                                                                                                                                               |
+| :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Administrador | Gerencia a escola cadastrada na plataforma, podendo criar e gerenciar usuários, configurar turmas, templates de comunicados e demais configurações institucionais. Tem visibilidade total sobre as operações da escola.                 |
+| Professor     | Pode registrar a rotina diária dos alunos seguindo templates configurados, publicar avisos no mural (direcionados à escola inteira ou a turmas específicas), conversar com responsáveis via chat e gerenciar eventos na agenda escolar. |
+| Responsável   | Acompanha os comunicados diários de seus filhos, confirma leitura, interage com professores via chat, visualiza o mural de avisos, consulta a agenda escolar e gerencia autorizações de retirada dos alunos.                            |
 
 ### Abrangência e Sistemas Similares
 
@@ -132,30 +132,30 @@ A equipe adotou a metodologia ágil com **Kanban**, com definição clara de tar
 
 ### Requisitos Funcionais
 
-| ID | Nome | Descrição | Prioridade |
-| :---- | :---- | :---- | :---- |
-| RF01 | Gestão de autenticação e sessão | O sistema deve permitir que os usuários realizem login utilizando e-mail e senha, gerenciando a sessão através de tokens JWT. | Alta |
-| RF02 | Cadastro e gestão escolar | O sistema deve permitir o cadastro de escolas, garantindo independência e autonomia de cada locatário. | Alta |
-| RF03 | Gestão de usuários e perfis | O sistema deve permitir a gestão de usuários com papéis distintos: administrador, professor e responsável. | Alta |
-| RF04 | Configuração dinâmica de comunicados | O sistema deve permitir a criação de templates personalizados de comunicados diários com campos de tipos variados. | Alta |
-| RF05 | Registro de rotina diária | Professores devem ser capazes de registrar a rotina diária dos alunos seguindo o template configurado. | Alta |
-| RF06 | Confirmação de leitura de comunicados | O sistema deve registrar automaticamente a data e hora em que um responsável visualizou o comunicado diário do aluno. | Alta |
-| RF07 | Publicação no mural | Professores devem poder publicar avisos no mural, direcionando-os para toda a escola ou para turmas específicas. | Alta |
-| RF08 | Interação no mural | O sistema deve permitir que os usuários curtam avisos publicados no mural. | Média |
-| RF09 | Comunicação via chat | O sistema deve conter um chat entre professores e responsáveis, permitindo mensagens privadas ou respostas diretas a comunicados diários. | Alta |
-| RF10 | Agenda escolar | O sistema deve permitir o cadastro e a visualização de eventos escolares. | Média |
-| RF11 | Controle de saída | O sistema deve permitir o gerenciamento de indivíduos autorizados para a retirada de alunos e deve registrar o log de saída (quem retirou e horário). | Alta |
-| RF12 | Notificações push | O sistema deve enviar notificações em tempo real para dispositivos móveis sobre novas mensagens, comunicados ou avisos urgentes. | Alta |
-| RF13 | Auditoria de acesso | O sistema deve registrar logs de auditoria de todas as operações e acessos realizados pelos usuários. | Média |
+| ID   | Nome                                  | Descrição                                                                                                                                             | Prioridade |
+| :--- | :------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- |
+| RF01 | Gestão de autenticação e sessão       | O sistema deve permitir que os usuários realizem login utilizando e-mail e senha, gerenciando a sessão através de tokens JWT.                         | Alta       |
+| RF02 | Cadastro e gestão escolar             | O sistema deve permitir o cadastro de escolas, garantindo independência e autonomia de cada locatário.                                                | Alta       |
+| RF03 | Gestão de usuários e perfis           | O sistema deve permitir a gestão de usuários com papéis distintos: administrador, professor e responsável.                                            | Alta       |
+| RF04 | Configuração dinâmica de comunicados  | O sistema deve permitir a criação de templates personalizados de comunicados diários com campos de tipos variados.                                    | Alta       |
+| RF05 | Registro de rotina diária             | Professores devem ser capazes de registrar a rotina diária dos alunos seguindo o template configurado.                                                | Alta       |
+| RF06 | Confirmação de leitura de comunicados | O sistema deve registrar automaticamente a data e hora em que um responsável visualizou o comunicado diário do aluno.                                 | Alta       |
+| RF07 | Publicação no mural                   | Professores devem poder publicar avisos no mural, direcionando-os para toda a escola ou para turmas específicas.                                      | Alta       |
+| RF08 | Interação no mural                    | O sistema deve permitir que os usuários curtam avisos publicados no mural.                                                                            | Média      |
+| RF09 | Comunicação via chat                  | O sistema deve conter um chat entre professores e responsáveis, permitindo mensagens privadas ou respostas diretas a comunicados diários.             | Alta       |
+| RF10 | Agenda escolar                        | O sistema deve permitir o cadastro e a visualização de eventos escolares.                                                                             | Média      |
+| RF11 | Controle de saída                     | O sistema deve permitir o gerenciamento de indivíduos autorizados para a retirada de alunos e deve registrar o log de saída (quem retirou e horário). | Alta       |
+| RF12 | Notificações push                     | O sistema deve enviar notificações em tempo real para dispositivos móveis sobre novas mensagens, comunicados ou avisos urgentes.                      | Alta       |
+| RF13 | Auditoria de acesso                   | O sistema deve registrar logs de auditoria de todas as operações e acessos realizados pelos usuários.                                                 | Média      |
 
 ### Requisitos Não Funcionais
 
-| ID | Nome | Descrição | Prioridade |
-| :---- | :---- | :---- | :---- |
-| RNF01 | Isolamento de dados | O sistema deve garantir o isolamento total dos dados entre diferentes escolas, usuários de uma escola não devem acessar dados de outra. | Alta |
-| RNF02 | Conformidade com a LGPD | O tratamento de dados, especialmente de menores de idade, deve seguir a Lei Geral de Proteção de Dados. | Alta |
-| RNF03 | Comunicação em tempo real | O sistema deve utilizar WebSockets para garantir que mensagens e notificações cheguem instantaneamente aos clientes. | Alta |
-| RNF04 | Interface e design system | A interface deve seguir um design moderno e intuitivo, utilizando componentes padronizados que garantam uma experiência fluida de navegação. | Média |
+| ID    | Nome                      | Descrição                                                                                                                                    | Prioridade |
+| :---- | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------- | :--------- |
+| RNF01 | Isolamento de dados       | O sistema deve garantir o isolamento total dos dados entre diferentes escolas, usuários de uma escola não devem acessar dados de outra.      | Alta       |
+| RNF02 | Conformidade com a LGPD   | O tratamento de dados, especialmente de menores de idade, deve seguir a Lei Geral de Proteção de Dados.                                      | Alta       |
+| RNF03 | Comunicação em tempo real | O sistema deve utilizar WebSockets para garantir que mensagens e notificações cheguem instantaneamente aos clientes.                         | Alta       |
+| RNF04 | Interface e design system | A interface deve seguir um design moderno e intuitivo, utilizando componentes padronizados que garantam uma experiência fluida de navegação. | Média      |
 
 ---
 
@@ -166,17 +166,20 @@ A equipe adotou a metodologia ágil com **Kanban**, com definição clara de tar
 ### Descrição Textual dos Casos de Uso
 
 **Administrador:**
+
 - **Cadastrar escola:** Realiza o cadastro de uma nova instituição de ensino no sistema, tornando-a um locatário independente.
 - **Gerenciar usuários:** Cria, edita, ativa e desativa usuários, atribuindo papéis (professor, responsável) dentro da escola.
 - **Configurar templates de comunicado:** Define os campos e tipos de cada template de comunicado diário utilizado pelos professores.
 
 **Professor:**
+
 - **Registrar rotina diária:** Preenche o comunicado diário de um aluno com base no template configurado pela escola.
 - **Publicar aviso no mural:** Cria e publica avisos para toda a escola ou para uma turma específica.
 - **Enviar mensagem no chat:** Inicia ou responde conversas privadas com responsáveis de alunos.
 - **Gerenciar agenda escolar:** Cadastra e edita eventos na agenda da escola ou de uma turma.
 
 **Responsável:**
+
 - **Visualizar comunicado diário:** Acessa e confirma a leitura do comunicado diário do(s) seu(s) filho(s).
 - **Interagir no mural:** Visualiza e curte avisos publicados no mural.
 - **Conversar no chat:** Envia e recebe mensagens privadas com professores.

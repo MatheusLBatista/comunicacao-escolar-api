@@ -16,7 +16,9 @@ class PickupAuthorizationService {
     if (!userId) return {};
 
     const user = await this.userRepository.getById(userId);
-    const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
+    const memberships = Array.isArray(user?.memberships)
+      ? user.memberships
+      : [];
 
     const isAdminOrTeacher = memberships.some(
       (m) => m?.role === 'admin' || m?.role === 'teacher',

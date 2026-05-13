@@ -44,8 +44,14 @@ const usuariosRoutes = {
       summary: 'Lista usuários de uma escola',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' }, example: '6642a3f7b4c5d6e7f8091001' },
-        ...generateParameters(usuariosSchemas.UsuarioFiltro)
+        {
+          name: 'schoolId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6642a3f7b4c5d6e7f8091001',
+        },
+        ...generateParameters(usuariosSchemas.UsuarioFiltro),
       ],
       responses: {
         200: commonResponses[200]('#/components/schemas/UsuarioListagem'),
@@ -66,7 +72,15 @@ const usuariosRoutes = {
             - Se não existir, cria o usuário com uma senha temporária (se não enviada).
       `,
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'schoolId', in: 'path', required: true, schema: { type: 'string' }, example: '6642a3f7b4c5d6e7f8091001' }],
+      parameters: [
+        {
+          name: 'schoolId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6642a3f7b4c5d6e7f8091001',
+        },
+      ],
       requestBody: {
         content: {
           'application/json': {
@@ -76,17 +90,34 @@ const usuariosRoutes = {
               properties: {
                 full_name: { type: 'string', example: 'Carlos Alves' },
                 email: { type: 'string', example: 'carlos.alves@escola.com' },
-                role: { type: 'string', enum: ['admin', 'teacher', 'parent', 'student'], example: 'teacher' },
+                role: {
+                  type: 'string',
+                  enum: ['admin', 'teacher', 'parent', 'student'],
+                  example: 'teacher',
+                },
                 password: { type: 'string', example: 'Senha@123' },
-                class_id: { type: 'string', description: 'Obrigatório para student', example: '6647f8ec0910203040506001', nullable: true },
-                associated_students: { type: 'array', items: { type: 'string' }, description: 'Para parent', example: [] }
-              }
-            }
-          }
-        }
+                class_id: {
+                  type: 'string',
+                  description: 'Obrigatório para student',
+                  example: '6647f8ec0910203040506001',
+                  nullable: true,
+                },
+                associated_students: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Para parent',
+                  example: [],
+                },
+              },
+            },
+          },
+        },
       },
-      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 409: commonResponses[409]() }
-    }
+      responses: {
+        201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'),
+        409: commonResponses[409](),
+      },
+    },
   },
   '/schools/{schoolId}/members': {
     post: {
@@ -100,7 +131,15 @@ const usuariosRoutes = {
             - Cria automaticamente o aluno e o vincula ao pai nesta escola.
       `,
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'schoolId', in: 'path', required: true, schema: { type: 'string' }, example: '6642a3f7b4c5d6e7f8091001' }],
+      parameters: [
+        {
+          name: 'schoolId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6642a3f7b4c5d6e7f8091001',
+        },
+      ],
       requestBody: {
         content: {
           'application/json': {
@@ -108,24 +147,45 @@ const usuariosRoutes = {
               type: 'object',
               required: ['role'],
               properties: {
-                email: { type: 'string', description: 'Email do usuário existente', example: 'maria.teacher@escola.com' },
-                user_id: { type: 'string', description: 'Ou ID do usuário (alternativa ao email)', example: '6644c5b9d6e7f80910203002' },
-                role: { type: 'string', enum: ['admin', 'teacher', 'parent', 'student'], example: 'teacher' },
+                email: {
+                  type: 'string',
+                  description: 'Email do usuário existente',
+                  example: 'maria.teacher@escola.com',
+                },
+                user_id: {
+                  type: 'string',
+                  description: 'Ou ID do usuário (alternativa ao email)',
+                  example: '6644c5b9d6e7f80910203002',
+                },
+                role: {
+                  type: 'string',
+                  enum: ['admin', 'teacher', 'parent', 'student'],
+                  example: 'teacher',
+                },
                 student: {
                   type: 'object',
                   description: 'Obrigatório se role=parent',
                   properties: {
                     full_name: { type: 'string', example: 'João Silva' },
-                    class_id: { type: 'string', description: 'ID da turma (opcional)', example: '6647f8ec0910203040506001', nullable: true }
-                  }
-                }
-              }
-            }
-          }
-        }
+                    class_id: {
+                      type: 'string',
+                      description: 'ID da turma (opcional)',
+                      example: '6647f8ec0910203040506001',
+                      nullable: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 409: commonResponses[409](), 404: commonResponses[404]() }
-    }
+      responses: {
+        201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'),
+        409: commonResponses[409](),
+        404: commonResponses[404](),
+      },
+    },
   },
   '/schools/{schoolId}/members/{userId}': {
     patch: {
@@ -137,8 +197,20 @@ const usuariosRoutes = {
       `,
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' }, example: '6642a3f7b4c5d6e7f8091001' },
-        { name: 'userId', in: 'path', required: true, schema: { type: 'string' }, example: '6644c5b9d6e7f80910203002' }
+        {
+          name: 'schoolId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6642a3f7b4c5d6e7f8091001',
+        },
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6644c5b9d6e7f80910203002',
+        },
       ],
       requestBody: {
         required: true,
@@ -148,14 +220,22 @@ const usuariosRoutes = {
               type: 'object',
               required: ['role'],
               properties: {
-                role: { type: 'string', enum: ['admin', 'teacher', 'parent', 'student'], example: 'teacher' }
-              }
-            }
-          }
-        }
+                role: {
+                  type: 'string',
+                  enum: ['admin', 'teacher', 'parent', 'student'],
+                  example: 'teacher',
+                },
+              },
+            },
+          },
+        },
       },
-      responses: { 200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404](), 409: commonResponses[409]() }
-    }
+      responses: {
+        200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'),
+        404: commonResponses[404](),
+        409: commonResponses[409](),
+      },
+    },
   },
   '/schools/{schoolId}/members/{userId}/students': {
     post: {
@@ -167,8 +247,20 @@ const usuariosRoutes = {
       `,
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'schoolId', in: 'path', required: true, schema: { type: 'string' }, example: '6642a3f7b4c5d6e7f8091001' },
-        { name: 'userId', in: 'path', required: true, schema: { type: 'string' }, example: '6645d6cae7f8091020304003' }
+        {
+          name: 'schoolId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6642a3f7b4c5d6e7f8091001',
+        },
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6645d6cae7f8091020304003',
+        },
       ],
       requestBody: {
         content: {
@@ -178,37 +270,81 @@ const usuariosRoutes = {
               required: ['full_name'],
               properties: {
                 full_name: { type: 'string', example: 'Lucas Silva' },
-                class_id: { type: 'string', description: 'ID da turma (opcional)', example: '6647f8ec0910203040506001', nullable: true }
-              }
-            }
-          }
-        }
+                class_id: {
+                  type: 'string',
+                  description: 'ID da turma (opcional)',
+                  example: '6647f8ec0910203040506001',
+                  nullable: true,
+                },
+              },
+            },
+          },
+        },
       },
-      responses: { 201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404]() }
-    }
+      responses: {
+        201: commonResponses[201]('#/components/schemas/UsuarioDetalhes'),
+        404: commonResponses[404](),
+      },
+    },
   },
   '/users/{id}': {
     get: {
       tags: ['Usuários'],
       summary: 'Obtém detalhes de um usuário',
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, example: '6643b4a8c5d6e7f809102001' }],
-      responses: { 200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404]() },
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6643b4a8c5d6e7f809102001',
+        },
+      ],
+      responses: {
+        200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'),
+        404: commonResponses[404](),
+      },
     },
     patch: {
       tags: ['Usuários'],
       summary: 'Atualiza um usuário',
       description: 'Campos email e password são ignorados no update.',
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, example: '6643b4a8c5d6e7f809102001' }],
-      requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/UsuarioPutPatch' } } } },
-      responses: { 200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'), 404: commonResponses[404]() },
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6643b4a8c5d6e7f809102001',
+        },
+      ],
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/UsuarioPutPatch' },
+          },
+        },
+      },
+      responses: {
+        200: commonResponses[200]('#/components/schemas/UsuarioDetalhes'),
+        404: commonResponses[404](),
+      },
     },
     delete: {
       tags: ['Usuários'],
       summary: 'Deleta (desativa) um usuário',
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, example: '6643b4a8c5d6e7f809102001' }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+          example: '6643b4a8c5d6e7f809102001',
+        },
+      ],
       responses: {
         200: {
           description: 'Sucesso',
@@ -218,13 +354,16 @@ const usuariosRoutes = {
                 type: 'object',
                 properties: {
                   error: { type: 'boolean', example: false },
-                  message: { type: 'string', example: 'Usuário desativado com sucesso.' }
-                }
-              }
-            }
-          }
+                  message: {
+                    type: 'string',
+                    example: 'Usuário desativado com sucesso.',
+                  },
+                },
+              },
+            },
+          },
         },
-        404: commonResponses[404]()
+        404: commonResponses[404](),
       },
     },
   },
