@@ -7,19 +7,24 @@ class DailyLog {
       {
         school_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'escolas',
+          ref: 'Schools',
           required: true,
           index: true,
         },
         student_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
           required: true,
           index: true,
         },
         teacher_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'usuarios',
+          ref: 'Users',
+          required: true,
+        },
+        dailylogtemplate_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'daily_log_templates',
           required: true,
         },
         is_present: {
@@ -34,6 +39,10 @@ class DailyLog {
           },
         ],
         attachments: [{ type: String }],
+        observation: {
+          type: String,
+          default: '',
+        },
         read_at: {
           type: Date,
           default: null,

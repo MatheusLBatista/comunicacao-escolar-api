@@ -9,7 +9,7 @@ const rotasRoutes = {
       summary: 'Cria uma nova rota',
       description: `
             + Caso de uso: Criação de nova rota de acesso no sistema para controle de permissões.
-            
+
             + Função de Negócio:
                 - Permitir ao usuário autenticado criar uma nova rota para controle de permissões de acesso.
                 + Recebe no corpo da requisição:
@@ -50,21 +50,21 @@ const rotasRoutes = {
       summary: 'Lista todas as rotas',
       description: `
         + Caso de uso: Listagem de rotas para gerenciamento e consulta.
-        
+
         + Função de Negócio:
             - Permitir à front-end, App Mobile e serviços server-to-server obter uma lista paginada de rotas cadastradas.
             + Recebe como query parameters (opcionais):
-                • filtros: rota, dominio, ativo.  
+                • filtros: rota, dominio, ativo.
                 • paginação: page (número da página), limite (quantidade de itens por página).
 
         + Regras de Negócio:
-            - Validar formatos e valores dos filtros fornecidos.  
-            - Respeitar as permissões do usuário autenticado.  
+            - Validar formatos e valores dos filtros fornecidos.
+            - Respeitar as permissões do usuário autenticado.
             - Aplicar paginação e retornar metadados: total de registros e total de páginas.
 
         + Resultado Esperado:
             - 200 OK com corpo conforme schema **RotaListagem**, contendo:
-                • **docs**: array de rotas.  
+                • **docs**: array de rotas.
                 • **dados de paginação**: totalDocs, limit, totalPages, page, pagingCounter, hasPrevPage, hasNextPage, prevPage, nextPage.
             `,
       security: [{ bearerAuth: [] }],
@@ -94,7 +94,7 @@ const rotasRoutes = {
       summary: 'Obtém detalhes de uma rota',
       description: `
             + Caso de uso: Consulta de detalhes de rota específica.
-            
+
             + Função de Negócio:
                 - Permitir à front-end, App Mobile ou serviços obter todas as informações de uma rota cadastrada.
                 + Recebe como path parameter:
@@ -102,7 +102,7 @@ const rotasRoutes = {
 
             + Regras de Negócio:
                 - Validação do formato do ID.
-                - Verificar existência da rota e seu status (ativo/inativo).  
+                - Verificar existência da rota e seu status (ativo/inativo).
                 - Checar permissões do solicitante para visualizar dados.
 
             + Resultado Esperado:
@@ -118,6 +118,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       responses: {
@@ -135,16 +136,16 @@ const rotasRoutes = {
       summary: 'Atualiza uma rota',
       description: `
             + Caso de uso: Atualização parcial de dados da rota.
-            
+
             + Função de Negócio:
                 - Permitir ao usuário autorizado modificar os campos desejados da rota.
                 + Recebe:
-                    - **id** no path.  
+                    - **id** no path.
                     - No corpo, objeto conforme **RotaPutPatch** com os campos a alterar.
 
             + Regras de Negócio:
-                - Garantir unicidade da combinação rota + dominio.  
-                - Aplicar imediatamente alterações críticas (ex.: desativação).  
+                - Garantir unicidade da combinação rota + dominio.
+                - Aplicar imediatamente alterações críticas (ex.: desativação).
                 - Impedir alterações inconsistentes com regras de negócio.
 
             + Resultado Esperado:
@@ -160,6 +161,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {
@@ -187,16 +189,16 @@ const rotasRoutes = {
       summary: 'Substitui uma rota',
       description: `
             + Caso de uso: Substituição completa de dados da rota.
-            
+
             + Função de Negócio:
                 - Permitir ao usuário autorizado substituir completamente os dados da rota.
                 + Recebe:
-                    - **id** no path.  
+                    - **id** no path.
                     - No corpo, objeto conforme **RotaPutPatch** com todos os campos.
 
             + Regras de Negócio:
-                - Garantir unicidade da combinação rota + dominio.  
-                - Aplicar imediatamente alterações críticas (ex.: desativação).  
+                - Garantir unicidade da combinação rota + dominio.
+                - Aplicar imediatamente alterações críticas (ex.: desativação).
                 - Campos não informados assumem valores padrão.
 
             + Resultado Esperado:
@@ -212,6 +214,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       requestBody: {
@@ -239,15 +242,15 @@ const rotasRoutes = {
       summary: 'Deleta uma rota',
       description: `
             + Caso de uso: Exclusão de rota do sistema.
-            
+
             + Função de Negócio:
                 - Permitir ao usuário autorizado remover uma rota sem afetar integridade de dados.
                 + Recebe como path parameter:
                     - **id**: identificador da rota.
 
             + Regras de Negócio:
-                - Verificar impedimentos por relacionamento (permissões vinculadas) antes de excluir.  
-                - Registrar log de auditoria sobre a operação.  
+                - Verificar impedimentos por relacionamento (permissões vinculadas) antes de excluir.
+                - Registrar log de auditoria sobre a operação.
                 - Garantir que não haja vínculos críticos pendentes.
 
             + Resultado Esperado:
@@ -263,6 +266,7 @@ const rotasRoutes = {
             type: 'string',
           },
           description: 'ID da rota',
+          example: '664f1b2c3a9d4e0012340001',
         },
       ],
       responses: {

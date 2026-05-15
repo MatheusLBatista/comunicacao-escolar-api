@@ -1,0 +1,109 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test-e2e:
+  stage: test
+  image: node:20
+  services:
+    - name: mongo:latest
+      alias: mongo
+    - name: minio/minio:latest
+      alias: minio
+      command: ['server', '/data']
+  variables:
+    DB_URL: 'mongodb://mongo:27017/comunicacao_escolar_test'
+    MONGO_URI: 'mongodb://mongo:27017/comunicacao_escolar_test'
+    MINIO_ENDPOINT: 'minio'
+    MINIO_PORT: '9000'
+    MINIO_ACCESS_KEY: 'minioadmin'
+    MINIO_SECRET_KEY: 'minioadmin'
+    MINIO_BUCKET: 'comunicacao-escolar-test'
+    PORT: '5000'
+    INTEGRATION_BASE_URL: 'http://127.0.0.1:5000'
+    NODE_ENV: 'test'
+    JWT_SECRET_ACCESS_TOKEN: 'teste_access_secret'
+    JWT_SECRET_REFRESH_TOKEN: 'teste_refresh_secret'
+    JWT_SECRET_PASSWORD_RECOVERY: 'teste_recovery_secret'
+    JWT_SECRET_INVITE: 'teste_invite_secret'
+    JWT_ACCESS_TOKEN_EXPIRATION: '1d'
+    JWT_REFRESH_TOKEN_EXPIRATION: '7d'
+    NODE_NO_WARNINGS: '1'
+
+  script:
+    - npm ci --no-fund --no-audit --loglevel=error
+    - node src/seeds/seeds.js
+    - node server.js &
+    - npx wait-on tcp:5000
+    - npx jest --silent --coverage
+  only:
+    - merge_requests
+
+build-docker-image:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ''
+    IMAGE_NAME: '$DOCKER_USER/comunicacao-escolar-api'
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+  script:
+    - echo "A iniciar o build da imagem Docker..."
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA -t $IMAGE_NAME:latest .
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $IMAGE_NAME:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
+deploy-aws:
+  stage: deploy
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: ['']
+  variables:
+    AWS_DEFAULT_REGION: '$AWS_REGION'
+  script:
+    - echo "Iniciando deploy na instancia $AWS_INSTANCE_ID via SSM..."
+    - |
+      COMMAND_ID=$(aws ssm send-command \
+        --instance-ids "$AWS_INSTANCE_ID" \
+        --document-name "AWS-RunShellScript" \
+        --parameters 'commands=["cd /opt/app","docker compose pull","docker compose up -d --remove-orphans","docker image prune -f","echo Deploy concluido"]' \
+        --comment "Deploy from GitLab CI" \
+        --output text \
+        --query "Command.CommandId")
+    - 'echo "SSM Command ID: $COMMAND_ID"'
+    - |
+      for i in $(seq 1 30); do
+        STATUS=$(aws ssm get-command-invocation \
+          --command-id "$COMMAND_ID" \
+          --instance-id "$AWS_INSTANCE_ID" \
+          --query "Status" \
+          --output text 2>/dev/null || echo "Pending")
+        echo "Tentativa $i/30 - Status: $STATUS"
+        if [ "$STATUS" = "Success" ]; then
+          echo "Deploy concluido com sucesso!"
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$AWS_INSTANCE_ID" \
+            --query "StandardOutputContent" \
+            --output text
+          exit 0
+        elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "TimedOut" ] || [ "$STATUS" = "Cancelled" ]; then
+          echo "Deploy falhou! Status: $STATUS"
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$AWS_INSTANCE_ID" \
+            --query "StandardErrorContent" \
+            --output text
+          exit 1
+        fi
+        sleep 10
+      done
+      echo "Timeout aguardando o comando SSM."
+      exit 1
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'

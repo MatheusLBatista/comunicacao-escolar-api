@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 import {
   CustomError,
   HttpStatusCodes,
@@ -8,18 +9,19 @@ import {
 import tokenUtil from '../utils/TokenUtil.js';
 import AuthHelper from '../utils/AuthHelper.js';
 
-import UsuarioRepository from '../repositories/UsuarioRepository.js';
+import UserRepository from '../repositories/UserRepository.js';
 import EmailService from './EmailService.js';
 
 class AuthService {
   constructor({ tokenUtil: injectedTokenUtil } = {}) {
     // Se nada for injetado, usa a instância importada
     this.TokenUtil = injectedTokenUtil || tokenUtil;
-    this.repository = new UsuarioRepository();
+    this.repository = new UserRepository();
+    this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
   }
 
-  async carregatokens(id, token) {
-    const data = await this.repository.buscarPorId(id, { includeTokens: true });
+  async loadTokens(id, token) {
+    const data = await this.repository.getById(id, { includeTokens: true });
     return { data };
   }
 
@@ -35,7 +37,7 @@ class AuthService {
     }
 
     // Verificar se o usuário existe
-    const usuario = await this.repository.buscarPorId(id);
+    const usuario = await this.repository.getById(id);
     if (!usuario) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
@@ -46,7 +48,7 @@ class AuthService {
       });
     }
 
-    const data = await this.repository.removeToken(id);
+    const data = await this.repository.deleteToken(id);
     if (!data) {
       throw new CustomError({
         statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
@@ -61,22 +63,158 @@ class AuthService {
   }
 
   async logout(id) {
-    const data = await this.repository.removeToken(id);
+    const data = await this.repository.deleteToken(id);
     return { data };
+  }
+
+  async register(data) {
+    const existente = await this.repository.getByEmail(data.email);
+
+    if (!existente) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'email',
+        details: [],
+        customMessage: 'E-mail não cadastrado no sistema. Entre em contato com o administrador da escola.',
+      });
+    }
+
+    if (existente.active) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.CONFLICT.code,
+        errorType: 'duplicateEntry',
+        field: 'email',
+        details: [{ path: 'email', message: 'Esta conta já está ativa. Faça login.' }],
+        customMessage: 'Esta conta já está ativa. Faça login.',
+      });
+    }
+
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(data.password, saltRounds);
+
+    await this.repository.update(existente._id, {
+      full_name: data.full_name,
+      password: passwordHash,
+      active: true,
+    });
+
+    return { message: 'Conta ativada com sucesso!' };
+  }
+
+  async googleAuth(idToken) {
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
+        errorType: 'serverError',
+        field: 'Google OAuth',
+        details: [],
+        customMessage:
+          'Autenticação com Google não está configurada no servidor.',
+      });
+    }
+
+    let payload;
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+        errorType: 'unauthorized',
+        field: 'id_token',
+        details: [],
+        customMessage: 'Token do Google inválido ou expirado.',
+      });
+    }
+
+    const { sub: googleId, email, name } = payload;
+
+    // Busca por google_id ou email
+    let usuario = await this.repository.getByGoogleId(googleId);
+    if (!usuario && email) {
+      usuario = await this.repository.getByEmail(email);
+    }
+
+    if (!usuario) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'email',
+        details: [],
+        customMessage: 'E-mail não cadastrado no sistema. Entre em contato com o administrador da escola.',
+      });
+    } else if (!usuario.google_id) {
+      // Conta local existente: vincula o google_id
+      await this.repository.update(usuario._id, {
+        google_id: googleId,
+        auth_provider: 'google',
+      });
+      usuario = await this.repository.getById(usuario._id);
+    }
+
+    const access_token = await this.TokenUtil.generateAccessToken(usuario._id);
+    const refresh_token = await this.TokenUtil.generateRefreshToken(
+      usuario._id,
+    );
+    await this.repository.storeTokens(usuario._id, access_token, refresh_token);
+
+    const userAtualizado = await this.repository.getById(usuario._id);
+    const obj = userAtualizado.toObject
+      ? userAtualizado.toObject()
+      : { ...userAtualizado };
+    delete obj.password;
+    await this._populateAssociatedStudents(obj);
+
+    if (!obj.memberships || obj.memberships.length === 0) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'membership',
+        details: [],
+        customMessage: 'Sua conta não está vinculada a nenhuma escola. Entre em contato com o administrador.',
+      });
+    }
+
+    return { user: { access_token, refresh_token, ...obj } };
+  }
+
+  async _populateAssociatedStudents(userObj) {
+    if (!Array.isArray(userObj.memberships)) return;
+    const studentIds = userObj.memberships
+      .filter((m) => m.role === 'parent')
+      .flatMap((m) => m.associated_students ?? []);
+    if (studentIds.length === 0) return;
+    const students = await this.repository.findUsers(studentIds, 'student');
+    const studentMap = {};
+    students.forEach((s) => {
+      const sm = s.memberships?.find((m) => m.role === 'student');
+      studentMap[s._id.toString()] = {
+        _id: s._id,
+        full_name: s.full_name,
+        class_id: sm?.class_id ?? null,
+      };
+    });
+    userObj.memberships = userObj.memberships.map((m) => {
+      if (m.role === 'parent' && Array.isArray(m.associated_students)) {
+        return {
+          ...m,
+          associated_students: m.associated_students
+            .map((id) => studentMap[id.toString()] ?? null)
+            .filter(Boolean),
+        };
+      }
+      return m;
+    });
   }
 
   async login(body) {
     // Buscar o usuário pelo email
-    const userEncontrado = await this.repository.buscarPorEmail(body.email);
+    const userEncontrado = await this.repository.getByEmail(body.email);
     if (!userEncontrado) {
-      /**
-       * Se o usuário não for encontrado, lança um erro personalizado
-       * É importante para bibliotecas de requisições como DIO, Retrofit, Axios, etc. que o
-       * statusCode seja 401, pois elas tratam esse código como não autorizado
-       * Isso é importante para que o usuário saiba que o email ou senha estão incorretos
-       * Se o statusCode for 404, a biblioteca não irá tratar como não autorizado
-       * Portanto, é importante que o statusCode seja 401
-       */
       throw new CustomError({
         statusCode: 401,
         errorType: 'notFound',
@@ -86,8 +224,33 @@ class AuthService {
       });
     }
 
+    if (!userEncontrado.active) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'active',
+        details: [],
+        customMessage: 'Conta pendente de ativação. Registre-se no aplicativo para criar sua senha.',
+      });
+    }
+
+    // Bloquear conta Google de usar login com senha
+    if (userEncontrado.auth_provider === 'google') {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+        errorType: 'unauthorized',
+        field: 'auth_provider',
+        details: [],
+        customMessage:
+          'Esta conta foi criada com o Google. Use o login com Google.',
+      });
+    }
+
     // Validar a senha
-    const senhaValida = await bcrypt.compare(body.senha, userEncontrado.senha);
+    const senhaValida = await bcrypt.compare(
+      body.password,
+      userEncontrado.password,
+    );
     if (!senhaValida) {
       throw new CustomError({
         statusCode: 401,
@@ -99,26 +262,26 @@ class AuthService {
     }
 
     // Gerar novo access token utilizando a instância injetada
-    const accesstoken = await this.TokenUtil.generateAccessToken(
+    const access_token = await this.TokenUtil.generateAccessToken(
       userEncontrado._id,
     );
 
     // Buscar o usuário com os tokens já armazenados
-    const userComTokens = await this.repository.buscarPorId(
+    const userComTokens = await this.repository.getById(
       userEncontrado._id,
       true,
     );
-    let refreshtoken = userComTokens.refreshtoken;
+    let refresh_token = userComTokens.refresh_token;
 
-    if (refreshtoken) {
+    if (refresh_token) {
       try {
-        jwt.verify(refreshtoken, process.env.JWT_SECRET_REFRESH_TOKEN);
+        jwt.verify(refresh_token, process.env.JWT_SECRET_REFRESH_TOKEN);
       } catch (error) {
         if (
           error.name === 'TokenExpiredError' ||
           error.name === 'JsonWebTokenError'
         ) {
-          refreshtoken = await this.TokenUtil.generateRefreshToken(
+          refresh_token = await this.TokenUtil.generateRefreshToken(
             userEncontrado._id,
           );
         } else {
@@ -135,36 +298,47 @@ class AuthService {
       }
     } else {
       // Se o refresh token não existe, gera um novo
-      refreshtoken = await this.TokenUtil.generateRefreshToken(
+      refresh_token = await this.TokenUtil.generateRefreshToken(
         userEncontrado._id,
       );
     }
 
     // Armazenar os tokens atualizados
-    await this.repository.armazenarTokens(
+    await this.repository.storeTokens(
       userEncontrado._id,
-      accesstoken,
-      refreshtoken,
+      access_token,
+      refresh_token,
     );
 
     // Buscar novamente o usuário e remover a senha
-    const userLogado = await this.repository.buscarPorEmail(body.email);
-    delete userLogado.senha;
+    const userLogado = await this.repository.getByEmail(body.email);
+    delete userLogado.password;
     const userObjeto = userLogado.toObject();
+    await this._populateAssociatedStudents(userObjeto);
+
+    if (!userObjeto.memberships || userObjeto.memberships.length === 0) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'membership',
+        details: [],
+        customMessage: 'Sua conta não está vinculada a nenhuma escola. Entre em contato com o administrador.',
+      });
+    }
 
     // Retornar o usuário com os tokens
-    return { user: { accesstoken, refreshtoken, ...userObjeto } };
+    return { user: { access_token, refresh_token, ...userObjeto } };
   }
 
   // RecuperaSenhaService.js
-  async recuperaSenha(body) {
+  async recoverPassword(body) {
     console.log('Dados recebidos para recuperação de senha:', body);
     // ───────────────────────────────────────────────
     // Passo 1 – Buscar usuário pelo e-mail informado
     // ───────────────────────────────────────────────
     console.log('E-mail recebido no body:', body.email);
 
-    const userEncontrado = await this.repository.buscarPorEmail(body.email);
+    const userEncontrado = await this.repository.getByEmail(body.email);
 
     console.log('Usuário encontrado:', userEncontrado);
 
@@ -185,7 +359,7 @@ class AuthService {
       Math.random()
         .toString(36) // ex: "0.f5g9hk3j"
         .replace(/[^a-z0-9]/gi, '') // mantém só letras/números
-        .slice(0, 6) // pega os 6 primeiros (aumentado para reduzir colisões)
+        .slice(0, 4) // pega os 4 primeiros
         .toUpperCase(); // converte p/ maiúsculas
 
     let codigoRecuperaSenha = generateCode();
@@ -196,7 +370,7 @@ class AuthService {
     let tentativas = 0;
     const MAX_TENTATIVAS = 10;
     let codigoExistente =
-      await this.repository.buscarPorCodigoRecuperacao(codigoRecuperaSenha);
+      await this.repository.getByRecoveryCode(codigoRecuperaSenha);
 
     while (codigoExistente && tentativas < MAX_TENTATIVAS) {
       tentativas++;
@@ -205,7 +379,7 @@ class AuthService {
       );
       codigoRecuperaSenha = generateCode();
       codigoExistente =
-        await this.repository.buscarPorCodigoRecuperacao(codigoRecuperaSenha);
+        await this.repository.getByRecoveryCode(codigoRecuperaSenha);
     }
 
     // Se após 10 tentativas ainda não conseguiu, usa timestamp + random
@@ -230,10 +404,10 @@ class AuthService {
     // Passo 5 – Persistir token + código no usuário
     // ───────────────────────────────────────────────
     const expMs = Date.now() + 60 * 60 * 1000; // 1 hora de expiração
-    const data = await this.repository.atualizar(userEncontrado._id, {
-      tokenUnico,
-      codigo_recupera_senha: codigoRecuperaSenha,
-      exp_codigo_recupera_senha: new Date(expMs).toISOString(), // Armazenar expiração como string ISO TMZ0 Ex.: 2023-10-01T12:00:00.000Z
+    const data = await this.repository.update(userEncontrado._id, {
+      unique_token: tokenUnico,
+      password_recovery_code: codigoRecuperaSenha,
+      password_recovery_code_exp: new Date(expMs).toISOString(),
     });
 
     if (!data) {
@@ -251,9 +425,9 @@ class AuthService {
     // ───────────────────────────────────────────────
     try {
       await EmailService.enviarEmailRecuperacaoSenha(
-        userEncontrado.nome,
+        userEncontrado.full_name,
         userEncontrado.email,
-        tokenUnico,
+        codigoRecuperaSenha,
       );
       console.log(
         'E-mail de recuperação enviado com sucesso para:',
@@ -262,10 +436,10 @@ class AuthService {
     } catch (error) {
       console.error('Erro ao enviar e-mail de recuperação:', error);
       // Se falhar ao enviar o e-mail, reverte a atualização do usuário
-      await this.repository.atualizar(userEncontrado._id, {
-        tokenUnico: null,
-        codigo_recupera_senha: null,
-        exp_codigo_recupera_senha: null,
+      await this.repository.update(userEncontrado._id, {
+        unique_token: null,
+        password_recovery_code: null,
+        password_recovery_code_exp: null,
       });
       throw new CustomError({
         statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
@@ -297,7 +471,7 @@ class AuthService {
    *    → Busca usuário pelo campo `codigo_recupera_senha`, salva hash da nova senha (mesmo se inativo),
    *      e “zera” o campo `codigo_recupera_senha`.
    */
-  async atualizarSenhaToken(tokenRecuperacao, senhaBody) {
+  async updatePasswordByToken(tokenRecuperacao, senhaBody) {
     // 1) Decodifica o token para obter o ID do usuário
     const usuarioId = await this.TokenUtil.decodePasswordRecoveryToken(
       tokenRecuperacao,
@@ -305,11 +479,11 @@ class AuthService {
     );
 
     // 2) Gera o hash da senha pura
-    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.senha);
+    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.password);
     console.log('Senha hasheada:', senhaHasheada);
 
     // Buscar usuário pelo token unico
-    const usuario = await this.repository.buscarPorTokenUnico(tokenRecuperacao);
+    const usuario = await this.repository.getByUniqueToken(tokenRecuperacao);
     if (!usuario) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
@@ -320,7 +494,7 @@ class AuthService {
     }
 
     // 3) Atualiza no repositório (já com hash)
-    const usuarioAtualizado = await this.repository.atualizarSenha(
+    const usuarioAtualizado = await this.repository.updatePassword(
       usuarioId,
       senhaHasheada,
     );
@@ -339,10 +513,9 @@ class AuthService {
   /**
    * Atualiza senha via código de recuperação
    */
-  async atualizarSenhaCodigo(codigoRecuperaSenha, senhaBody) {
+  async updatePasswordByCode(codigoRecuperaSenha, senhaBody) {
     // 1) Busca usuário pelo código de recuperação
-    const user =
-      await this.repository.buscarPorCodigoRecuperacao(codigoRecuperaSenha);
+    const user = await this.repository.getByRecoveryCode(codigoRecuperaSenha);
     if (!user) {
       throw new CustomError({
         statusCode: HttpStatusCodes.NOT_FOUND.code,
@@ -353,7 +526,7 @@ class AuthService {
     }
 
     // 2) Verifica expiração
-    if (user.exp_codigo_recupera_senha < new Date()) {
+    if (user.password_recovery_code_exp < new Date()) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
         field: 'Código de Recuperação',
@@ -363,10 +536,10 @@ class AuthService {
     }
 
     // 3) Hash da nova senha
-    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.senha);
+    const senhaHasheada = await AuthHelper.hashPassword(senhaBody.password);
 
     // 4) Atualiza no repositório
-    const atualizado = await this.repository.atualizarSenha(
+    const atualizado = await this.repository.updatePassword(
       user._id,
       senhaHasheada,
     );
@@ -383,7 +556,7 @@ class AuthService {
   }
 
   async refresh(id, token) {
-    const userEncontrado = await this.repository.buscarPorId(id, {
+    const userEncontrado = await this.repository.getById(id, {
       includeTokens: true,
     });
 
@@ -396,7 +569,7 @@ class AuthService {
       });
     }
 
-    if (userEncontrado.refreshtoken !== token) {
+    if (userEncontrado.refresh_token !== token) {
       console.log('Token inválido');
       throw new CustomError({
         statusCode: HttpStatusCodes.UNAUTHORIZED.code,
@@ -408,36 +581,41 @@ class AuthService {
     }
 
     // Gerar novo access token utilizando a instância injetada
-    const accesstoken = await this.TokenUtil.generateAccessToken(id);
+    const access_token = await this.TokenUtil.generateAccessToken(id);
 
     /**
      * Se SINGLE_SESSION_REFRESH_TOKEN for true, gera um novo refresh token
      * Senão, mantém o token armazenado
      */
-    let refreshtoken = '';
+    let refresh_token = '';
     if (process.env.SINGLE_SESSION_REFRESH_TOKEN === 'true') {
-      refreshtoken = await this.TokenUtil.generateRefreshToken(id);
+      refresh_token = await this.TokenUtil.generateRefreshToken(id);
     } else {
-      refreshtoken = userEncontrado.refreshtoken;
+      refresh_token = userEncontrado.refresh_token;
     }
 
     // Atualiza o usuário com os novos tokens
-    await this.repository.armazenarTokens(id, accesstoken, refreshtoken);
+    await this.repository.storeTokens(id, access_token, refresh_token);
 
     // monta o objeto de usuário com os tokens para resposta
-    const userLogado = await this.repository.buscarPorId(id, {
+    const userLogado = await this.repository.getById(id, {
       includeTokens: true,
     });
-    delete userLogado.senha;
+    delete userLogado.password;
     const userObjeto = userLogado.toObject();
 
     const userComTokens = {
-      accesstoken,
-      refreshtoken,
+      access_token,
+      refresh_token,
       ...userObjeto,
     };
 
     return { user: userComTokens };
+  }
+
+  async registerFcmToken(userId, fcmToken) {
+    await this.repository.addFcmToken(userId, fcmToken);
+    return { message: 'Token FCM registrado com sucesso.' };
   }
 }
 

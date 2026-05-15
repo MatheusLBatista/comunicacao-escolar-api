@@ -1,16 +1,16 @@
 const rotasSchemas = {
   RotaPost: {
     type: 'object',
-    required: ['rota', 'dominio'],
+    required: ['route', 'domain'],
     properties: {
-      rota: {
+      route: {
         type: 'string',
         minLength: 1,
         maxLength: 200,
         description: 'Nome/caminho da rota',
         example: '/usuarios',
       },
-      dominio: {
+      domain: {
         type: 'string',
         maxLength: 200,
         description: 'Domínio da aplicação',
@@ -22,7 +22,7 @@ const rotasSchemas = {
         description: 'Descrição da rota',
         example: 'Rota para gerenciamento de usuários',
       },
-      ativo: {
+      active: {
         type: 'boolean',
         default: true,
         description: 'Status da rota',
@@ -35,14 +35,14 @@ const rotasSchemas = {
   RotaPutPatch: {
     type: 'object',
     properties: {
-      rota: {
+      route: {
         type: 'string',
         minLength: 1,
         maxLength: 200,
         description: 'Nome/caminho da rota',
         example: '/usuarios',
       },
-      dominio: {
+      domain: {
         type: 'string',
         maxLength: 200,
         description: 'Domínio da aplicação',
@@ -54,7 +54,7 @@ const rotasSchemas = {
         description: 'Descrição da rota',
         example: 'Rota para gerenciamento de usuários',
       },
-      ativo: {
+      active: {
         type: 'boolean',
         description: 'Status da rota',
         example: true,
@@ -71,12 +71,12 @@ const rotasSchemas = {
         description: 'ID único da rota',
         example: '507f1f77bcf86cd799439011',
       },
-      rota: {
+      route: {
         type: 'string',
         description: 'Nome/caminho da rota',
         example: '/usuarios',
       },
-      dominio: {
+      domain: {
         type: 'string',
         description: 'Domínio da aplicação',
         example: 'http://localhost:3000',
@@ -86,7 +86,7 @@ const rotasSchemas = {
         description: 'Descrição da rota',
         example: 'Rota para gerenciamento de usuários',
       },
-      ativo: {
+      active: {
         type: 'boolean',
         description: 'Status da rota',
         example: true,
@@ -172,17 +172,17 @@ const rotasSchemas = {
   RotaFiltro: {
     type: 'object',
     properties: {
-      rota: {
+      route: {
         type: 'string',
         description: 'Filtrar por nome da rota',
         example: '/usuarios',
       },
-      dominio: {
+      domain: {
         type: 'string',
         description: 'Filtrar por domínio',
         example: 'localhost',
       },
-      ativo: {
+      active: {
         type: 'boolean',
         description: 'Filtrar por status ativo/inativo',
         example: true,

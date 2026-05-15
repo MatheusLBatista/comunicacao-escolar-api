@@ -1,30 +1,32 @@
 import express from 'express';
 import AuthController from '../controllers/AuthController.js';
-import UsuarioController from '../controllers/UsuarioController.js';
+import AuthMiddleware from '../middlewares/AuthMiddleware.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
 
 const router = express.Router();
 
 const authController = new AuthController();
-const usuarioController = new UsuarioController();
 
 router
+  .post('/register', asyncWrapper(authController.register.bind(authController)))
+  .post('/google', asyncWrapper(authController.googleAuth.bind(authController)))
   .post('/login', asyncWrapper(authController.login.bind(authController)))
   .post(
     '/recover',
-    asyncWrapper(authController.recuperaSenha.bind(authController)),
+    asyncWrapper(authController.recoverPassword.bind(authController)),
   )
-  .post(
-    '/redefinir-senha',
-    asyncWrapper(authController.atualizarSenhaToken.bind(authController)),
-  )
-  .post(
-    '/ativar-conta',
-    asyncWrapper(usuarioController.ativarConta.bind(usuarioController)),
+  .patch(
+    '/password/reset',
+    asyncWrapper(authController.updatePasswordByCode.bind(authController)),
   )
   .post('/logout', asyncWrapper(authController.logout.bind(authController)))
   .post('/revoke', asyncWrapper(authController.revoke.bind(authController)))
   .post('/refresh', asyncWrapper(authController.refresh.bind(authController)))
-  .post('/introspect', asyncWrapper(authController.pass.bind(authController)));
+  .post('/introspect', asyncWrapper(authController.pass.bind(authController)))
+  .post(
+    '/fcm-token',
+    AuthMiddleware,
+    asyncWrapper(authController.registerFcmToken.bind(authController)),
+  );
 
 export default router;

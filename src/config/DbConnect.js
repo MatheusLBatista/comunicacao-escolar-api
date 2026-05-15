@@ -59,19 +59,20 @@ class DbConnect {
 
       // Conexão com opções configuráveis via variáveis de ambiente
       await mongoose.connect(mongoURI, {
+        dbName: process.env.DB_NAME || 'comunicacao-escolar',
         serverSelectionTimeoutMS: process.env.MONGO_SERVER_SELECTION_TIMEOUT_MS
           ? parseInt(process.env.MONGO_SERVER_SELECTION_TIMEOUT_MS)
-          : 5000,
+          : 30000,
         socketTimeoutMS: process.env.MONGO_SOCKET_TIMEOUT_MS
           ? parseInt(process.env.MONGO_SOCKET_TIMEOUT_MS)
-          : 45000,
+          : 120000,
         connectTimeoutMS: process.env.MONGO_CONNECT_TIMEOUT_MS
           ? parseInt(process.env.MONGO_CONNECT_TIMEOUT_MS)
-          : 10000,
-        retryWrites: true,
+          : 30000,
+        retryWrites: false,
         maxPoolSize: process.env.MONGO_MAX_POOL_SIZE
           ? parseInt(process.env.MONGO_MAX_POOL_SIZE)
-          : 10,
+          : 5,
       });
 
       logger.info('Conexão com o banco estabelecida!');

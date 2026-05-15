@@ -1,6 +1,20 @@
 import mongoose from 'mongoose';
 import DbConnect from '../config/DbConnect.js';
-import usuarioSeed from './usuarioSeed.js';
+import schoolSeed from './schoolSeed.js';
+import userSeed from './userSeed.js';
+import postSeed from './postSeed.js';
+import classSeed from './classSeed.js';
+
+import dailyLogTemplateSeed from './dailyLogTemplateSeed.js';
+import dailyLogSeed from './dailyLogSeed.js';
+import conversationSeed from './conversationSeed.js';
+import messageSeed from './messageSeed.js';
+import pickupAuthorizationSeed from './pickupAuthorization.js';
+import pickupLogSeed from './pickupLogSeed.js';
+import eventSeed from './eventSeed.js';
+import likeSeed from './likeSeed.js';
+import auditLogSeed from './auditLogSeed.js';
+import linkStudentsToClasses from './linkStudentsToClasses.js';
 
 await DbConnect.conectar();
 
@@ -9,7 +23,21 @@ try {
     `[${new Date().toLocaleString()}] - Iniciando criação das seeds...`,
   );
 
-  await usuarioSeed();
+  const schools = await schoolSeed();
+  const users = await userSeed();
+  const classesResult = await classSeed();
+  const classes = classesResult.classes || [];
+  await linkStudentsToClasses();
+  await postSeed(schools, users);
+  await likeSeed();
+  await dailyLogTemplateSeed();
+  await dailyLogSeed();
+  await conversationSeed();
+  await messageSeed();
+  await pickupAuthorizationSeed();
+  await pickupLogSeed();
+  await eventSeed(schools, users);
+  await auditLogSeed(schools, users);
 
   console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
 } catch (error) {

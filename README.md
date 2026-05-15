@@ -1,103 +1,188 @@
-# comunicacao-escolar-api
+# Comunicação Escolar API
 
-## Getting started
+Plataforma backend para centralizar e modernizar a comunicação entre instituições de ensino, professores e responsáveis. A API suporta múltiplas escolas de forma isolada (multi-tenant), cobrindo desde o registro de rotinas diárias dos alunos até chat em tempo real, mural de avisos, agenda escolar e controle de saída.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Tecnologias
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+<img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" /> <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" /> <img alt="Express" src="https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white" /> <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" /> <img alt="Socket.IO" src="https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socketdotio&logoColor=white" /> <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" /> <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" /> <img alt="MinIO" src="https://img.shields.io/badge/MinIO-C72E49?style=for-the-badge&logo=minio&logoColor=white" /> <img alt="JWT" src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" /> <img alt="Zod" src="https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white" /> <img alt="Jest" src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" /> <img alt="Swagger" src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" />
 
-## Add your files
+## Features
 
-- [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+- **Autenticação e autorização** com JWT (access token + refresh token), recuperação de senha via e-mail e convite de usuários.
+- **Multi-tenant** - isolamento total de dados entre escolas via `school_id`.
+- **Gestão de usuários e perfis** com papéis distintos: Administrador, Professor e Responsável.
+- **Comunicados diários** - templates configuráveis por escola; professores registram a rotina dos alunos e responsáveis confirmam a leitura.
+- **Mural de avisos** - publicação de posts direcionados à escola inteira ou a turmas específicas, com suporte a curtidas.
+- **Chat em tempo real** via Socket.IO - mensagens privadas entre professores e responsáveis.
+- **Agenda escolar** - cadastro e visualização de eventos por escola ou turma.
+- **Controle de saída** - cadastro de autorizados para retirada de alunos com registro de log.
+- **Grupos e rotas** - gestão de grupos de alunos e itinerários de transporte escolar.
+- **Armazenamento de arquivos** com MinIO (imagens de perfil, anexos).
+- **Notificações push** via Firebase Cloud Messaging para novos comunicados, mensagens e avisos urgentes.
+- **Auditoria** - logs detalhados de todas as operações com Winston.
+- **Documentação interativa** da API via Swagger UI em `/docs`.
+
+## Pré-requisitos
+
+- [Node.js](https://nodejs.org/) v18 ou superior
+- [Docker](https://www.docker.com/) e Docker Compose
+- [npm](https://www.npmjs.com/)
+
+## Instalação e configuração
+
+**1. Clone o repositório**
+
+```bash
+git clone https://gitlab.fslab.dev/fabrica-de-software-iv/comunicacao-escolar/comunicacao-escolar-api.git
+cd comunicacao-escolar-api
+```
+
+**2. Configure as variáveis de ambiente**
+
+```bash
+cp .env.example .env
+```
+
+Edite o arquivo `.env` com os valores adequados ao seu ambiente. As principais variáveis são:
+
+| Variável                       | Descrição                                       | Exemplo                                              |
+| :----------------------------- | :---------------------------------------------- | :--------------------------------------------------- |
+| `PORT`                         | Porta do servidor                               | `3010`                                               |
+| `FRONTEND_PORT`                | Porta do frontend (usada no Docker Compose)     | `3001`                                               |
+| `NODE_ENV`                     | Ambiente (`development` / `production`)         | `development`                                        |
+| `DEBUGLOG`                     | Ativa logs detalhados de rotas (`true`/`false`) | `true`                                               |
+| `DB_URL`                       | URL de conexão com o MongoDB                    | `mongodb://localhost:27017/comunicacao-escolar`      |
+| `DB_URL_TEST`                  | URL do banco de dados de testes                 | `mongodb://localhost:27017/comunicacao-escolar-test` |
+| `JWT_SECRET_ACCESS_TOKEN`      | Chave secreta do access token                   | _(gere uma chave segura)_                            |
+| `JWT_SECRET_REFRESH_TOKEN`     | Chave secreta do refresh token                  | _(gere uma chave segura)_                            |
+| `JWT_SECRET_PASSWORD_RECOVERY` | Chave secreta para recuperação de senha         | _(gere uma chave segura)_                            |
+| `JWT_SECRET_INVITE`            | Chave secreta para convite de usuários          | _(gere uma chave segura)_                            |
+| `JWT_ACCESS_TOKEN_EXPIRATION`  | Tempo de expiração do access token              | `1d`                                                 |
+| `JWT_REFRESH_TOKEN_EXPIRATION` | Tempo de expiração do refresh token             | `7d`                                                 |
+| `EMAIL_USER`                   | E-mail Gmail para envio de notificações         | `seu@gmail.com`                                      |
+| `EMAIL_APP_PASSWORD`           | Senha de app do Gmail                           | _(gerada nas configurações do Google)_               |
+| `COMPANY_NAME`                 | Nome da instituição (aparece nos e-mails)       | `Comunicação Escolar`                                |
+| `FRONTEND_URL`                 | URL do frontend (para links em e-mails)         | `http://localhost:3000`                              |
+| `MINIO_ENDPOINT`               | Endpoint do MinIO                               | `localhost`                                          |
+| `MINIO_PORT`                   | Porta da API do MinIO                           | `9000`                                               |
+| `MINIO_CONSOLE_PORT`           | Porta do console web do MinIO                   | `9001`                                               |
+| `MINIO_ACCESS_KEY`             | Chave de acesso do MinIO                        | `minioadmin`                                         |
+| `MINIO_SECRET_KEY`             | Chave secreta do MinIO                          | `minioadmin`                                         |
+| `MINIO_BUCKET`                 | Nome do bucket de usuários                      | `usuarios`                                           |
+| `MINIO_BUCKET_2`               | Nome do bucket de itens/anexos                  | `itens`                                              |
+| `MINIO_PUBLIC_URL`             | URL pública de acesso ao MinIO                  | `http://localhost:9000`                              |
+| `ADMIN_NAME`                   | Nome do admin criado pelas seeds                | `Administrador`                                      |
+| `ADMIN_EMAIL`                  | E-mail do admin criado pelas seeds              | `admin@admin.com`                                    |
+| `ADMIN_PASSWORD`               | Senha do admin criado pelas seeds               | `Senha@123`                                          |
+| `FIREBASE_PROJECT_ID`          | ID do projeto Firebase (push notifications)     | _(do console Firebase)_                              |
+| `FIREBASE_CLIENT_EMAIL`        | E-mail da conta de serviço Firebase             | _(do console Firebase)_                              |
+| `FIREBASE_PRIVATE_KEY`         | Chave privada da conta de serviço Firebase      | _(do console Firebase)_                              |
+
+**3. Suba a infraestrutura (MongoDB + MinIO)**
+
+```bash
+docker compose up -d
+```
+
+**4. Instale as dependências**
+
+```bash
+npm install
+```
+
+**5. Popule o banco com dados iniciais (opcional)**
+
+```bash
+npm run seed
+```
+
+## Executando
+
+**Modo desenvolvimento** (com hot-reload via Nodemon):
+
+```bash
+npm run dev
+```
+
+**Modo desenvolvimento com Docker** (hot-reload + infraestrutura em container):
+
+```bash
+npm run dev:docker
+```
+
+**Modo produção** (sem Docker):
+
+```bash
+npm run start
+```
+
+**Modo produção** (com Docker):
+
+```bash
+npm run start:production
+```
+
+O servidor ficará disponível em `http://localhost:{PORT}`.
+A documentação Swagger estará disponível em `http://localhost:{PORT}/docs`.
+
+> **Desenvolvimento com Android Studio (emulador):** para que o app acesse a API rodando localmente, execute o redirecionamento de porta via ADB:
+>
+> ```bash
+> adb reverse tcp:PORT tcp:PORT
+> ```
+>
+> Substitua `PORT` pelo valor definido na variável `PORT` do `.env` (ex.: `3010`).
+
+## Testes
+
+```bash
+# Executar todos os testes com relatório de cobertura
+npm test
+
+# Verificar lint
+npm run lint
+
+# Corrigir lint e formatar o código
+npm run fix
+
+# Apenas formatar o código com Prettier
+npm run format
+
+# Verificar se o código está formatado corretamente
+npm run format:check
+```
+
+Os testes utilizam o `mongodb-memory-server`, portanto não é necessário um banco em execução para rodá-los.
+
+## Estrutura do projeto
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.fslab.dev/fabrica-de-software-iv/comunicacao-escolar/comunicacao-escolar-api.git
-git branch -M main
-git push -uf origin main
+src/
+├── config/          # Configurações (MinIO, Multer, Sharp, Firebase, Socket.IO)
+├── controllers/     # Controladores das rotas
+├── docs/            # Configuração do Swagger (paths, schemas, cabeçalho)
+├── middlewares/     # Autenticação, autorização e validação
+├── models/          # Schemas Mongoose
+├── modules/         # Módulos independentes (ex.: usuário)
+├── repositories/    # Camada de acesso a dados
+├── routes/          # Definição das rotas Express
+├── seeds/           # Dados iniciais para desenvolvimento
+├── services/        # Regras de negócio
+├── tests/           # Testes unitários e de integração
+└── utils/           # Utilitários (logger, token, helpers)
 ```
 
-## Integrate with your tools
+## Equipe
 
-- [Set up project integrations](https://gitlab.fslab.dev/fabrica-de-software-iv/comunicacao-escolar/comunicacao-escolar-api/-/settings/integrations)
+| Nome            | Papel         | Contato                     |
+| :-------------- | :------------ | :-------------------------- |
+| Arthur Gomes    | Desenvolvedor | piclekrick@gmail.com        |
+| Matheus Batista | Desenvolvedor | matheusifro2020@gmail.com   |
+| Silvio Ribeiro  | Desenvolvedor | silviohuan@gmail.com        |
+| Vinícius Moraes | Desenvolvedor | viniciusmoraesvha@gmail.com |
 
-## Collaborate with your team
+**Cliente:** Gilberto Pereira da Silva - gilberto.silva@ifro.edu.br
 
-- [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## Licença
 
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
----
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-
-Choose a self-explaining name for your project.
-
-## Description
-
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-
-Show your appreciation to those who have contributed to the project.
-
-## License
-
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Distribuído sob a licença [MIT](https://opensource.org/licenses/MIT).

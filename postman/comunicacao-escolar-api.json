@@ -1,0 +1,1788 @@
+{
+  "info": {
+    "name": "comunicacao-escolar-api",
+    "description": "Collection completa para testar todas as rotas da API de Comunicação Escolar.\n\n## Fluxo de uso:\n1. Execute **Login** para obter os tokens\n2. `access_token`, `refresh_token` e `user_id` são salvos automaticamente\n3. Use as demais rotas normalmente\n\n## Variáveis de ambiente:\n- `base_url`: URL base da API (padrão: http://localhost:5000)\n- `access_token`: Token JWT de acesso (preenchido automaticamente pelo login)\n- `refresh_token`: Token JWT de refresh (preenchido automaticamente pelo login)\n- `school_id`: ID da escola para operações vinculadas\n- `user_id`: ID do usuário para operações individuais\n- `group_id`: ID do grupo para operações individuais\n- `route_id`: ID da rota/permissão para operações individuais\n\n## Validação RBAC (Usuários)\n1. Execute os logins auxiliares (Teacher/Parent) para salvar tokens específicos\n2. Execute a pasta **RBAC - Usuários (Refatoração)**\n3. Valide os status esperados (200/403/401) em cada cenário\n4. Execute **Listar Escolas (Salvar school_id)** para preencher automaticamente `school_id`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "school_id",
+      "value": "000000000000000000000001",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "group_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "route_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacher_email",
+      "value": "maria.teacher@escola.com",
+      "type": "string"
+    },
+    {
+      "key": "teacher_password",
+      "value": "Senha@123",
+      "type": "string"
+    },
+    {
+      "key": "parent_email",
+      "value": "ana.parent@escola.com",
+      "type": "string"
+    },
+    {
+      "key": "parent_password",
+      "value": "Senha@123",
+      "type": "string"
+    },
+    {
+      "key": "student_email",
+      "value": "joao.aluno@escola.com",
+      "type": "string"
+    },
+    {
+      "key": "student_password",
+      "value": "Senha@123",
+      "type": "string"
+    },
+    {
+      "key": "teacher_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "parent_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacher_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "parent_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "conversation_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "participant_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Rotas de autenticação: login, logout, refresh, revogação, recuperação e redefinição de senha.",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.user) {",
+                  "    const user = res.data.user;",
+                  "    if (user.access_token)  pm.collectionVariables.set('access_token',  user.access_token);",
+                  "    if (user.refresh_token) pm.collectionVariables.set('refresh_token', user.refresh_token);",
+                  "    if (user._id)           pm.collectionVariables.set('user_id',       user._id);",
+                  "    console.log('Tokens e user_id salvos com sucesso!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@escola.com\",\n  \"password\": \"Senha@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Autentica o usuário e salva automaticamente `access_token`, `refresh_token` e `user_id` nas variáveis da collection."
+          }
+        },
+        {
+          "name": "Listar Escolas (Salvar school_id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "const payload = body?.data;",
+                  "let school = null;",
+                  "if (Array.isArray(payload?.docs) && payload.docs.length) school = payload.docs[0];",
+                  "else if (Array.isArray(payload) && payload.length) school = payload[0];",
+                  "else if (payload && payload._id) school = payload;",
+                  "if (school && school._id) {",
+                  "  pm.collectionVariables.set(\"school_id\", school._id);",
+                  "  console.log(\"school_id salvo:\", school._id);",
+                  "} else {",
+                  "  console.warn(\"Nenhuma escola encontrada para salvar school_id\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lista escolas e salva automaticamente o primeiro `_id` em `school_id` para uso nas rotas de usuários."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.access_token) {",
+                  "    pm.collectionVariables.set('access_token', res.data.access_token);",
+                  "    console.log('access_token renovado!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["refresh"]
+            },
+            "description": "Renova o `access_token` usando o `refresh_token`. O novo token é salvo automaticamente."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"access_token\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            },
+            "description": "Invalida o `access_token`. Pode receber o token pelo body (`access_token`) ou pelo header Authorization."
+          }
+        },
+        {
+          "name": "Revogar Token (Revoke)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/revoke",
+              "host": ["{{base_url}}"],
+              "path": ["revoke"]
+            },
+            "description": "Revoga todos os tokens de um usuário pelo ID. Útil para forçar logout remoto."
+          }
+        },
+        {
+          "name": "Introspect (Validar Token)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/introspect",
+              "host": ["{{base_url}}"],
+              "path": ["introspect"]
+            },
+            "description": "Valida o `access_token` enviado no header Authorization e retorna as informações do token."
+          }
+        },
+        {
+          "name": "Recuperar Senha",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@escola.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/recover",
+              "host": ["{{base_url}}"],
+              "path": ["recover"]
+            },
+            "description": "Envia e-mail com código/link de recuperação de senha para o endereço informado."
+          }
+        },
+        {
+          "name": "Redefinir Senha (por Token na URL)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NovaSenha@456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/redefinir-senha?token=SEU_TOKEN_DE_RECUPERACAO",
+              "host": ["{{base_url}}"],
+              "path": ["redefinir-senha"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "SEU_TOKEN_DE_RECUPERACAO",
+                  "description": "JWT de recuperação de senha recebido por e-mail"
+                }
+              ]
+            },
+            "description": "Redefine a senha usando o token JWT recebido por e-mail (query string `?token=`) e a nova senha no body."
+          }
+        },
+        {
+          "name": "Login Teacher (Salvar Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.user) {",
+                  "  if (res.data.user.access_token) pm.collectionVariables.set(\"teacher_access_token\", res.data.user.access_token);",
+                  "  if (res.data.user._id) pm.collectionVariables.set(\"teacher_user_id\", res.data.user._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{teacher_email}}\",\n  \"password\": \"{{teacher_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Login do professor para salvar token em `teacher_access_token`."
+          }
+        },
+        {
+          "name": "Login Parent (Salvar Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.user) {",
+                  "  if (res.data.user.access_token) pm.collectionVariables.set(\"parent_access_token\", res.data.user.access_token);",
+                  "  if (res.data.user._id) pm.collectionVariables.set(\"parent_user_id\", res.data.user._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{parent_email}}\",\n  \"password\": \"{{parent_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Login do responsável para salvar token em `parent_access_token`."
+          }
+        },
+        {
+          "name": "Login Student (Esperado 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Student sem acesso deve retornar 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{student_email}}\",\n  \"password\": \"{{student_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Valida regra: perfil student não pode logar na API."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - Admin Global",
+      "description": "Criação de administradores globais sem vínculo a escola.",
+      "item": [
+        {
+          "name": "Criar Admin Global",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Administrador Geral\",\n  \"email\": \"novo.admin@escola.com\",\n  \"password\": \"Senha@123\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Cria um usuário administrador global (sem vínculo a escola). Requer permissão POST na rota 'users'."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - Por Escola",
+      "description": "Criação e listagem de usuários vinculados a uma escola específica.",
+      "item": [
+        {
+          "name": "Criar Professor na Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (professor) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Maria da Silva\",\n  \"email\": \"maria.teacher@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"teacher\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um professor vinculado a uma escola. Se o e-mail já existir no sistema, adiciona o membership à escola."
+          }
+        },
+        {
+          "name": "Criar Aluno na Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (aluno) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"João Aluno\",\n  \"email\": \"joao.aluno@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"student\",\n  \"class_id\": null,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um aluno vinculado a uma escola. O campo `class_id` pode ser informado para associar a uma turma."
+          }
+        },
+        {
+          "name": "Criar Responsável na Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (responsavel) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Ana Responsável\",\n  \"email\": \"ana.parent@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"parent\",\n  \"associated_students\": [],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um responsável vinculado a uma escola. `associated_students` aceita um array de IDs de alunos."
+          }
+        },
+        {
+          "name": "Criar Admin da Escola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "    console.log('user_id (admin escola) salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Carlos Admin Escola\",\n  \"email\": \"carlos.admin@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"admin\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Cria um administrador vinculado a uma escola específica."
+          }
+        },
+        {
+          "name": "Listar Usuários da Escola",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Página (padrão: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Itens por página (padrão: 10, máx: 100)"
+                },
+                {
+                  "key": "full_name",
+                  "value": "",
+                  "description": "Filtro por nome (parcial, case-insensitive)",
+                  "disabled": true
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "description": "Filtro por e-mail",
+                  "disabled": true
+                },
+                {
+                  "key": "role",
+                  "value": "teacher",
+                  "description": "Filtro por role: admin | teacher | parent | student",
+                  "disabled": true
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "description": "Filtro por status ativo: true | false",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista usuários vinculados a uma escola com paginação e filtros opcionais."
+          }
+        },
+        {
+          "name": "Listar por Escola - Filtro por Role",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?role=teacher&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "teacher"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lista apenas professores de uma escola específica."
+          }
+        },
+        {
+          "name": "Listar por Escola - Filtro por Nome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?full_name=Maria&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                {
+                  "key": "full_name",
+                  "value": "Maria"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Busca usuários por nome (parcial, case-insensitive) dentro de uma escola."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários - Operações Individuais",
+      "description": "Buscar, atualizar e desativar usuários por ID.",
+      "item": [
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Busca um usuário pelo ID. Regra atual: GET permitido para admin e teacher; parent não deve acessar esta rota."
+          }
+        },
+        {
+          "name": "Atualizar Usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Nome Atualizado\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Atualiza dados do usuário. Campos permitidos: `full_name`, `active`, `memberships`. E-mail e senha NÃO podem ser alterados por esta rota."
+          }
+        },
+        {
+          "name": "Atualizar Memberships do Usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"memberships\": [\n    {\n      \"school_id\": \"{{school_id}}\",\n      \"role\": \"teacher\",\n      \"class_id\": null,\n      \"associated_students\": []\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Atualiza os vínculos (memberships) de um usuário com escolas. Roles aceitas: admin | teacher | parent | student (entidade sem login)."
+          }
+        },
+        {
+          "name": "Desativar Usuário (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Desativa o usuário (soft delete — define `active = false`). O registro permanece no banco."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Grupos",
+      "description": "Gerenciamento de grupos de permissão. Grupos agregam permissões de rotas e são associados a usuários.",
+      "item": [
+        {
+          "name": "Listar Grupos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/grupos?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["grupos"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Página (padrão: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Itens por página (padrão: 10)"
+                },
+                {
+                  "key": "name",
+                  "value": "",
+                  "description": "Filtro por nome do grupo",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista todos os grupos com suporte a filtros e paginação."
+          }
+        },
+        {
+          "name": "Buscar Grupo por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Retorna os dados de um grupo específico pelo ID."
+          }
+        },
+        {
+          "name": "Criar Grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('group_id', res.data._id);",
+                  "    console.log('group_id salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grupo Professores\",\n  \"description\": \"Grupo com permissões para professores\",\n  \"active\": true,\n  \"permissions\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos",
+              "host": ["{{base_url}}"],
+              "path": ["grupos"]
+            },
+            "description": "Cria um novo grupo de permissões. O `group_id` é salvo automaticamente."
+          }
+        },
+        {
+          "name": "Adicionar Rota ao Grupo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idRota\": \"{{route_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}/rotas",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}", "rotas"]
+            },
+            "description": "Associa uma rota (permissão) a um grupo existente. Recebe `idRota` no body."
+          }
+        },
+        {
+          "name": "Atualizar Grupo (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grupo Atualizado\",\n  \"description\": \"Descrição atualizada\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Atualiza parcialmente um grupo existente."
+          }
+        },
+        {
+          "name": "Atualizar Grupo (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grupo Atualizado Completo\",\n  \"description\": \"Substituição completa dos dados\",\n  \"active\": true,\n  \"permissions\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Substitui completamente os dados de um grupo existente."
+          }
+        },
+        {
+          "name": "Deletar Grupo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/grupos/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["grupos", "{{group_id}}"]
+            },
+            "description": "Remove um grupo pelo ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rotas (Permissões)",
+      "description": "Gerenciamento das rotas de permissão do sistema. Cada rota define quais métodos HTTP são permitidos em um determinado endpoint e domínio.",
+      "item": [
+        {
+          "name": "Listar Rotas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/rotas?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["rotas"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Página (padrão: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Itens por página (padrão: 10)"
+                },
+                {
+                  "key": "route",
+                  "value": "",
+                  "description": "Filtro por nome da rota",
+                  "disabled": true
+                },
+                {
+                  "key": "domain",
+                  "value": "localhost",
+                  "description": "Filtro por domínio",
+                  "disabled": true
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "description": "Filtro por status ativo: true | false",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista todas as rotas de permissão cadastradas com suporte a filtros e paginação."
+          }
+        },
+        {
+          "name": "Buscar Rota por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Retorna os dados de uma rota de permissão específica pelo ID."
+          }
+        },
+        {
+          "name": "Criar Rota",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('route_id', res.data._id);",
+                  "    console.log('route_id salvo: ' + res.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"route\": \"schools\",\n  \"domain\": \"localhost\",\n  \"active\": true,\n  \"get\": true,\n  \"post\": true,\n  \"put\": true,\n  \"patch\": true,\n  \"delete\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rotas",
+              "host": ["{{base_url}}"],
+              "path": ["rotas"]
+            },
+            "description": "Cadastra uma nova rota de permissão no sistema. O `route_id` é salvo automaticamente."
+          }
+        },
+        {
+          "name": "Atualizar Rota (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"active\": true,\n  \"get\": true,\n  \"post\": false,\n  \"put\": false,\n  \"patch\": true,\n  \"delete\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Atualiza parcialmente uma rota de permissão existente."
+          }
+        },
+        {
+          "name": "Atualizar Rota (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"route\": \"schools\",\n  \"domain\": \"localhost\",\n  \"active\": true,\n  \"get\": true,\n  \"post\": true,\n  \"put\": true,\n  \"patch\": true,\n  \"delete\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Substitui completamente os dados de uma rota de permissão."
+          }
+        },
+        {
+          "name": "Deletar Rota",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/rotas/{{route_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["rotas", "{{route_id}}"]
+            },
+            "description": "Remove uma rota de permissão pelo ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "RBAC - Usuários (Refatoração)",
+      "description": "Cenários para validar as regras refatoradas de autorização em /users e /schools/:schoolId/users.",
+      "item": [
+        {
+          "name": "Admin - Listar usuários da escola (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Admin deve listar usuários\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Executar com token admin padrão da collection (`access_token`)."
+          }
+        },
+        {
+          "name": "Teacher - Listar usuários da escola (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Teacher deve listar usuários da escola\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Requer execução prévia de Login Teacher."
+          }
+        },
+        {
+          "name": "Teacher - Criar usuário na escola (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Teacher não pode criar usuário\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Teste Teacher Block\",\n  \"email\": \"blocked.teacher.create@escola.com\",\n  \"password\": \"Senha@123\",\n  \"role\": \"parent\",\n  \"associated_students\": [],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"]
+            },
+            "description": "Teacher deve receber 403 para criação em /schools/:schoolId/users."
+          }
+        },
+        {
+          "name": "Parent - Listar usuários da escola (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Parent não pode listar usuários da escola\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{parent_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/schools/{{school_id}}/users?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["schools", "{{school_id}}", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Requer execução prévia de Login Parent."
+          }
+        },
+        {
+          "name": "Parent - Buscar usuário por ID (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Parent não pode buscar /users/:id\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{parent_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Valida bloqueio de parent na rota /users/:id."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conversations & Messages",
+      "description": "Rotas de conversas e mensagens entre usuários da escola.\n\n## Fluxo de teste de conversa real entre dois usuários:\n1. Execute **Login (Teacher)** e **Login (Parent)** para salvar os tokens de cada usuário\n2. Copie o `parent_user_id` para a variável `participant_id`\n3. Execute **[Teacher] Criar ou Buscar Conversa** para iniciar a conversa\n4. Execute **[Teacher] Enviar Mensagem** para o teacher enviar uma mensagem\n5. Execute **[Parent] Enviar Mensagem** para o parent responder\n6. Execute **[Teacher] Listar Mensagens** para ver o histórico\n7. Execute **[Teacher] Marcar Mensagens como Lidas** para confirmar leitura\n\n## Variáveis utilizadas:\n- `school_id`: ID da escola\n- `participant_id`: ID do outro participante da conversa (preencher com `teacher_user_id` ou `parent_user_id`)\n- `conversation_id`: preenchido automaticamente ao criar/buscar conversa",
+      "item": [
+        {
+          "name": "Configuração",
+          "description": "Logins auxiliares para simular conversa entre dois usuários. Execute antes dos testes de conversa.",
+          "item": [
+            {
+              "name": "Login (Teacher) — salva teacher_access_token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res.data && res.data.user) {",
+                      "    const user = res.data.user;",
+                      "    if (user.access_token)  pm.collectionVariables.set('teacher_access_token', user.access_token);",
+                      "    if (user._id)           pm.collectionVariables.set('teacher_user_id', user._id);",
+                      "    console.log('Teacher token e ID salvos:', user._id);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{teacher_email}}\",\n  \"password\": \"{{teacher_password}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                },
+                "description": "Faz login como Teacher e salva o token e user_id nas variáveis da collection."
+              }
+            },
+            {
+              "name": "Login (Parent) — salva parent_access_token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res.data && res.data.user) {",
+                      "    const user = res.data.user;",
+                      "    if (user.access_token)  pm.collectionVariables.set('parent_access_token', user.access_token);",
+                      "    if (user._id)           pm.collectionVariables.set('parent_user_id', user._id);",
+                      "    // Preenche participant_id para a conversa do Teacher → Parent",
+                      "    pm.collectionVariables.set('participant_id', user._id);",
+                      "    console.log('Parent token e ID salvos:', user._id);",
+                      "    console.log('participant_id atualizado para:', user._id);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{parent_email}}\",\n  \"password\": \"{{parent_password}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                },
+                "description": "Faz login como Parent e salva o token, user_id e participant_id automaticamente."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Conversas",
+          "item": [
+            {
+              "name": "[Teacher] Criar ou Buscar Conversa",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res.data && res.data._id) {",
+                      "    pm.collectionVariables.set('conversation_id', res.data._id);",
+                      "    console.log('conversation_id salvo:', res.data._id);",
+                      "    const wasCreated = pm.response.code === 201;",
+                      "    console.log(wasCreated ? 'Nova conversa criada.' : 'Conversa existente retornada.');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participant_id\": \"{{participant_id}}\",\n  \"type\": \"private\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"]
+                },
+                "description": "Cria uma nova conversa privada entre o Teacher (usuário autenticado) e o participante (`participant_id`). Se já existir, retorna a conversa existente. O `conversation_id` é salvo automaticamente.\n\n**Tipos disponíveis:** `private` | `daily_log_reply`"
+              }
+            },
+            {
+              "name": "[Teacher] Listar Conversas",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"],
+                  "query": [
+                    { "key": "type", "value": "private", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Lista todas as conversas do Teacher na escola. Filtros opcionais: `type` (private | daily_log_reply), `page`, `limit`."
+              }
+            },
+            {
+              "name": "[Parent] Listar Conversas",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"],
+                  "query": [
+                    { "key": "type", "value": "private", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Lista todas as conversas do Parent na escola. Útil para verificar se a conversa aparece para os dois lados."
+              }
+            },
+            {
+              "name": "[Teacher] Buscar Conversa por ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}"]
+                },
+                "description": "Retorna os detalhes de uma conversa específica pelo ID. Requer que `conversation_id` esteja preenchido."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mensagens",
+          "item": [
+            {
+              "name": "[Teacher] Enviar Mensagem",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"Olá! Gostaria de conversar sobre o desempenho do seu filho nas últimas semanas.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"]
+                },
+                "description": "Teacher envia uma mensagem para a conversa. Requer `conversation_id` preenchido."
+              }
+            },
+            {
+              "name": "[Parent] Enviar Mensagem (resposta)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_access_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"Claro! Pode falar, estou à disposição.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"]
+                },
+                "description": "Parent responde à mensagem do Teacher na mesma conversa. Simula um diálogo real entre os dois usuários."
+              }
+            },
+            {
+              "name": "[Teacher] Listar Mensagens",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"],
+                  "query": [
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Lista todas as mensagens da conversa. Filtros opcionais: `page`, `limit`."
+              }
+            },
+            {
+              "name": "[Parent] Listar Mensagens",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"],
+                  "query": [
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "limit", "value": "20", "disabled": true }
+                  ]
+                },
+                "description": "Parent lista as mensagens da conversa. Útil para verificar se o Parent vê as mensagens do Teacher."
+              }
+            },
+            {
+              "name": "[Teacher] Marcar Mensagens como Lidas",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages/read",
+                  "host": ["{{base_url}}"],
+                  "path": [
+                    "conversations",
+                    "{{conversation_id}}",
+                    "messages",
+                    "read"
+                  ]
+                },
+                "description": "Marca todas as mensagens não lidas da conversa como lidas para o Teacher."
+              }
+            },
+            {
+              "name": "[Parent] Marcar Mensagens como Lidas",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{parent_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages/read",
+                  "host": ["{{base_url}}"],
+                  "path": [
+                    "conversations",
+                    "{{conversation_id}}",
+                    "messages",
+                    "read"
+                  ]
+                },
+                "description": "Marca todas as mensagens não lidas da conversa como lidas para o Parent."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cenários de Erro",
+          "description": "Testes para validar comportamento com dados inválidos.",
+          "item": [
+            {
+              "name": "Criar Conversa — participant_id inválido",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participant_id\": \"id-invalido\",\n  \"type\": \"private\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/schools/{{school_id}}/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["schools", "{{school_id}}", "conversations"]
+                },
+                "description": "Espera: 400 Bad Request — ObjectId inválido rejeitado pelo Zod."
+              }
+            },
+            {
+              "name": "Enviar Mensagem — texto vazio",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}", "messages"]
+                },
+                "description": "Espera: 400 Bad Request — texto vazio rejeitado pelo Zod."
+              }
+            },
+            {
+              "name": "Acessar Conversa sem Autenticação",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/conversations/{{conversation_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "{{conversation_id}}"]
+                },
+                "description": "Espera: 401 Unauthorized — sem token JWT."
+              }
+            },
+            {
+              "name": "Listar Mensagens — conversationId inválido",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{teacher_access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/conversations/id-invalido/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["conversations", "id-invalido", "messages"]
+                },
+                "description": "Espera: 400 Bad Request — ObjectId inválido rejeitado pelo Zod."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
