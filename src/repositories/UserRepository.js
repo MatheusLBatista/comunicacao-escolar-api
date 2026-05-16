@@ -286,9 +286,9 @@ class UserRepository {
       memberships: {
         $elemMatch: {
           role: role,
+          active: { $ne: false },
         },
       },
-      active: true,
     });
 
     return data;

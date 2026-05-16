@@ -219,7 +219,7 @@ Equipe Edu Connect
             <div style="background: #f0f4ff; border-radius: 6px; padding: 14px; text-align: center; margin: 20px 0;">
                 <p style="margin: 0; font-size: 20px; font-weight: bold; color: #306FCC;">${email}</p>
             </div>
-            <p style="margin: 0 0 20px 0; font-size: 16px;">Você pode criar uma conta com este e-mail ou <strong>entrar diretamente com o Google</strong>, desde que use este mesmo endereço.</p>
+            <p style="margin: 0 0 20px 0; font-size: 16px;">Você pode criar uma conta ou <strong>entrar diretamente com o Google</strong>, desde que use este mesmo endereço.</p>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
                 <p style="margin: 0; font-size: 16px; color: #999;">Equipe Edu Connect</p>
             </div>

@@ -74,15 +74,17 @@ export default async function dailyLogTemplateSeed() {
       _id: new mongoose.Types.ObjectId('6648f9ed1020304050607001'),
       school_id: school._id,
       student_id: null,
+      name: 'Diário de Bordo Padrão',
       fields: buildBaseFields(),
       ativo: true,
     },
   ];
 
-  for (const student of students) {
+  for (const [i, student] of students.entries()) {
     templates.push({
       school_id: school._id,
       student_id: student._id,
+      name: `Diário Individual ${i + 1}`,
       fields: [...buildBaseFields(), ...buildStudentSpecificFields()],
       ativo: true,
     });
