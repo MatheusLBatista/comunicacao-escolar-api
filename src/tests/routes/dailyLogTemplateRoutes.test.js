@@ -172,6 +172,11 @@ describe('DailyLogTemplate - integração de rotas', () => {
       seedLabel: 'TeacherDailyLogTemplate',
     });
 
+    await request(BASE_URL)
+      .post(`/schools/${schoolId}/members`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ user_id: teacherUser.id, role: 'teacher' });
+
     teacherToken = await loginWithCredentials(
       teacherUser.email,
       teacherUser.password,
@@ -199,7 +204,7 @@ describe('DailyLogTemplate - integração de rotas', () => {
       labelSeed: 'TemplateStudent',
     });
     templateIdsToCleanup.push(studentTemplate.id);
-  });
+  }, 30000);
 
   afterAll(async () => {
     for (const id of templateIdsToCleanup) {
