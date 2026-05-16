@@ -28,7 +28,7 @@ const userPolicies = [
     methods: {
       GET: {
         scope: 'school',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent'],
         schoolParam: 'schoolId',
       },
       POST: {
@@ -53,7 +53,7 @@ const userPolicies = [
     methods: {
       GET: {
         scope: 'school',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent', 'student'],
         schoolParam: 'schoolId',
       },
       POST: {
@@ -86,7 +86,7 @@ const userPolicies = [
     methods: {
       GET: {
         scope: 'global',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent', 'student'],
       },
       PATCH: {
         scope: 'global',
@@ -107,7 +107,7 @@ const userPolicies = [
     methods: {
       GET: {
         scope: 'global',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent', 'student'],
       },
     },
   },
@@ -156,7 +156,7 @@ const userPolicies = [
     methods: {
       GET: {
         scope: 'school',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent'],
         schoolParam: 'schoolId',
       },
       POST: {
@@ -180,7 +180,8 @@ const userPolicies = [
     methods: {
       GET: {
         scope: 'global',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent'],
+        allowSelf: true,
       },
       PATCH: {
         scope: 'global',
@@ -215,7 +216,7 @@ const auditLogPolicies = [
     methods: {
       GET: {
         scope: 'global',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent', 'student'],
       },
       POST: {
         scope: 'global',
