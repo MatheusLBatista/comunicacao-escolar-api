@@ -200,9 +200,9 @@ Equipe Edu Connect
     const text = `
 Olá!
 
-O administrador da escola ${schoolName} cadastrou o seu e-mail no sistema Edu Connect como ${roleLabel}.
+A diretoria da escola ${schoolName} cadastrou seu e-mail no sistema Edu Connect como ${roleLabel}.
 
-Para acessar o aplicativo, baixe o Edu Connect e crie sua conta usando este endereço de e-mail: ${email}
+Para acessar o aplicativo, baixe o Edu Connect e crie sua conta com este e-mail ou entre com o Google: ${email}
 
 Equipe Edu Connect
     `.trim();
@@ -214,11 +214,12 @@ Equipe Edu Connect
     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h1 style="color: #306FCC; font-size: 24px; margin-bottom: 20px; margin-top: 0;">Você foi convidado(a)!</h1>
-            <p style="margin: 0 0 15px 0; font-size: 18px;">O administrador da escola <strong>${schoolName}</strong> cadastrou seu e-mail no sistema Edu Connect como <strong>${roleLabel}</strong>.</p>
-            <p style="margin: 0 0 20px 0; font-size: 18px;">Para acessar, baixe o aplicativo <strong>Edu Connect</strong> e crie sua conta usando este e-mail:</p>
+            <p style="margin: 0 0 15px 0; font-size: 18px;">A diretoria da escola <strong>${schoolName}</strong> cadastrou seu e-mail no sistema Edu Connect como <strong>${roleLabel}</strong>.</p>
+            <p style="margin: 0 0 20px 0; font-size: 18px;">Para acessar, baixe o aplicativo <strong>Edu Connect</strong> e entre com este e-mail:</p>
             <div style="background: #f0f4ff; border-radius: 6px; padding: 14px; text-align: center; margin: 20px 0;">
                 <p style="margin: 0; font-size: 20px; font-weight: bold; color: #306FCC;">${email}</p>
             </div>
+            <p style="margin: 0 0 20px 0; font-size: 16px;">Você pode criar uma conta com este e-mail ou <strong>entrar diretamente com o Google</strong>, desde que use este mesmo endereço.</p>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
                 <p style="margin: 0; font-size: 16px; color: #999;">Equipe Edu Connect</p>
             </div>
