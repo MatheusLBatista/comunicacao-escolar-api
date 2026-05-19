@@ -1,4 +1,5 @@
 import ConversationService from '../services/ConversationService.js';
+import AuditLogService from '../services/AuditLogService.js';
 import { ConversationSchema } from '../utils/validators/schemas/zod/ConversationSchema.js';
 import {
   ConversationIdSchema,
@@ -9,7 +10,9 @@ import { CommonResponse } from '../utils/helpers/index.js';
 class ConversationController {
   constructor() {
     this.service = new ConversationService();
+    this.auditLogService = new AuditLogService();
   }
+
 
   async findOrCreate(req, res) {
     const { schoolId } = req.params;
@@ -25,6 +28,13 @@ class ConversationController {
     );
 
     if (created) {
+      this.auditLogService.logAsync(req, {
+        schoolId: conversation.school_id,
+        resourceType: 'conversation',
+        resourceId: conversation._id,
+        resourceSummary: 'Conversa iniciada',
+        action: 'create',
+      });
       return CommonResponse.created(res, conversation);
     }
 

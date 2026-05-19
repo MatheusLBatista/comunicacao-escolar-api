@@ -2,6 +2,7 @@ import DailyLogRepository from '../repositories/DailyLogRepository.js';
 import DailyLogTemplateRepository from '../repositories/DailyLogTemplateRepository.js';
 import SchoolRepository from '../repositories/SchoolRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
+import AuditLogService from './AuditLogService.js';
 import mongoose from 'mongoose';
 import compress from '../config/SharpConfig.js';
 import minioClient from '../config/MinIO.js';
@@ -13,6 +14,7 @@ class DailyLogService {
     this.templateRepository = new DailyLogTemplateRepository();
     this.schoolRepository = new SchoolRepository();
     this.userRepository = new UserRepository();
+    this.auditLogService = new AuditLogService();
   }
 
   async resolveAccessScope(req) {
@@ -68,10 +70,20 @@ class DailyLogService {
     return { studentIds };
   }
 
-  async create(parsedData) {
+  async create(parsedData, req) {
     await this.validateReferences(parsedData);
 
     const data = await this.repository.create(parsedData);
+
+    this.auditLogService.logAsync(req || { user_id: parsedData.teacher_id }, {
+      schoolId: data.school_id,
+      resourceType: 'daily_log',
+      resourceId: data._id,
+      resourceSummary: 'Diário do aluno criado',
+      studentId: data.student_id,
+      action: 'create',
+    });
+
     return data;
   }
 
@@ -83,18 +95,38 @@ class DailyLogService {
 
   async update(id, parsedData, req) {
     const accessScope = await this.resolveAccessScope(req);
-    await this.repository.getById(id, accessScope);
+    const existing = await this.repository.getById(id, accessScope);
     await this.validateReferences(parsedData);
 
     const data = await this.repository.update(id, parsedData);
+
+    this.auditLogService.logAsync(req, {
+      schoolId: existing.school_id,
+      resourceType: 'daily_log',
+      resourceId: id,
+      resourceSummary: 'Diário do aluno atualizado',
+      studentId: existing.student_id,
+      action: 'update',
+    });
+
     return data;
   }
 
   async delete(id, req) {
     const accessScope = await this.resolveAccessScope(req);
-    await this.repository.getById(id, accessScope);
+    const existing = await this.repository.getById(id, accessScope);
 
     const data = await this.repository.delete(id);
+
+    this.auditLogService.logAsync(req, {
+      schoolId: existing.school_id,
+      resourceType: 'daily_log',
+      resourceId: id,
+      resourceSummary: 'Diário do aluno removido',
+      studentId: existing.student_id,
+      action: 'delete',
+    });
+
     return data;
   }
 
@@ -103,6 +135,16 @@ class DailyLogService {
     await this.repository.getById(id, accessScope);
 
     const data = await this.repository.markAsRead(id);
+
+    this.auditLogService.logAsync(req, {
+      schoolId: data.school_id,
+      resourceType: 'daily_log',
+      resourceId: data._id,
+      resourceSummary: 'Diário do aluno visualizado',
+      studentId: data.student_id,
+      action: 'view',
+    });
+
     return data;
   }
 

@@ -1,6 +1,7 @@
 import DailyLogTemplateRepository from '../repositories/DailyLogTemplateRepository.js';
 import SchoolRepository from '../repositories/SchoolRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
+import AuditLogService from './AuditLogService.js';
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class DailyLogTemplateService {
@@ -8,6 +9,7 @@ class DailyLogTemplateService {
     this.repository = new DailyLogTemplateRepository();
     this.schoolRepository = new SchoolRepository();
     this.userRepository = new UserRepository();
+    this.auditLogService = new AuditLogService();
   }
 
   async _assertSchoolMembership(schoolId, req) {
@@ -30,10 +32,19 @@ class DailyLogTemplateService {
     }
   }
 
-  async create(parsedData) {
+  async create(parsedData, req) {
     await this.validateReferences(parsedData);
 
     const data = await this.repository.create(parsedData);
+
+    this.auditLogService.logAsync(req, {
+      schoolId: data.school_id,
+      resourceType: 'template',
+      resourceId: data._id,
+      resourceSummary: `Template criado: ${data.name || ''}`,
+      action: 'create',
+    });
+
     return data;
   }
 
@@ -48,6 +59,15 @@ class DailyLogTemplateService {
     await this.validateReferences(parsedData);
 
     const data = await this.repository.update(id, parsedData);
+
+    this.auditLogService.logAsync(req, {
+      schoolId: template.school_id,
+      resourceType: 'template',
+      resourceId: id,
+      resourceSummary: `Template atualizado: ${template.name || ''}`,
+      action: 'update',
+    });
+
     return data;
   }
 
@@ -56,6 +76,15 @@ class DailyLogTemplateService {
     await this._assertSchoolMembership(template.school_id, req);
 
     const data = await this.repository.delete(id);
+
+    this.auditLogService.logAsync(req, {
+      schoolId: template.school_id,
+      resourceType: 'template',
+      resourceId: id,
+      resourceSummary: `Template removido: ${template.name || ''}`,
+      action: 'delete',
+    });
+
     return data;
   }
 
