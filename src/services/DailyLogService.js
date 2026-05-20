@@ -6,6 +6,7 @@ import AuditLogService from './AuditLogService.js';
 import mongoose from 'mongoose';
 import compress from '../config/SharpConfig.js';
 import minioClient from '../config/MinIO.js';
+import getPresignedUrl from '../utils/getPresignedUrl.js';
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
 
 class DailyLogService {
@@ -70,6 +71,28 @@ class DailyLogService {
     return { studentIds };
   }
 
+  _enrichWithPresignedUrls(data) {
+    if (!data) return data;
+
+    const enrich = (userField) => {
+      if (userField?.avatar_url) {
+        userField.avatar_url = getPresignedUrl(userField.avatar_url);
+      }
+    };
+
+    if (Array.isArray(data.docs)) {
+      data.docs.forEach((doc) => {
+        enrich(doc.student_id);
+        enrich(doc.teacher_id);
+      });
+    } else {
+      enrich(data.student_id);
+      enrich(data.teacher_id);
+    }
+
+    return data;
+  }
+
   async create(parsedData, req) {
     await this.validateReferences(parsedData);
 
@@ -90,7 +113,7 @@ class DailyLogService {
   async list(req) {
     const accessScope = await this.resolveAccessScope(req);
     const data = await this.repository.list(req, accessScope);
-    return data;
+    return this._enrichWithPresignedUrls(data);  // síncrono, sem await
   }
 
   async update(id, parsedData, req) {
