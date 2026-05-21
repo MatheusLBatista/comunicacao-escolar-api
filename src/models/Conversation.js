@@ -27,6 +27,10 @@ class Conversation {
           type: Date,
           default: null,
         },
+        last_message_text: {
+          type: String,
+          default: null,
+        },
         active: {
           type: Boolean,
           default: true,

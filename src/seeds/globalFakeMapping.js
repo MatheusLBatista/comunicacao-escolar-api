@@ -95,6 +95,7 @@ export const fakeMappings = {
     ],
     type: () => fakebr.random.arrayElement(['private', 'daily_log_reply']),
     last_message_at: () => null,
+    last_message_text: () => null,
   },
 
   DailyLog: {
