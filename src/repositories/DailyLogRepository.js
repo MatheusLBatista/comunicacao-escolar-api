@@ -20,6 +20,7 @@ class DailyLogRepository {
       { path: 'student_id', select: '_id full_name avatar_url' },
       { path: 'teacher_id', select: '_id full_name avatar_url' },
       { path: 'school_id', select: '_id name' },
+      { path: 'dailylogtemplate_id', select: 'fields'}
     ];
 
     if (id) {
