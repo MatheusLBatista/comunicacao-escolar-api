@@ -47,9 +47,11 @@ class EventFilterBuilder {
     return this;
   }
 
-  withTargetId(target_id) {
-    if (target_id) {
-      this.filters['target.target_id'] = target_id;
+  withTargetIds(target_ids) {
+    if (Array.isArray(target_ids) && target_ids.length > 0) {
+      this.filters['target.target_ids'] = { $in: target_ids };
+    } else if (target_ids && !Array.isArray(target_ids)) {
+      this.filters['target.target_ids'] = target_ids;
     }
 
     return this;
@@ -68,6 +70,16 @@ class EventFilterBuilder {
       }
     }
 
+    return this;
+  }
+
+  withParentClassFilter(classIds) {
+    if (Array.isArray(classIds)) {
+      this.filters.$or = [
+        { 'target.scope': 'all' },
+        { 'target.target_ids': { $in: classIds } },
+      ];
+    }
     return this;
   }
 
