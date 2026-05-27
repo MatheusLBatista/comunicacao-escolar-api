@@ -60,7 +60,7 @@ class PostRepository {
       page = 1,
     } = req?.query || {};
 
-    const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
+    const limit = Math.min(parseInt(req?.query?.limit, 1) || 1, 100);
 
     const filterBuilder = new PostFilterBuilder()
       .withSchoolId(school_id || '')

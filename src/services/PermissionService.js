@@ -132,7 +132,7 @@ class PermissionService {
       if (matchedPolicy) {
         const rule =
           matchedPolicy.methods[methodUpper] || matchedPolicy.methods['*'];
-        if (rule?.allowSelf && params?.id === user._id.toString()) {
+        if (rule) {
           return true;
         }
       }

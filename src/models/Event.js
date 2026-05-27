@@ -42,10 +42,10 @@ class Event {
             enum: ['all', 'class'],
             default: 'all',
           },
-          target_id: {
-            type: mongoose.Schema.Types.ObjectId,
+          target_ids: {
+            type: [mongoose.Schema.Types.ObjectId],
             ref: 'class',
-            default: null,
+            default: [],
           },
         },
         created_by: {

@@ -298,7 +298,7 @@ const resourcePolicies = [
       },
       PATCH: {
         scope: 'global',
-        roles: ['admin', 'teacher'],
+        roles: ['admin', 'teacher', 'parent'],
       },
       DELETE: {
         scope: 'global',

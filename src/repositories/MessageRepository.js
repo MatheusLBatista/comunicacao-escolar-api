@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import MessageModel from '../models/Message.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
@@ -52,6 +53,24 @@ class MessageRepository {
     );
 
     return result.modifiedCount;
+  }
+
+  async countUnreadByConversations(conversationIds, userId) {
+    const result = await this.model.aggregate([
+      {
+        $match: {
+          conversation_id: { $in: conversationIds.map((id) => new mongoose.Types.ObjectId(id)) },
+          active: true,
+          sender_id: { $ne: new mongoose.Types.ObjectId(userId) },
+          'read_by.user_id': { $ne: new mongoose.Types.ObjectId(userId) },
+        },
+      },
+      { $group: { _id: '$conversation_id', count: { $sum: 1 } } },
+    ]);
+    return result.reduce((acc, item) => {
+      acc[item._id.toString()] = item.count;
+      return acc;
+    }, {});
   }
 
   async getById(id) {

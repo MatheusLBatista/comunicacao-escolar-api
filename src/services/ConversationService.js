@@ -1,4 +1,5 @@
 import ConversationRepository from '../repositories/ConversationRepository.js';
+import MessageRepository from '../repositories/MessageRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 import SchoolRepository from '../repositories/SchoolRepository.js';
 import { CustomError } from '../utils/helpers/index.js';
@@ -6,6 +7,7 @@ import { CustomError } from '../utils/helpers/index.js';
 class ConversationService {
   constructor() {
     this.repository = new ConversationRepository();
+    this.messageRepository = new MessageRepository();
     this.userRepository = new UserRepository();
     this.schoolRepository = new SchoolRepository();
   }
@@ -41,7 +43,14 @@ class ConversationService {
   }
 
   async list(schoolId, userId, query) {
-    return await this.repository.listByUser(schoolId, userId, query);
+    const result = await this.repository.listByUser(schoolId, userId, query);
+    const ids = result.docs.map((c) => c._id.toString());
+    const unreadMap = await this.messageRepository.countUnreadByConversations(ids, userId);
+    result.docs = result.docs.map((c) => ({
+      ...c,
+      unread_count: unreadMap[c._id.toString()] ?? 0,
+    }));
+    return result;
   }
 
   async getById(id, userId) {

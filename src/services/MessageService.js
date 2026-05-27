@@ -25,7 +25,7 @@ class MessageService {
       sent_at: now,
     });
 
-    await this.conversationRepository.updateLastMessageAt(conversationId, now);
+    await this.conversationRepository.updateLastMessageAt(conversationId, now, parsedData.text);
 
     this._emitNewMessage(conversation, senderId, message);
 

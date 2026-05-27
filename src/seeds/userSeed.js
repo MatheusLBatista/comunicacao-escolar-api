@@ -93,7 +93,7 @@ export default async function userSeed() {
   const defaultTeacher = {
     _id: new mongoose.Types.ObjectId('6644c5b9d6e7f80910203002'),
     full_name: process.env.TEACHER_NAME || 'Maria Teacher',
-    email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+    email: process.env.TEACHER_EMAIL || 'teacher@teacher.com',
     password: await bcrypt.hash(
       process.env.TEACHER_PASSWORD || 'Senha@123',
       10,
@@ -113,7 +113,7 @@ export default async function userSeed() {
   const defaultParent = {
     _id: new mongoose.Types.ObjectId('6645d6cae7f8091020304003'),
     full_name: process.env.PARENT_NAME || 'Ana Parent',
-    email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+    email: process.env.PARENT_EMAIL || 'parent@parent.com',
     password: await bcrypt.hash(process.env.PARENT_PASSWORD || 'Senha@123', 10),
     active: true,
     permissions: userGroup?.permissions || [],

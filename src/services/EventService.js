@@ -17,19 +17,46 @@ class EventService {
     if (!userId) return {};
 
     const user = await this.userRepository.getById(userId);
-    const memberships = Array.isArray(user?.memberships)
-      ? user.memberships
-      : [];
+    const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
 
     const schoolIds = [
-      ...new Set(
-        memberships.map((m) => m?.school_id?.toString()).filter(Boolean),
-      ),
+      ...new Set(memberships.map((m) => m?.school_id?.toString()).filter(Boolean)),
     ];
 
     if (!schoolIds.length) return {};
 
-    return { schoolIds };
+    const hasPrivilegedRole = memberships.some(
+      (m) => m.role === 'admin' || m.role === 'teacher',
+    );
+    if (hasPrivilegedRole) return { schoolIds };
+
+    // parent: resolve class_ids dos filhos vinculados
+    const studentIds = [
+      ...new Set(
+        memberships
+          .filter((m) => m.role === 'parent')
+          .flatMap((m) => m.associated_students ?? [])
+          .map((id) => id.toString()),
+      ),
+    ];
+
+    if (!studentIds.length) return { schoolIds, parentClassIds: [] };
+
+    const students = await Promise.all(
+      studentIds.map((id) => this.userRepository.getById(id).catch(() => null)),
+    );
+
+    const parentClassIds = [
+      ...new Set(
+        students
+          .filter(Boolean)
+          .flatMap((s) =>
+            (s?.memberships ?? []).map((m) => m.class_id?.toString()).filter(Boolean),
+          ),
+      ),
+    ];
+
+    return { schoolIds, parentClassIds };
   }
 
   async _assertSchoolMembership(userId, schoolId) {
@@ -83,7 +110,10 @@ class EventService {
     const merged = {
       ...existingEvent.toObject(),
       ...parsedData,
-      target: { ...(existingEvent.target || {}), ...(parsedData.target || {}) },
+      target: {
+        scope: (parsedData.target?.scope ?? existingEvent.target?.scope) || 'all',
+        target_ids: parsedData.target?.target_ids ?? existingEvent.target?.target_ids ?? [],
+      },
     };
 
     const normalizedTarget = this.normalizeTarget(merged.target);
@@ -199,55 +229,57 @@ class EventService {
 
   async validateTarget(target = {}, schoolId = null) {
     const targetScope = target?.scope ?? 'all';
-    const targetId = target?.target_id ?? null;
+    const targetIds = target?.target_ids ?? [];
 
     if (targetScope !== 'class') return;
 
-    if (!targetId) {
+    if (!Array.isArray(targetIds) || targetIds.length === 0) {
       throw new CustomError({
         statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
         errorType: 'validationError',
-        field: 'target.target_id',
+        field: 'target.target_ids',
         details: [
           {
-            path: 'target.target_id',
-            message: 'target_id é obrigatório quando target.scope for class.',
+            path: 'target.target_ids',
+            message: 'target_ids é obrigatório quando target.scope for class.',
           },
         ],
-        customMessage: 'Para scope=class, informe o id da turma.',
+        customMessage: 'Para scope=class, informe ao menos uma turma em target_ids.',
       });
     }
 
-    const turma = await this.classRepository.findById(targetId);
+    for (const targetId of targetIds) {
+      const turma = await this.classRepository.findById(targetId);
 
-    if (!turma) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
-        errorType: 'validationError',
-        field: 'target.target_id',
-        details: [
-          {
-            path: 'target.target_id',
-            message: 'A turma informada não foi encontrada.',
-          },
-        ],
-        customMessage: 'target.target_id inválido.',
-      });
-    }
+      if (!turma) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
+          errorType: 'validationError',
+          field: 'target.target_ids',
+          details: [
+            {
+              path: 'target.target_ids',
+              message: `Turma ${targetId} não foi encontrada.`,
+            },
+          ],
+          customMessage: 'Um ou mais IDs em target_ids são inválidos.',
+        });
+      }
 
-    if (schoolId && String(turma.school_id) !== String(schoolId)) {
-      throw new CustomError({
-        statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
-        errorType: 'validationError',
-        field: 'target.target_id',
-        details: [
-          {
-            path: 'target.target_id',
-            message: 'A turma informada não pertence à escola do evento.',
-          },
-        ],
-        customMessage: 'target.target_id não pertence à escola informada.',
-      });
+      if (schoolId && String(turma.school_id) !== String(schoolId)) {
+        throw new CustomError({
+          statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
+          errorType: 'validationError',
+          field: 'target.target_ids',
+          details: [
+            {
+              path: 'target.target_ids',
+              message: `Turma ${targetId} não pertence à escola do evento.`,
+            },
+          ],
+          customMessage: 'Um ou mais IDs em target_ids não pertencem à escola informada.',
+        });
+      }
     }
   }
 
@@ -257,13 +289,13 @@ class EventService {
     if (targetScope === 'class') {
       return {
         scope: 'class',
-        target_id: target?.target_id ?? null,
+        target_ids: Array.isArray(target?.target_ids) ? target.target_ids : [],
       };
     }
 
     return {
       scope: 'all',
-      target_id: null,
+      target_ids: [],
     };
   }
 }

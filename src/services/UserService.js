@@ -115,9 +115,11 @@ class UserService {
     }
 
     if (usuario) {
-      const jaMembro = Array.isArray(usuario.memberships) &&
-        usuario.memberships.some((m) => m.school_id?.toString() === schoolId);
-      if (jaMembro) {
+      const existingMembership = Array.isArray(usuario.memberships)
+        ? usuario.memberships.find((m) => m.school_id?.toString() === schoolId)
+        : null;
+
+      if (existingMembership?.active !== false) {
         throw new CustomError({
           statusCode: HttpStatusCodes.CONFLICT.code,
           errorType: 'duplicateEntry',
@@ -125,6 +127,16 @@ class UserService {
           details: [{ path: 'school_id', message: 'Usuário já vinculado a esta escola.' }],
           customMessage: 'Usuário já vinculado a esta escola.',
         });
+      }
+
+      if (existingMembership) {
+        existingMembership.active = true;
+        existingMembership.deactivated_at = null;
+        existingMembership.role = parsedData.role;
+        const atualizado = await this.repository.update(usuario._id, {
+          memberships: usuario.memberships,
+        });
+        return { _id: atualizado._id, full_name: atualizado.full_name, email: atualizado.email };
       }
     }
 

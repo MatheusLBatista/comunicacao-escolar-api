@@ -1,4 +1,5 @@
 import UserService from '../services/UserService.js';
+import AuditLogService from '../services/AuditLogService.js';
 import {
   UserQuerySchema,
   UserIdSchema,
@@ -18,6 +19,7 @@ import { CommonResponse } from '../utils/helpers/index.js';
 class UserController {
   constructor() {
     this.service = new UserService();
+    this.auditLogService = new AuditLogService();
   }
 
   async createAdmin(req, res) {
@@ -39,6 +41,14 @@ class UserController {
     const parsedData = UserSchema.parse(req.body);
     const data = await this.service.createAtSchool(schoolId, parsedData);
 
+    this.auditLogService.logAsync(req, {
+      schoolId,
+      resourceType: 'user',
+      resourceId: data._id,
+      resourceSummary: `Usuário criado: ${data.full_name || data.email || ''}`,
+      action: 'create',
+    });
+
     const userLimpo = data.toObject
       ? data.toObject()
       : { ...(data._doc || data) };
@@ -53,6 +63,14 @@ class UserController {
 
     const parsedData = LinkToSchoolSchema.parse(req.body);
     const data = await this.service.linkToSchool(schoolId, parsedData);
+
+    this.auditLogService.logAsync(req, {
+      schoolId,
+      resourceType: 'user',
+      resourceId: data._id,
+      resourceSummary: `Usuário vinculado: ${data.full_name || data.email || ''}`,
+      action: 'create',
+    });
 
     const userLimpo = data.toObject
       ? data.toObject()
@@ -131,6 +149,15 @@ class UserController {
     ObjectIdSchema.parse(schoolId);
     ObjectIdSchema.parse(userId);
     const data = await this.service.deactivateMembership(schoolId, userId);
+
+    this.auditLogService.logAsync(req, {
+      schoolId,
+      resourceType: 'user',
+      resourceId: userId,
+      resourceSummary: `Usuário desvinculado: ${data?.full_name || userId}`,
+      action: 'delete',
+    });
+
     return CommonResponse.success(res, data);
   }
 

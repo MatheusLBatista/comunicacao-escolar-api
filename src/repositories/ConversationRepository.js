@@ -65,10 +65,10 @@ class ConversationRepository {
     return data;
   }
 
-  async updateLastMessageAt(id, date) {
+  async updateLastMessageAt(id, date, text) {
     return await this.model.findByIdAndUpdate(
       id,
-      { last_message_at: date },
+      { last_message_at: date, last_message_text: text ?? null },
       { new: true },
     );
   }

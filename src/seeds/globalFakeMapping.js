@@ -95,6 +95,7 @@ export const fakeMappings = {
     ],
     type: () => fakebr.random.arrayElement(['private', 'daily_log_reply']),
     last_message_at: () => null,
+    last_message_text: () => null,
   },
 
   DailyLog: {
@@ -213,9 +214,11 @@ export const fakeMappings = {
 
   AuditLog: {
     user_role: () => fakebr.random.arrayElement(['admin', 'teacher', 'parent']),
-    action: () => fakebr.random.arrayElement(['view', 'download', 'export']),
+    action: () => fakebr.random.arrayElement(['create', 'update', 'delete', 'view']),
     resource_type: () =>
       fakebr.random.arrayElement([
+        'user',
+        'template',
         'daily_log',
         'announcement',
         'message',

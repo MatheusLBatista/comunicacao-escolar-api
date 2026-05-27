@@ -15,7 +15,7 @@ class EventRepository {
     const populate = [
       { path: 'school_id', select: 'name tax_id active' },
       { path: 'created_by', select: 'full_name email active' },
-      { path: 'target.target_id', select: 'name grade year school_id active' },
+      { path: 'target.target_ids', select: 'name grade year school_id active' },
     ];
 
     if (id) {
@@ -45,31 +45,48 @@ class EventRepository {
         });
       }
 
-      return {
-        ...data.toObject(),
-      };
+      return this._flattenEvent(data.toObject());
     }
 
     const {
       type,
       active,
       scope,
-      target_id,
+      target_ids,
       start_date,
       end_date,
+      month,
+      year,
       page = 1,
     } = req?.query || {};
 
-    const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 100);
+    let resolvedStartDate = start_date;
+    let resolvedEndDate = end_date;
+    if (month && year) {
+      const m = parseInt(month, 10);
+      const y = parseInt(year, 10);
+      resolvedStartDate = new Date(y, m - 1, 1).toISOString();
+      resolvedEndDate = new Date(y, m, 0, 23, 59, 59, 999).toISOString();
+    }
+
+    const parsedTargetIds = target_ids
+      ? Array.isArray(target_ids) ? target_ids : [target_ids]
+      : [];
+
+    const limit = Math.min(parseInt(req?.query?.limit, 10) || 10, 200);
     const filterBuilder = new EventFilterBuilder()
       .withType(type || '')
       .withActive(active)
       .withScope(scope || '')
-      .withTargetId(target_id || '')
-      .withStartDateRange(start_date, end_date);
+      .withTargetIds(parsedTargetIds)
+      .withStartDateRange(resolvedStartDate, resolvedEndDate);
 
     if (scopedSchoolIds) {
       filterBuilder.withSchoolIds(scopedSchoolIds);
+    }
+
+    if (accessScope.parentClassIds !== undefined) {
+      filterBuilder.withParentClassFilter(accessScope.parentClassIds);
     }
 
     const filters = filterBuilder.build();
@@ -86,13 +103,26 @@ class EventRepository {
     result.docs = result.docs.map((doc) => {
       const eventObj =
         typeof doc.toObject === 'function' ? doc.toObject() : doc;
-
-      return {
-        ...eventObj,
-      };
+      return this._flattenEvent(eventObj);
     });
 
     return result;
+  }
+
+  _flattenEvent(eventObj) {
+    const targetIds = eventObj?.target?.target_ids ?? [];
+    const class_ids = targetIds.map((t) =>
+      t?._id ? String(t._id) : String(t),
+    );
+    const class_names = targetIds
+      .filter((t) => t?.name)
+      .map((t) => t.name);
+
+    return {
+      ...eventObj,
+      class_ids,
+      class_names,
+    };
   }
 
   async create(parsedData) {

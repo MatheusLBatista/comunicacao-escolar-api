@@ -23,12 +23,14 @@ class AuditLog {
         },
         action: {
           type: String,
-          enum: ['view', 'download', 'export'],
+          enum: ['create', 'update', 'delete', 'view'],
           required: true,
         },
         resource_type: {
           type: String,
           enum: [
+            'user',
+            'template',
             'daily_log',
             'announcement',
             'message',
