@@ -36,14 +36,21 @@ class PostFilterBuilder {
 
   withScope(scope) {
     if (scope) {
-      this.filters = { 'target.scope': { $regex: scope, $options: 'i' } };
+      this.filters['target.scope'] = { $regex: scope, $options: 'i' };
     }
     return this;
   }
 
   withTargetId(target_id) {
     if (target_id) {
-      this.filters = { 'target.target_id': target_id };
+      this.filters['target.target_id'] = target_id;
+    }
+    return this;
+  }
+
+  withCreatedAtBefore(created_at) {
+    if (created_at) {
+      this.filters.created_at = { $lt: created_at };
     }
     return this;
   }

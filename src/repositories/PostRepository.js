@@ -57,6 +57,7 @@ class PostRepository {
       scope,
       target_id,
       active,
+      created_at,
       page = 1,
     } = req?.query || {};
 
@@ -69,6 +70,7 @@ class PostRepository {
       .withContent(content || '')
       .withScope(scope || '')
       .withTargetId(target_id || '')
+      .withCreatedAtBefore(created_at || '')
       .withActive(active || '');
 
     const filters = filterBuilder.build();
@@ -76,6 +78,7 @@ class PostRepository {
     const options = {
       page: parseInt(page, 10),
       limit,
+      sort: { created_at: -1 },
     };
 
     const result = await this.model.paginate(filters, options);
