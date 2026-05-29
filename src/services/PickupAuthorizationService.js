@@ -20,11 +20,15 @@ class PickupAuthorizationService {
       ? user.memberships
       : [];
 
-    const isAdminOrTeacher = memberships.some(
-      (m) => m?.role === 'admin' || m?.role === 'teacher',
-    );
+    const isAdmin = memberships.some((m) => m?.role === 'admin');
+    if (isAdmin) return {};
 
-    if (isAdminOrTeacher) return {};
+    const isTeacher = memberships.some((m) => m?.role === 'teacher');
+    if (isTeacher) {
+      const schoolId = req?.query?.school_id?.toString() || null;
+      const studentIds = await this.userRepository.findStudentIdsByTeacherId(userId, schoolId);
+      return { studentIds };
+    }
 
     const schoolId = req?.query?.school_id?.toString();
     const parentMemberships = memberships.filter((m) => {

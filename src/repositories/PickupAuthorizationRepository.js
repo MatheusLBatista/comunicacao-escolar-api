@@ -80,7 +80,7 @@ class PickupAuthorizationRepository {
         .findOne(findByIdFilter)
         .populate('school_id')
         .populate({ path: 'student_id', select: '_id full_name email' })
-        .populate({ path: 'authorized_by', select: '_id full_name email' });
+        .populate({ path: 'authorized_by', select: '_id full_name email avatar_url' });
 
       if (!data) {
         throw new CustomError({
@@ -124,7 +124,7 @@ class PickupAuthorizationRepository {
       populate: [
         'school_id',
         { path: 'student_id', select: '_id full_name email' },
-        { path: 'authorized_by', select: '_id full_name email' },
+        { path: 'authorized_by', select: '_id full_name email avatar_url' },
       ],
     };
 

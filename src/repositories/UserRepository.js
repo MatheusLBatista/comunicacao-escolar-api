@@ -276,6 +276,31 @@ class UserRepository {
     return [...parents, ...teachers];
   }
 
+  async findStudentIdsByTeacherId(teacherId, schoolId = null) {
+    const classFilter = { teacher_ids: teacherId };
+    if (schoolId) classFilter.school_id = schoolId;
+
+    const classes = await this.class.find(classFilter, { _id: 1 }).lean();
+    const classIds = classes.map((c) => c._id);
+
+    if (classIds.length === 0) return [];
+
+    const students = await this.model.find(
+      {
+        memberships: {
+          $elemMatch: {
+            class_id: { $in: classIds },
+            role: 'student',
+            active: { $ne: false },
+          },
+        },
+      },
+      { _id: 1 },
+    ).lean();
+
+    return students.map((s) => s._id.toString());
+  }
+
   async findUsers(ids, role) {
     if (!Array.isArray(ids) || ids.length === 0) {
       return [];
