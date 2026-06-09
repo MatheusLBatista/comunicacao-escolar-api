@@ -68,27 +68,10 @@ deploy-aws:
   script:
     - echo "Iniciando deploy na instancia $AWS_INSTANCE_ID via SSM..."
     - |
-      FIX_SCRIPT=$(printf '%s' '
-import re
-with open("/opt/app/.env", "r") as f:
-    content = f.read()
-m = re.search(r"FIREBASE_PRIVATE_KEY=(.*?-----END PRIVATE KEY-----[^\n]*)", content, re.DOTALL)
-if m:
-    val = m.group(1).strip().strip("\"")
-    val_escaped = val.replace("\n", "\\n")
-    new_line = "FIREBASE_PRIVATE_KEY=\"" + val_escaped + "\""
-    content = content[:m.start()] + new_line + content[m.end():]
-    with open("/opt/app/.env", "w") as f:
-        f.write(content)
-    print("env fixed")
-else:
-    print("key already correct or not found")
-' | base64 -w0)
-    - |
       COMMAND_ID=$(aws ssm send-command \
         --instance-ids "$AWS_INSTANCE_ID" \
         --document-name "AWS-RunShellScript" \
-        --parameters "{\"commands\":[\"echo $FIX_SCRIPT | base64 -d | python3\",\"docker pull $DOCKER_USER/comunicacao-escolar-api:latest\",\"docker rm -f comunicacao-escolar-api 2>/dev/null || true\",\"docker run -d --name comunicacao-escolar-api --restart always -p 3010:3010 --env-file /opt/app/.env $DOCKER_USER/comunicacao-escolar-api:latest\",\"sleep 5\",\"docker inspect -f '{{.State.Running}}' comunicacao-escolar-api\",\"docker image prune -f\",\"echo Deploy concluido\"]}" \
+        --parameters "{\"commands\":[\"echo aW1wb3J0IHJlCndpdGggb3BlbigiL29wdC9hcHAvLmVudiIsICJyIikgYXMgZjoKICAgIGNvbnRlbnQgPSBmLnJlYWQoKQptID0gcmUuc2VhcmNoKHIiRklSRUJBU0VfUFJJVkFURV9LRVk9KC4qPy0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS1bXlxuXSopIiwgY29udGVudCwgcmUuRE9UQUxMKQppZiBtOgogICAgdmFsID0gbS5ncm91cCgxKS5zdHJpcCgpLnN0cmlwKCciJykKICAgIHZhbF9lc2NhcGVkID0gdmFsLnJlcGxhY2UoIlxuIiwgIlxcbiIpCiAgICBuZXdfbGluZSA9ICJGSVJFQkFTRV9QUklWQVRFX0tFWT1cIiIgKyB2YWxfZXNjYXBlZCArICJcIiIKICAgIGNvbnRlbnQgPSBjb250ZW50WzptLnN0YXJ0KCldICsgbmV3X2xpbmUgKyBjb250ZW50W20uZW5kKCk6XQogICAgd2l0aCBvcGVuKCIvb3B0L2FwcC8uZW52IiwgInciKSBhcyBmOgogICAgICAgIGYud3JpdGUoY29udGVudCkKICAgIHByaW50KCJlbnYgZml4ZWQiKQplbHNlOgogICAgcHJpbnQoImtleSBhbHJlYWR5IGNvcnJlY3Qgb3Igbm90IGZvdW5kIik= | base64 -d | python3\",\"docker pull $DOCKER_USER/comunicacao-escolar-api:latest\",\"docker rm -f comunicacao-escolar-api 2>/dev/null || true\",\"docker run -d --name comunicacao-escolar-api --restart always -p 3010:3010 --env-file /opt/app/.env $DOCKER_USER/comunicacao-escolar-api:latest\",\"sleep 5\",\"docker inspect -f '{{.State.Running}}' comunicacao-escolar-api\",\"docker image prune -f\",\"echo Deploy concluido\"]}" \
         --comment "Deploy from GitLab CI" \
         --output text \
         --query "Command.CommandId")
