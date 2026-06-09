@@ -68,10 +68,27 @@ deploy-aws:
   script:
     - echo "Iniciando deploy na instancia $AWS_INSTANCE_ID via SSM..."
     - |
+      FIX_SCRIPT=$(printf '%s' '
+import re
+with open("/opt/app/.env", "r") as f:
+    content = f.read()
+m = re.search(r"FIREBASE_PRIVATE_KEY=(.*?-----END PRIVATE KEY-----[^\n]*)", content, re.DOTALL)
+if m:
+    val = m.group(1).strip().strip("\"")
+    val_escaped = val.replace("\n", "\\n")
+    new_line = "FIREBASE_PRIVATE_KEY=\"" + val_escaped + "\""
+    content = content[:m.start()] + new_line + content[m.end():]
+    with open("/opt/app/.env", "w") as f:
+        f.write(content)
+    print("env fixed")
+else:
+    print("key already correct or not found")
+' | base64 -w0)
+    - |
       COMMAND_ID=$(aws ssm send-command \
         --instance-ids "$AWS_INSTANCE_ID" \
         --document-name "AWS-RunShellScript" \
-        --parameters "{\"commands\":[\"docker pull $DOCKER_USER/comunicacao-escolar-api:latest\",\"docker rm -f comunicacao-escolar-api 2>/dev/null || true\",\"docker run -d --name comunicacao-escolar-api --restart always -p 3010:3010 --env-file /opt/app/.env $DOCKER_USER/comunicacao-escolar-api:latest\",\"sleep 5\",\"docker inspect -f '{{.State.Running}}' comunicacao-escolar-api\",\"docker image prune -f\",\"echo Deploy concluido\"]}" \
+        --parameters "{\"commands\":[\"echo $FIX_SCRIPT | base64 -d | python3\",\"docker pull $DOCKER_USER/comunicacao-escolar-api:latest\",\"docker rm -f comunicacao-escolar-api 2>/dev/null || true\",\"docker run -d --name comunicacao-escolar-api --restart always -p 3010:3010 --env-file /opt/app/.env $DOCKER_USER/comunicacao-escolar-api:latest\",\"sleep 5\",\"docker inspect -f '{{.State.Running}}' comunicacao-escolar-api\",\"docker image prune -f\",\"echo Deploy concluido\"]}" \
         --comment "Deploy from GitLab CI" \
         --output text \
         --query "Command.CommandId")
