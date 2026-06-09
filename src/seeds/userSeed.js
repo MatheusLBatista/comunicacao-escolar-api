@@ -186,10 +186,10 @@ export default async function userSeed() {
     email: process.env.ADMIN_EMAIL || 'admin@admin.com',
   });
   const createdDefaultTeacher = await User.findOne({
-    email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+    email: process.env.TEACHER_EMAIL || 'teacher@teacher.com',
   });
   const createdDefaultParent = await User.findOne({
-    email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+    email: process.env.PARENT_EMAIL || 'parent@parent.com',
   });
 
   console.log(`School created: ${school.name} (${school._id})`);
