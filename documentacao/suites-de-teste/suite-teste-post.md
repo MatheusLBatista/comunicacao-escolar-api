@@ -15,6 +15,8 @@ Arquivo: src/tests/routes/postRoutes.test.js
 | Vinculacao a Escola          | Postagens sao criadas vinculadas a uma escola especifica via schoolId na rota. | Validar school_id no objeto retornado.                                            |
 | Conflito de Escolas          | Nao e possivel vincular um anuncio a uma turma de outra escola.                | Cobrir erro 409 ao tentar PATCH com target_id de outra escola.                    |
 | Notificacoes Push            | Criacao de post dispara envios via Firebase Cloud Messaging.                   | Ponto de atencao: Requer ambiente com Firebase configurado ou mock.               |
+| Aguardar Anexos              | Se wait_attachments for true, a notificacao nao e enviada na criacao.          | Validar que a criacao nao notifica quando sinalizado.                             |
+| Notificacao via Anexo        | Se notify=true for enviado no upload, o sistema notifica sobre o post.         | Validar disparo de notificacao durante o upload de fotos.                         |
 | Delecao de Postagem          | DELETE remove a postagem; exige ser o autor ou ter permissao administrativa.   | Cobrir exclusao de post e erro 403 ao tentar deletar post de outro autor.         |
 | Envelope padrao de resposta  | Em sucesso retorna error=false e data; em erro retorna error=true.             | Validar contrato basico de sucesso/erro nos cenarios principais.                  |
 
@@ -40,7 +42,16 @@ Arquivo: src/tests/routes/postRoutes.test.js
 | :-------------------------- | :----------------------------------------- | :------------------------------------------------- | :--------------------------------------- |
 | Sem token                   | Deve bloquear criacao nao autenticada.     | POST sem Authorization.                            | Retorna 401 ou 498.                      |
 | Payload valido (scope: all) | Deve criar postagem com dados validos.     | POST com title, content, target.scope="all".       | Retorna 201, error=false, data com \_id. |
+| Criacao com espera          | Nao deve notificar imediatamente.          | POST com wait_attachments=true.                    | Retorna 201 e log de notificacao e pulado. |
 | Falta de target_id (class)  | Deve rejeitar criacao sem alvo especifico. | POST com target.scope="class" e target_id omitido. | Retorna 422 e error=true.                |
+
+## POST /posts/:id/attachments - Anexos
+
+| Funcionalidade              | Comportamento Esperado                     | Verificacoes                                       | Criterios de Aceite                      |
+| :-------------------------- | :----------------------------------------- | :------------------------------------------------- | :--------------------------------------- |
+| Upload simples              | Deve adicionar foto ao post.               | POST /attachments com arquivo em 'files'.          | Retorna 201 e attachments possui novo ID. |
+| Upload com notificacao      | Deve adicionar foto e notificar usuarios.  | POST /attachments?notify=true.                     | Retorna 201 e log de envio Firebase.     |
+| Limite de tamanho           | Deve rejeitar arquivo > 10MB.              | POST com arquivo pesado.                           | Retorna 413 Payload Too Large.           |
 
 ## PATCH /posts/:id - Atualizacao
 
