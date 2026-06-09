@@ -35,7 +35,7 @@ locals {
   ], compact([
     var.firebase_project_id != "" ? "FIREBASE_PROJECT_ID=${var.firebase_project_id}" : "",
     var.firebase_client_email != "" ? "FIREBASE_CLIENT_EMAIL=${var.firebase_client_email}" : "",
-    var.firebase_private_key != "" ? "FIREBASE_PRIVATE_KEY=${var.firebase_private_key}" : "",
+    var.firebase_private_key != "" ? "FIREBASE_PRIVATE_KEY=\"${replace(var.firebase_private_key, "\n", "\\n")}\"" : "",
     var.google_client_id != "" ? "GOOGLE_CLIENT_ID=${var.google_client_id}" : "",
   ]))
 
