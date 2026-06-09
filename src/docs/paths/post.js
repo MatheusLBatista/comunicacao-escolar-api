@@ -14,10 +14,11 @@ const postPaths = {
                 - Permitir que usuários autenticados autorizados criem comunicados na escola.
                 - O autor é definido automaticamente pelo token da sessão.
                 - O school_id é extraído da URL e não precisa ser enviado no corpo da requisição.
-                - Dispara notificações push via Firebase para usuários da escola/turma.
+                - Dispara notificações push via Firebase para usuários da escola/turma, a menos que wait_attachments seja verdadeiro.
 
             + Regras de Negócio:
                 - A escola (schoolId) deve existir (Erro 404).
+                - Se wait_attachments for true, a notificação push é ignorada na criação.
                 - Se target.scope for diferente de "all" (ex: "class"), target_id é obrigatório (Erro 422).
                 - Quando informado, target_id deve corresponder a uma turma existente da mesma escola validada (Erro 422).
 
@@ -263,9 +264,11 @@ const postPaths = {
                 - Receber arquivos via multipart/form-data no campo 'files'.
                 - Comprimir imagem e armazenar no MinIO.
                 - Registrar nome do objeto em attachments do comunicado.
+                - Disparar notificação push se o parâmetro 'notify' for verdadeiro.
 
             + Regras de Negócio:
                 - O comunicado deve existir.
+                - Se query param 'notify=true' for enviado, notifica os usuários sobre o post.
                 - Deve ser enviado ao menos um arquivo.
                 - Máximo de 10 arquivos por requisição.
                 - Limite de 10 MB por arquivo.
@@ -282,6 +285,14 @@ const postPaths = {
           schema: { type: 'string' },
           description: 'ID do comunicado',
           example: '664bfc0040506070809010a1',
+        },
+        {
+          name: 'notify',
+          in: 'query',
+          required: false,
+          schema: { type: 'boolean', default: false },
+          description: 'Se verdadeiro, envia notificação push após o upload.',
+          example: true,
         },
       ],
       requestBody: {

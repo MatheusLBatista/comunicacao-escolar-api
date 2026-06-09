@@ -47,6 +47,12 @@ const postSchemas = {
         description: 'Status do comunicado',
         example: true,
       },
+      wait_attachments: {
+        type: 'boolean',
+        default: false,
+        description: 'Se verdadeiro, não envia notificação push na criação do post, aguardando o upload de anexos para notificar.',
+        example: false,
+      },
     },
     additionalProperties: false,
   },
@@ -74,6 +80,7 @@ const postSchemas = {
         example: [],
       },
       active: { type: 'boolean', example: true },
+      wait_attachments: { type: 'boolean', example: false },
       likes_count: {
         type: 'number',
         description: 'Total de curtidas do comunicado',

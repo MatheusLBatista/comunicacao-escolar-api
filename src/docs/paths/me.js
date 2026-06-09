@@ -70,6 +70,77 @@ const mePaths = {
     },
   },
 
+  '/me/avatar': {
+    patch: {
+      tags: ['Me'],
+      summary: 'Atualizar foto de perfil (avatar)',
+      description: `
+            + **Caso de uso**: Fazer upload de uma nova imagem para o avatar do próprio usuário.
+
+            + **Função de Negócio**:
+                - Recebe arquivo via multipart/form-data no campo 'avatar'.
+                - Armazena a imagem no storage e atualiza o perfil do usuário.
+
+            + **Resultado Esperado**:
+                - HTTP 201 Created com os dados da operação de upload.
+            `,
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              required: ['avatar'],
+              properties: {
+                avatar: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Arquivo de imagem para o avatar',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        201: commonResponses[201]('#/components/schemas/UsuarioUploadFotoResposta'),
+        400: commonResponses[400](),
+        401: commonResponses[401](),
+        500: commonResponses[500](),
+      },
+    },
+    delete: {
+      tags: ['Me'],
+      summary: 'Remover foto de perfil (avatar)',
+      description: `
+            + **Caso de uso**: Remover o avatar atual do próprio usuário.
+
+            + **Resultado Esperado**:
+                - HTTP 200 OK com mensagem de sucesso.
+            `,
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Avatar removido com sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  error: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Avatar removido com sucesso.' },
+                },
+              },
+            },
+          },
+        },
+        401: commonResponses[401](),
+        500: commonResponses[500](),
+      },
+    },
+  },
+
   '/me/password': {
     patch: {
       tags: ['Me'],
