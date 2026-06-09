@@ -135,7 +135,7 @@ function buildEventTarget(classIds) {
   if (!classIds.length) {
     return {
       scope: 'all',
-      target_id: null,
+      target_ids: [],
     };
   }
 
@@ -144,13 +144,13 @@ function buildEventTarget(classIds) {
   if (!useClassScope) {
     return {
       scope: 'all',
-      target_id: null,
+      target_ids: [],
     };
   }
 
   return {
     scope: 'class',
-    target_id: classIds[Math.floor(Math.random() * classIds.length)],
+    target_ids: [classIds[Math.floor(Math.random() * classIds.length)]],
   };
 }
 
