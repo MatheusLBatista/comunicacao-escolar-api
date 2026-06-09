@@ -176,6 +176,16 @@ const userPolicies = [
     },
   },
   {
+    pattern: /^\/users\/update-fcm-token(?:\/|$)/,
+    methods: {
+      POST: {
+        scope: 'global',
+        roles: ['admin', 'teacher', 'parent', 'student'],
+        allowSelf: true,
+      },
+    },
+  },
+  {
     pattern: /^\/users\/[^/]+(?:\/|$)/,
     methods: {
       GET: {

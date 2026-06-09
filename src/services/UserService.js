@@ -756,6 +756,18 @@ class UserService {
     delete obj.password;
     return obj;
   }
+
+  async updateFcmTokens(userId, fcmToken) {
+    const user = await this.repository.getById(userId);
+
+    const tokens = user.fcm_tokens || [];
+    if (tokens.includes(fcmToken)) {
+      return user;
+    }
+
+    const updatedUser = await this.repository.addFcmToken(userId, fcmToken);
+    return updatedUser;
+  }
 }
 
 export default UserService;

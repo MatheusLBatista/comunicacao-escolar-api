@@ -12,6 +12,7 @@ import {
   StudentInputSchema,
   UpdateMembershipRoleSchema,
   MoveStudentClassSchema,
+  FcmTokenSchema
 } from '../utils/validators/schemas/zod/UserSchema.js';
 import ObjectIdSchema from '../utils/validators/schemas/zod/ObjectIdSchema.js';
 import { CommonResponse } from '../utils/helpers/index.js';
@@ -210,6 +211,21 @@ class UserController {
       data,
       200,
       'Usuário desativado com sucesso.',
+    );
+  }
+
+  async fcmTokens(req, res) {
+    const id = req.user_id;
+
+    const { fcm_token } = FcmTokenSchema.parse(req.body);
+
+    const data = await this.service.updateFcmTokens(id, fcm_token);
+
+    return CommonResponse.success(
+      res,
+      data,
+      201,
+      'Token FCM salvo com sucesso.',
     );
   }
 }

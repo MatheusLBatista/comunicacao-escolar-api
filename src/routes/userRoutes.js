@@ -86,6 +86,12 @@ router
     AuthMiddleware,
     AuthPermission,
     asyncWrapper(userController.delete.bind(userController)),
-  );
+  )
+  .post(
+    '/users/update-fcm-token',
+    AuthMiddleware,
+    AuthPermission,
+    asyncWrapper(userController.fcmTokens.bind(userController))
+  )
 
 export default router;
