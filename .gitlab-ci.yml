@@ -71,7 +71,7 @@ deploy-aws:
       COMMAND_ID=$(aws ssm send-command \
         --instance-ids "$AWS_INSTANCE_ID" \
         --document-name "AWS-RunShellScript" \
-        --parameters 'commands=["cd /opt/app","docker compose pull","docker compose up -d --remove-orphans","docker image prune -f","echo Deploy concluido"]' \
+        --parameters "{\"commands\":[\"docker pull $DOCKER_USER/comunicacao-escolar-api:latest\",\"docker rm -f comunicacao-escolar-api 2>/dev/null || true\",\"docker run -d --name comunicacao-escolar-api --restart always -p 3010:3010 --env-file /opt/app/.env $DOCKER_USER/comunicacao-escolar-api:latest\",\"sleep 5\",\"docker inspect -f '{{.State.Running}}' comunicacao-escolar-api\",\"docker image prune -f\",\"echo Deploy concluido\"]}" \
         --comment "Deploy from GitLab CI" \
         --output text \
         --query "Command.CommandId")
