@@ -41,29 +41,17 @@ services:
       timeout: 5s
       retries: 5
 
-  # api:
-  #   container_name: comunicacao-escolar-api
-  #   build: .
-  #   ports:
-  #     - '${PORT}:${PORT}'
-  #   environment:
-  #     - NODE_ENV=production
-  #     - DB_URL=mongodb://mongodb:27017/comunicacao-escolar
-  #     - MINIO_ENDPOINT=minio
-  #     - MINIO_PORT=${MINIO_PORT}
-  #     - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-  #     - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-  #     - MINIO_BUCKET=${MINIO_BUCKET}
-  #     - MINIO_BUCKET_2=${MINIO_BUCKET_2}
-  #     - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL}
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     mongodb:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_healthy
-  #   restart: always
+  api:
+    container_name: comunicacao-escolar-api
+    image: arthurhlmg/comunicacao-escolar-api:latest
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: always
 
 volumes:
   vol-mongodb:
