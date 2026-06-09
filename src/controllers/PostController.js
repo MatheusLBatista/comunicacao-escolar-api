@@ -49,7 +49,12 @@ class PostController {
     const userId = req.user_id;
     const parsedData = PostSchemaInput.parse(body);
 
-    const data = await this.service.create(parsedData, userId, schoolId);
+    const data = await this.service.create(
+      parsedData,
+      userId,
+      schoolId,
+      parsedData.wait_attachments,
+    );
 
     return CommonResponse.created(res, data);
   }
@@ -84,10 +89,11 @@ class PostController {
 
   async uploadFoto(req, res) {
     const { id } = req.params || {};
+    const { notify } = req.query;
 
     UserIdSchema.parse(id);
 
-    const data = await this.service.uploadFoto(req, id);
+    const data = await this.service.uploadFoto(req, id, notify === 'true');
 
     return CommonResponse.created(res, data);
   }

@@ -46,7 +46,7 @@ class PostService {
     return data;
   }
 
-  async create(parsedData, userId, schoolId) {
+  async create(parsedData, userId, schoolId, waitAttachments = false) {
     const school = await this.schoolRepository.findById(schoolId);
 
     if (!school) {
@@ -107,11 +107,12 @@ class PostService {
         school_id: schoolId,
       });
 
-      const users = await this.userRepository.listByClass(
-        parsedData.target.target_id,
-      );
-
-      await this._notifyUsers(users, parsedData, data, turma?.name);
+      if (!waitAttachments) {
+        const users = await this.userRepository.listByClass(
+          parsedData.target.target_id,
+        );
+        await this._notifyUsers(users, parsedData, data, turma?.name);
+      }
 
       return data;
     }
@@ -122,11 +123,15 @@ class PostService {
       school_id: schoolId,
     });
 
-    // Busca usuários sem limitação estrita de paginação para notificação
-    const usersResult = await this.userRepository.listBySchool(schoolId, { limit: 1000 });
-    const users = usersResult?.docs || [];
+    if (!waitAttachments) {
+      // Busca usuários sem limitação estrita de paginação para notificação
+      const usersResult = await this.userRepository.listBySchool(schoolId, {
+        limit: 1000,
+      });
+      const users = usersResult?.docs || [];
 
-    await this._notifyUsers(users, parsedData, data);
+      await this._notifyUsers(users, parsedData, data);
+    }
 
     return data;
   }
@@ -275,7 +280,7 @@ class PostService {
     return parsedData;
   }
 
-  async uploadFoto(req, id) {
+  async uploadFoto(req, id, notify = false) {
     const userId = req.user_id;
 
     const files = req.files;
@@ -358,6 +363,24 @@ class PostService {
       }
     }
     const data = await this.repository.getById(id);
+
+    if (notify) {
+      const targetScope = data.target?.scope ?? 'all';
+      if (targetScope !== 'all' && data.target?.target_id) {
+        const turma = await this.classRepository.findById(data.target.target_id);
+        const users = await this.userRepository.listByClass(
+          data.target.target_id,
+        );
+        await this._notifyUsers(users, data, data, turma?.name);
+      } else {
+        const usersResult = await this.userRepository.listBySchool(
+          data.school_id,
+          { limit: 1000 },
+        );
+        const users = usersResult?.docs || [];
+        await this._notifyUsers(users, data, data);
+      }
+    }
 
     return data;
   }

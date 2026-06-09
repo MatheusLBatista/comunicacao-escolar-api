@@ -34,6 +34,7 @@ export const PostSchema = z.object({
     .array()
     .optional(),
   active: z.coerce.boolean().default(true),
+  wait_attachments: z.coerce.boolean().default(false).optional(),
 });
 
 export const PostSchemaInput = PostSchema.omit({ id: true }).partial({
