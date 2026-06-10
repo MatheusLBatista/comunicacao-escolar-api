@@ -222,7 +222,7 @@ const auditLogPolicies = [
     },
   },
   {
-    pattern: /^\/schools(?:\/[^/]+)?(?:\/|$)/,
+    pattern: /^\/schools(?:\/[^/]+)?(?:\/)?$/,
     methods: {
       GET: {
         scope: 'global',
