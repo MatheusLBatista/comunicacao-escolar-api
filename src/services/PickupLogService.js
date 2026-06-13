@@ -54,7 +54,16 @@ class PickupLogService {
     await this.validateReferences(parsedData);
     this.ensureQrCodeRequiresAuthorization(parsedData);
 
-    return this.repository.create(parsedData);
+    const result = await this.repository.create(parsedData);
+
+    if (parsedData.authorization_id) {
+      await this.pickupAuthorizationRepository.update(
+        parsedData.authorization_id.toString(),
+        { used: true },
+      );
+    }
+
+    return result;
   }
 
   async list(req) {
