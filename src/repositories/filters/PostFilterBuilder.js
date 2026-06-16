@@ -43,7 +43,7 @@ class PostFilterBuilder {
 
   withTargetId(target_id) {
     if (target_id) {
-      this.filters['target.target_id'] = target_id;
+      this.filters['target.target_ids'] = { $in: [target_id] };
     }
     return this;
   }
@@ -60,6 +60,19 @@ class PostFilterBuilder {
       this.filters.active = true;
     } else if (active === 'false') {
       this.filters.active = false;
+    }
+    return this;
+  }
+
+  // classIds: array de class_id dos filhos do responsável.
+  // null = não aplicar filtro (admin/professor veem tudo).
+  // [] = responsável sem filhos em turma (só posts 'all').
+  withParentClassAccess(classIds) {
+    if (classIds !== null && classIds !== undefined) {
+      this.filters.$or = [
+        { 'target.scope': { $ne: 'class' } },
+        { 'target.target_ids': { $in: classIds } },
+      ];
     }
     return this;
   }

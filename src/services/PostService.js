@@ -19,6 +19,37 @@ class PostService {
   }
 
   async list(req) {
+    const userId = req?.user_id || req?.user?.id;
+    const schoolId = req?.params?.schoolId;
+
+    if (userId && schoolId && !req?.params?.id) {
+      const user = await this.userRepository.getById(userId);
+      const parentMembership = user?.memberships?.find(
+        (m) => m.school_id?.toString() === schoolId.toString() && m.role === 'parent',
+      );
+
+      if (parentMembership) {
+        const studentIds = parentMembership.associated_students ?? [];
+        const classIds = [];
+
+        for (const studentId of studentIds) {
+          try {
+            const student = await this.userRepository.getById(studentId.toString());
+            const studentMembership = student?.memberships?.find(
+              (m) => m.school_id?.toString() === schoolId.toString() && m.role === 'student',
+            );
+            if (studentMembership?.class_id) {
+              classIds.push(studentMembership.class_id);
+            }
+          } catch {
+            // aluno não encontrado, ignora
+          }
+        }
+
+        req._parentClassIds = classIds;
+      }
+    }
+
     const data = await this.repository.list(req);
 
     if (req?.params?.id && data?.school_id) {
@@ -64,10 +95,9 @@ class PostService {
     const targetScope = parsedData.target?.scope ?? 'all';
 
     if (targetScope !== 'all') {
-      if (
-        parsedData.target?.target_id == null ||
-        parsedData.target?.target_id == ''
-      ) {
+      const targetIds = parsedData.target?.target_ids ?? [];
+
+      if (!targetIds.length) {
         throw new CustomError({
           statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
           errorType: 'unprocessableEntity',
@@ -75,32 +105,28 @@ class PostService {
           details: [
             {
               path: 'anuncio',
-              message:
-                'O anuncio não possui o target_id exigido quando o scope é diferente de "all"',
+              message: 'O anuncio não possui target_ids quando o scope é "class"',
             },
           ],
-          customMessage: 'target_id não é válido ou está ausente.',
+          customMessage: 'target_ids não é válido ou está ausente.',
         });
       }
 
-      const turma = await this.classRepository.findById(
-        parsedData.target.target_id,
+      const turmas = await Promise.all(
+        targetIds.map((id) => this.classRepository.findById(id)),
       );
 
-      if (!turma) {
+      const missingTurma = turmas.find((t) => !t);
+      if (missingTurma !== undefined && !turmas.every(Boolean)) {
         throw new CustomError({
           statusCode: HttpStatusCodes.UNPROCESSABLE_ENTITY.code,
           errorType: 'unprocessableEntity',
           field: 'class',
-          details: [
-            {
-              path: 'class',
-              message: 'O id da class/turma informado não foi encontrado.',
-            },
-          ],
-          customMessage: 'class_id não foi encontrado.',
+          details: [{ path: 'class', message: 'Uma ou mais turmas não foram encontradas.' }],
+          customMessage: 'Um ou mais class_ids não foram encontrados.',
         });
       }
+
       const data = await this.repository.create({
         ...parsedData,
         author_id: userId,
@@ -108,10 +134,12 @@ class PostService {
       });
 
       if (!waitAttachments) {
-        const users = await this.userRepository.listByClass(
-          parsedData.target.target_id,
+        const usersArrays = await Promise.all(
+          targetIds.map((id) => this.userRepository.listByClass(id)),
         );
-        await this._notifyUsers(users, parsedData, data, turma?.name);
+        const users = usersArrays.flat();
+        const turmaNames = turmas.map((t) => t.name).join(', ');
+        await this._notifyUsers(users, parsedData, data, turmaNames);
       }
 
       return data;
@@ -217,8 +245,11 @@ class PostService {
     // Notifica os usuários sobre a deleção (Silencioso)
     try {
       let users = [];
-      if (post.target?.scope === 'class' && post.target?.target_id) {
-        users = await this.userRepository.listByClass(post.target.target_id);
+      if (post.target?.scope === 'class' && post.target?.target_ids?.length) {
+        const usersArrays = await Promise.all(
+          post.target.target_ids.map((id) => this.userRepository.listByClass(id)),
+        );
+        users = usersArrays.flat();
       } else {
         const result = await this.userRepository.listBySchool(post.school_id, {
           limit: 1000,
@@ -264,57 +295,45 @@ class PostService {
   }
 
   async verifyRelation(id, parsedData) {
-    if (parsedData.target?.scope && parsedData.target.scope != 'all') {
-      if (!parsedData.target.target_id) {
+    if (parsedData.target?.scope && parsedData.target.scope !== 'all') {
+      const targetIds = parsedData.target?.target_ids ?? [];
+
+      if (!targetIds.length) {
         throw new CustomError({
           statusCode: HttpStatusCodes.BAD_REQUEST.code,
           errorType: 'badRequest',
           field: 'class',
-          details: [
-            {
-              path: 'class',
-              message: 'O id da class/turma informado não foi encontrado.',
-            },
-          ],
-          customMessage: 'class_id/target_id não foi encontrado.',
+          details: [{ path: 'class', message: 'target_ids ausente ou vazio para scope "class".' }],
+          customMessage: 'target_ids não foi encontrado.',
         });
       }
 
-      const turma = await this.classRepository.findById(
-        parsedData.target.target_id,
-      );
       const post = await this.repository.getById(id);
-      if (!turma) {
-        throw new CustomError({
-          statusCode: HttpStatusCodes.NOT_FOUND.code,
-          errorType: 'notFound',
-          field: 'class',
-          details: [
-            {
-              path: 'class',
-              message: 'O id da class/turma informado não foi encontrado.',
-            },
-          ],
-          customMessage: 'class_id/target_id não foi encontrado.',
-        });
+      const turmas = await Promise.all(
+        targetIds.map((tid) => this.classRepository.findById(tid)),
+      );
+
+      for (const turma of turmas) {
+        if (!turma) {
+          throw new CustomError({
+            statusCode: HttpStatusCodes.NOT_FOUND.code,
+            errorType: 'notFound',
+            field: 'class',
+            details: [{ path: 'class', message: 'Uma ou mais turmas não foram encontradas.' }],
+            customMessage: 'Um ou mais class_ids não foram encontrados.',
+          });
+        }
+        if (post.school_id?.toString() !== turma.school_id?.toString()) {
+          throw new CustomError({
+            statusCode: HttpStatusCodes.CONFLICT.code,
+            errorType: 'conflictError',
+            field: 'class',
+            details: [{ path: 'class', message: 'Turma pertence a outra escola.' }],
+            customMessage: 'Não é possível vincular o anúncio a uma turma de outra escola.',
+          });
+        }
       }
 
-      if (post.school_id !== turma.school_id) {
-        throw new CustomError({
-          statusCode: HttpStatusCodes.CONFLICT.code,
-          errorType: 'conflictError',
-          field: 'class',
-          details: [
-            {
-              path: 'class',
-              message:
-                'A turma selecionada pertence a uma escola diferente do anúncio.',
-            },
-          ],
-          customMessage:
-            'Não é possível vincular o anúncio a uma turma de outra escola.',
-        });
-      }
       return parsedData;
     }
 
@@ -382,6 +401,9 @@ class PostService {
       });
     }
 
+    const uploaderUser = await this.userRepository.getById(userId);
+    const isAdmin = uploaderUser?.memberships?.some((m) => m.role === 'admin');
+
     for (const file of files) {
       const image = await compress(file.buffer);
 
@@ -391,7 +413,7 @@ class PostService {
 
       // let urlMinio = `${process.env.MINIO_PUBLIC_URL}/${process.env.MINIO_BUCKET}/${objectName}`
 
-      await this.repository.uploadFoto(id, objectName, userId);
+      await this.repository.uploadFoto(id, objectName, isAdmin ? null : userId);
 
       try {
         await minioClient.putObject(
@@ -411,12 +433,17 @@ class PostService {
 
     if (notify) {
       const targetScope = data.target?.scope ?? 'all';
-      if (targetScope !== 'all' && data.target?.target_id) {
-        const turma = await this.classRepository.findById(data.target.target_id);
-        const users = await this.userRepository.listByClass(
-          data.target.target_id,
+      const targetIds = data.target?.target_ids ?? [];
+      if (targetScope !== 'all' && targetIds.length) {
+        const turmas = await Promise.all(
+          targetIds.map((id) => this.classRepository.findById(id)),
         );
-        await this._notifyUsers(users, data, data, turma?.name);
+        const usersArrays = await Promise.all(
+          targetIds.map((id) => this.userRepository.listByClass(id)),
+        );
+        const users = usersArrays.flat();
+        const turmaNames = turmas.map((t) => t?.name).filter(Boolean).join(', ');
+        await this._notifyUsers(users, data, data, turmaNames);
       } else {
         const usersResult = await this.userRepository.listBySchool(
           data.school_id,

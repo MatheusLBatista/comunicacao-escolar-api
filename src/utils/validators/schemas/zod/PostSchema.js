@@ -1,30 +1,19 @@
 import { z } from 'zod';
 
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+const objectIdSchema = z.string().regex(objectIdRegex, {
+  message: 'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
+});
+
 const Target = z.object({
-  target_id: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, {
-      message:
-        'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-    })
-    .default(null)
-    .optional(),
   scope: z.enum(['all', 'class']).default('all'),
+  target_ids: z.array(objectIdSchema).optional(),
 });
 
 export const PostSchema = z.object({
-  id: z.string().regex(/^[0-9a-fA-F]{24}$/, {
-    message:
-      'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-  }),
-  school_id: z.string().regex(/^[0-9a-fA-F]{24}$/, {
-    message:
-      'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-  }),
-  author_id: z.string().regex(/^[0-9a-fA-F]{24}$/, {
-    message:
-      'ID inválido (deve ser um MongoDB ObjectId de 24 caracteres hexadecimais)',
-  }),
+  id: objectIdSchema,
+  school_id: objectIdSchema,
+  author_id: objectIdSchema,
   title: z.string({ message: 'O título não é uma string válida.' }),
   content: z.string({ message: 'O conteúdo não é uma string válida.' }),
   target: Target.optional(),

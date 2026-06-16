@@ -29,10 +29,12 @@ class Post {
             enum: ['all', 'class'],
             default: 'all',
           },
-          target_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            default: null,
-          },
+          target_ids: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'classes',
+            },
+          ],
         },
         attachments: [{ type: String }],
         active: {

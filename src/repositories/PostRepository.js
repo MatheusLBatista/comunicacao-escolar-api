@@ -71,7 +71,8 @@ class PostRepository {
       .withScope(scope || '')
       .withTargetId(target_id || '')
       .withCreatedAtBefore(created_at || '')
-      .withActive(active || '');
+      .withActive(active || '')
+      .withParentClassAccess(req._parentClassIds ?? null);
 
     const filters = filterBuilder.build();
 
