@@ -79,7 +79,7 @@ class PickupAuthorizationRepository {
       const data = await this.model
         .findOne(findByIdFilter)
         .populate('school_id')
-        .populate({ path: 'student_id', select: '_id full_name email' })
+        .populate({ path: 'student_id', select: '_id full_name email avatar_url memberships' })
         .populate({ path: 'authorized_by', select: '_id full_name email avatar_url' });
 
       if (!data) {
@@ -123,7 +123,7 @@ class PickupAuthorizationRepository {
       sort: { created_at: -1 },
       populate: [
         'school_id',
-        { path: 'student_id', select: '_id full_name email' },
+        { path: 'student_id', select: '_id full_name email avatar_url memberships' },
         { path: 'authorized_by', select: '_id full_name email avatar_url' },
       ],
     };

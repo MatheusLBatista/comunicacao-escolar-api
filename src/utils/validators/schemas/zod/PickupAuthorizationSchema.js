@@ -3,14 +3,18 @@ import ObjectIdSchema from './ObjectIdSchema.js';
 
 const AuthorizedPersonSchema = z.object({
   name: z.string().min(1, 'Campo name é obrigatório.'),
-  document: z.string().min(1, 'Campo document é obrigatório.'),
+  document: z
+    .string()
+    .regex(/^\d{11}$/, 'document deve conter exatamente 11 dígitos numéricos.'),
   relationship: z.string().min(1, 'Campo relationship é obrigatório.'),
   photo_url: z.string().url().nullable().optional().default(null),
 });
 
 const AuthorizedPersonUpdateSchema = z.object({
   name: z.string().min(1, 'Campo name é obrigatório.'),
-  document: z.string().min(1, 'Campo document é obrigatório.'),
+  document: z
+    .string()
+    .regex(/^\d{11}$/, 'document deve conter exatamente 11 dígitos numéricos.'),
   relationship: z.string().min(1, 'Campo relationship é obrigatório.'),
   photo_url: z.string().url().nullable().optional(),
 });

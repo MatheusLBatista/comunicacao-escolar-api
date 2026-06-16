@@ -37,7 +37,7 @@ class PickupAuthorizationService {
       return m?.school_id?.toString() === schoolId;
     });
 
-    if (!parentMemberships.length) return {};
+    if (!parentMemberships.length) return { studentIds: [] };
 
     const studentIds = [
       ...new Set(

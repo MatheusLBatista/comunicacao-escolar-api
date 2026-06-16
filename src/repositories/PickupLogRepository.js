@@ -36,7 +36,7 @@ class PickupLogRepository {
       : null;
     const populate = [
       'school_id',
-      { path: 'student_id', select: '_id full_name email' },
+      { path: 'student_id', select: '_id full_name email avatar_url memberships' },
       {
         path: 'authorization_id',
         select:
