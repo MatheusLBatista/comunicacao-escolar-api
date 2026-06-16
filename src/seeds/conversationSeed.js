@@ -50,16 +50,6 @@ export default async function conversationSeed() {
     });
   }
 
-  for (let i = 0; i < Math.min(2, teachers.length, parents.length); i++) {
-    conversations.push({
-      school_id: school._id,
-      participants: [parents[i]._id, teachers[i]._id],
-      type: 'daily_log_reply',
-      last_message_at: new Date(now - (i + 1) * 30 * 60 * 1000),
-      active: true,
-    });
-  }
-
   if (!conversations.length) {
     return { insertedCount: 0, schoolId: school._id };
   }

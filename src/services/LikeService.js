@@ -70,7 +70,9 @@ class LikeService {
       return data;
     }
 
-    const targetClassId = post.target?.target_id?.toString();
+    const targetClassIds = (post.target?.target_ids ?? []).map((id) =>
+      id?.toString(),
+    );
     const associatedStudentIds = user.memberships.flatMap((membership) =>
       Array.isArray(membership.associated_students)
         ? membership.associated_students.map((studentId) =>
@@ -94,8 +96,8 @@ class LikeService {
     );
 
     const classExists = associatedStudents.some((student) =>
-      student?.memberships?.some(
-        (membership) => membership?.class_id?.toString() === targetClassId,
+      student?.memberships?.some((membership) =>
+        targetClassIds.includes(membership?.class_id?.toString()),
       ),
     );
 

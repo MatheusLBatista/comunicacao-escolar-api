@@ -101,11 +101,11 @@ export default async function postSeed(schools, users) {
     posts[0]._id = new mongoose.Types.ObjectId('664bfc0040506070809010a1');
   }
 
-  const result = await Post.collection.insertMany(posts);
+  const result = await Post.insertMany(posts);
 
-  console.log(`Seeded ${result.insertedCount} posts.`);
+  console.log(`Seeded ${result.length} posts.`);
 
-  return { insertedCount: result.insertedCount, posts };
+  return { insertedCount: result.length, posts };
 }
 
 function extractSchoolIds(schools, users) {
@@ -180,23 +180,17 @@ function normalizeObjectIds(ids) {
 
 function buildPostTarget(classIds) {
   if (!classIds.length) {
-    return {
-      scope: 'all',
-      target_id: null,
-    };
+    return { scope: 'all', target_ids: [] };
   }
 
   const useClassScope = Math.random() >= 0.5;
 
   if (!useClassScope) {
-    return {
-      scope: 'all',
-      target_id: null,
-    };
+    return { scope: 'all', target_ids: [] };
   }
 
   return {
     scope: 'class',
-    target_id: classIds[Math.floor(Math.random() * classIds.length)],
+    target_ids: [classIds[Math.floor(Math.random() * classIds.length)]],
   };
 }
