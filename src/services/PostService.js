@@ -206,16 +206,61 @@ class PostService {
 
   async delete(id, userId) {
     const user = await this.userRepository.getById(userId);
+    const post = await this.repository.getById(id);
 
     if (user.memberships.some((user) => user.role === 'admin')) {
       await this.repository.delete(id);
-
-      return;
+    } else {
+      await this.repository.delete(id, userId);
     }
 
-    await this.repository.delete(id, userId);
+    // Notifica os usuários sobre a deleção (Silencioso)
+    try {
+      let users = [];
+      if (post.target?.scope === 'class' && post.target?.target_id) {
+        users = await this.userRepository.listByClass(post.target.target_id);
+      } else {
+        const result = await this.userRepository.listBySchool(post.school_id, {
+          limit: 1000,
+        });
+        users = result?.docs || [];
+      }
+      await this._notifyPostDeletion(users, id);
+    } catch (error) {
+      console.error('Erro ao notificar deleção de post:', error);
+    }
 
     return;
+  }
+
+  async _notifyPostDeletion(users, postId) {
+    const fcmTokens = [];
+    if (users && Array.isArray(users)) {
+      for (const doc of users) {
+        if (doc.fcm_tokens && Array.isArray(doc.fcm_tokens)) {
+          doc.fcm_tokens.forEach((token) => {
+            if (token) fcmTokens.push(token);
+          });
+        }
+      }
+    }
+
+    if (fcmTokens.length === 0) return;
+
+    const message = {
+      tokens: [...new Set(fcmTokens)],
+      // Notificação silenciosa: SEM o campo 'notification', apenas 'data'
+      data: {
+        type: 'delete_post',
+        postId: postId.toString(),
+      },
+    };
+
+    try {
+      await firebaseMessaging.sendEachForMulticast(message);
+    } catch (error) {
+      console.error('Erro ao enviar notificação de deleção Firebase:', error);
+    }
   }
 
   async verifyRelation(id, parsedData) {

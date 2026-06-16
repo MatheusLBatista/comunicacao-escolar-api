@@ -246,6 +246,9 @@ class UserRepository {
   }
 
   async listByClass(class_id) {
+    const classDoc = await this.class.findById(class_id);
+    if (!classDoc) return [];
+
     const students = await this.model.find({
       memberships: {
         $elemMatch: {
@@ -266,14 +269,24 @@ class UserRepository {
       },
     });
 
-    const classDoc = await this.class.findById(class_id);
-    const teacherIds = classDoc ? classDoc.teacher_ids : [];
+    const teacherIds = classDoc.teacher_ids || [];
 
     const teachers = await this.model.find({
       _id: { $in: teacherIds },
     });
 
-    return [...parents, ...teachers];
+    const schoolId = classDoc.school_id;
+    const admins = await this.model.find({
+      memberships: {
+        $elemMatch: {
+          school_id: schoolId,
+          role: 'admin',
+          active: { $ne: false },
+        },
+      },
+    });
+
+    return [...parents, ...teachers, ...admins];
   }
 
   async findStudentIdsByTeacherId(teacherId, schoolId = null) {

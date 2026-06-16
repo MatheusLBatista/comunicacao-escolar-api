@@ -31,6 +31,7 @@ export const UserQuerySchema = z.object({
     .refine((value) => !value || value === 'true' || value === 'false', {
       message: "Active deve ser 'true' ou 'false'",
     }),
+  class_id: z.string().optional(),
   page: z
     .string()
     .optional()

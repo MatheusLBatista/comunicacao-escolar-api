@@ -70,6 +70,7 @@ export default async function messageSeed() {
     }
 
     conversation.last_message_at = messages[messages.length - 1].sent_at;
+    conversation.last_message_text = messages[messages.length - 1].text;
   });
 
   const [result] = await Promise.all([
