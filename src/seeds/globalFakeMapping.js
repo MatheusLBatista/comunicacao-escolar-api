@@ -173,8 +173,7 @@ export const fakeMappings = {
     authorized_by: () => new mongoose.Types.ObjectId(),
     authorized_person: {
       name: () => `${fakebr.name.firstName()} ${fakebr.name.lastName()}`,
-      document: () =>
-        fakebr.random.boolean() ? fakebr.br.cpf() : fakebr.br.rg(),
+      document: () => fakebr.br.cpf().replace(/\D/g, ''),
       relationship: () =>
         fakebr.random.arrayElement([
           'Avó',
@@ -203,7 +202,7 @@ export const fakeMappings = {
     picked_up_by: () => ({
       user_id: null,
       name: `${fakebr.name.firstName()} ${fakebr.name.lastName()}`,
-      document: fakebr.random.boolean() ? fakebr.br.cpf() : fakebr.br.rg(),
+      document: fakebr.br.cpf().replace(/\D/g, ''),
     }),
     method: () => fakebr.random.arrayElement(['qr_code', 'manual']),
     departure_time: () => new Date(),

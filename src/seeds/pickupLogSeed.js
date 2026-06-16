@@ -101,7 +101,7 @@ export default async function pickupLogSeed() {
       name:
         defaultAuthorization?.authorized_person?.name || 'Responsavel Padrao',
       document:
-        defaultAuthorization?.authorized_person?.document || '000.000.000-00',
+        defaultAuthorization?.authorized_person?.document || '00000000000',
     },
     method: defaultAuthorization ? 'qr_code' : 'manual',
     departure_time: buildDepartureTime(0),

@@ -52,7 +52,7 @@ export default async function pickupAuthorizationSeed() {
     authorized_by: defaultParent._id,
     authorized_person: {
       name: 'Maria da Silva',
-      document: '123.456.789-00',
+      document: '12345678900',
       relationship: 'Avó',
       photo_url: null,
     },
