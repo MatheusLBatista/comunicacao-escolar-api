@@ -2,6 +2,7 @@ import MessageRepository from '../repositories/MessageRepository.js';
 import ConversationRepository from '../repositories/ConversationRepository.js';
 import { CustomError } from '../utils/helpers/index.js';
 import { getIO } from '../config/SocketIO.js';
+import { firebaseMessaging } from '../config/Firebase.js';
 
 class MessageService {
   constructor() {
@@ -28,6 +29,9 @@ class MessageService {
     await this.conversationRepository.updateLastMessageAt(conversationId, now, parsedData.text);
 
     this._emitNewMessage(conversation, senderId, message);
+    this._notifyParticipants(conversation, senderId, message).catch((err) =>
+      console.error('Erro ao enviar notificação Firebase de mensagem:', err),
+    );
 
     return message;
   }
@@ -100,6 +104,54 @@ class MessageService {
       conversation_id: conversationId,
       user_id: userId.toString(),
     });
+  }
+
+  async _notifyParticipants(conversation, senderId, message) {
+    const fcmTokens = [];
+
+    conversation.participants?.forEach((participant) => {
+      const participantId = participant._id?.toString() ?? participant.toString();
+      if (participantId === senderId.toString()) return;
+
+      if (participant.fcm_tokens && Array.isArray(participant.fcm_tokens)) {
+        participant.fcm_tokens.forEach((token) => {
+          if (token) fcmTokens.push(token);
+        });
+      }
+    });
+
+    if (fcmTokens.length === 0) return;
+
+    const senderParticipant = conversation.participants?.find(
+      (p) => (p._id?.toString() ?? p.toString()) === senderId.toString(),
+    );
+    const senderName = senderParticipant?.full_name ?? 'Nova mensagem';
+
+    const fcmMessage = {
+      tokens: [...new Set(fcmTokens)],
+      notification: {
+        title: senderName,
+        body: message.text,
+      },
+      data: {
+        type: 'new_message',
+        conversationId: conversation._id.toString(),
+        messageId: message._id.toString(),
+      },
+    };
+
+    const response = await firebaseMessaging.sendEachForMulticast(fcmMessage);
+    console.log(
+      `Notificações de chat enviadas: ${response.successCount}, Falhadas: ${response.failureCount}`,
+    );
+
+    if (response.failureCount > 0) {
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.error(`Token falhou: ${fcmMessage.tokens[idx]} - ${resp.error?.message}`);
+        }
+      });
+    }
   }
 }
 
