@@ -50,7 +50,7 @@ class ConversationRepository {
   async getById(id) {
     const data = await this.model
       .findById(id)
-      .populate('participants', 'full_name email');
+      .populate('participants', 'full_name email fcm_tokens');
 
     if (!data) {
       throw new CustomError({
