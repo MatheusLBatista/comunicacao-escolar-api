@@ -47,6 +47,46 @@ class PickupAuthorizationRepository {
     return data;
   }
 
+  async updatePhoto(id, objectName) {
+    const data = await this.model.findByIdAndUpdate(
+      id,
+      { $set: { 'authorized_person.photo_url': objectName } },
+      { new: true },
+    );
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'PickupAuthorization',
+        details: [],
+        customMessage: messages.error.resourceNotFound('PickupAuthorization'),
+      });
+    }
+
+    return data;
+  }
+
+  async removePhoto(id) {
+    const data = await this.model.findByIdAndUpdate(
+      id,
+      { $set: { 'authorized_person.photo_url': null } },
+      { new: true },
+    );
+
+    if (!data) {
+      throw new CustomError({
+        statusCode: 404,
+        errorType: 'resourceNotFound',
+        field: 'PickupAuthorization',
+        details: [],
+        customMessage: messages.error.resourceNotFound('PickupAuthorization'),
+      });
+    }
+
+    return data;
+  }
+
   async delete(id) {
     const data = await this.model.findByIdAndDelete(id);
 

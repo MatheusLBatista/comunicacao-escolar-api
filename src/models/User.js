@@ -55,6 +55,10 @@ class User {
           },
         ],
         fcm_tokens: [{ type: String }],
+        timezone: {
+          type: String,
+          default: 'America/Manaus',
+        },
         avatar_url: {
           type: String,
           default: null,

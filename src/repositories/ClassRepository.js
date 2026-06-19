@@ -110,6 +110,12 @@ class ClassRepository {
     return data;
   }
 
+  async findByTeacher(teacherId, schoolId) {
+    return this.model
+      .find({ teacher_ids: teacherId, school_id: schoolId, active: true }, { _id: 1 })
+      .lean();
+  }
+
   async delete(id) {
     const data = await this.model.findOneAndUpdate(
       { _id: id, active: true },

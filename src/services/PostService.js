@@ -94,6 +94,13 @@ class PostService {
 
     const targetScope = parsedData.target?.scope ?? 'all';
 
+    await this._assertTeacherClassPermission(
+      userId,
+      schoolId,
+      targetScope,
+      parsedData.target?.target_ids ?? [],
+    );
+
     if (targetScope !== 'all') {
       const targetIds = parsedData.target?.target_ids ?? [];
 
@@ -213,6 +220,39 @@ class PostService {
       }
     } catch (error) {
       console.error('Erro ao enviar notificação Firebase:', error);
+    }
+  }
+
+  async _assertTeacherClassPermission(userId, schoolId, scope, targetIds) {
+    const user = await this.userRepository.getById(userId);
+    const membership = user?.memberships?.find(
+      (m) => m.school_id?.toString() === schoolId?.toString() && m.active !== false,
+    );
+
+    if (!membership || membership.role !== 'teacher') return;
+
+    if (scope === 'all') {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'target',
+        details: [],
+        customMessage: 'Professores só podem publicar para suas próprias turmas.',
+      });
+    }
+
+    const teacherClasses = await this.classRepository.findByTeacher(userId, schoolId);
+    const teacherClassIds = new Set(teacherClasses.map((c) => c._id.toString()));
+
+    const unauthorized = targetIds.find((id) => !teacherClassIds.has(id.toString()));
+    if (unauthorized) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'target.target_ids',
+        details: [],
+        customMessage: 'Professores só podem publicar para turmas às quais pertencem.',
+      });
     }
   }
 

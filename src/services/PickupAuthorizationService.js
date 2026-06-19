@@ -2,6 +2,10 @@ import PickupAuthorizationRepository from '../repositories/PickupAuthorizationRe
 import SchoolRepository from '../repositories/SchoolRepository.js';
 import UserRepository from '../repositories/UserRepository.js';
 import { CustomError, HttpStatusCodes } from '../utils/helpers/index.js';
+import compress from '../config/SharpConfig.js';
+import minioClient from '../config/MinIO.js';
+import mongoose from 'mongoose';
+import 'dotenv/config';
 
 class PickupAuthorizationService {
   constructor() {
@@ -189,6 +193,102 @@ class PickupAuthorizationService {
     await this.repository.getById(id);
 
     return this.repository.delete(id);
+  }
+
+  async uploadPhoto(req, id) {
+    const userId = req.user_id;
+    const file = req.file;
+
+    if (!file) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.BAD_REQUEST.code,
+        errorType: 'badRequest',
+        field: 'photo',
+        details: [{ path: 'photo', message: 'Nenhum arquivo foi enviado.' }],
+        customMessage: 'Nenhum arquivo foi enviado.',
+      });
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
+        errorType: 'payloadTooLarge',
+        field: 'photo',
+        details: [{ path: 'photo', message: 'Arquivo é superior a 10 MB.' }],
+        customMessage: 'O arquivo é maior do que 10 MB.',
+      });
+    }
+
+    const auth = await this.repository.getById(id);
+
+    const user = await this.userRepository.getById(userId);
+    const isAdmin = user?.memberships?.some((m) => m.role === 'admin');
+
+    if (!isAdmin && auth.authorized_by?.toString() !== userId?.toString()) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'pickup_authorization',
+        details: [],
+        customMessage: 'Você não tem permissão para editar esta autorização.',
+      });
+    }
+
+    const image = await compress(file.buffer);
+    const objectName = `${new mongoose.Types.ObjectId().toString()}.${image[1].format}`;
+
+    await this.repository.updatePhoto(id, objectName);
+
+    try {
+      await minioClient.putObject(process.env.MINIO_BUCKET, objectName, image[0], {
+        'Content-Type': file.mimetype,
+      });
+    } catch (error) {
+      await this.repository.removePhoto(id);
+      throw new Error(error);
+    }
+
+    return this.repository.getById(id);
+  }
+
+  async deletePhoto(req, id) {
+    const userId = req.user_id;
+    const auth = await this.repository.getById(id);
+
+    const user = await this.userRepository.getById(userId);
+    const isAdmin = user?.memberships?.some((m) => m.role === 'admin');
+
+    if (!isAdmin && auth.authorized_by?.toString() !== userId?.toString()) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'pickup_authorization',
+        details: [],
+        customMessage: 'Você não tem permissão para editar esta autorização.',
+      });
+    }
+
+    const objectName = auth.authorized_person?.photo_url;
+
+    if (!objectName) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.NOT_FOUND.code,
+        errorType: 'notFound',
+        field: 'photo',
+        details: [{ path: 'photo', message: 'Esta autorização não possui foto.' }],
+        customMessage: 'Nenhuma foto encontrada para esta autorização.',
+      });
+    }
+
+    await this.repository.removePhoto(id);
+
+    try {
+      await minioClient.removeObject(process.env.MINIO_BUCKET, objectName);
+    } catch (error) {
+      console.error('Erro ao remover foto do MinIO:', error);
+    }
+
+    return { message: 'Foto removida com sucesso.' };
   }
 
   async validateReferences(parsedData) {

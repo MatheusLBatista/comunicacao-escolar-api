@@ -65,6 +65,7 @@ export const fakeMappings = {
     password_recovery_code_exp: () => null,
     google_id: () => null,
     auth_provider: () => 'local',
+    timezone: () => 'America/Sao_Paulo',
   },
 
   School: {

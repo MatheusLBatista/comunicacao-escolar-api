@@ -124,6 +124,21 @@ const LinkToSchoolSchema = z
   })
 ;
 
+const VALID_TIMEZONES = [
+  'America/Manaus',
+  'America/Sao_Paulo',
+  'America/Belem',
+  'America/Fortaleza',
+  'America/Recife',
+  'America/Maceio',
+  'America/Bahia',
+  'America/Cuiaba',
+  'America/Porto_Velho',
+  'America/Boa_Vista',
+  'America/Rio_Branco',
+  'America/Noronha',
+];
+
 const MeUpdateSchema = z
   .object({
     full_name: z
@@ -132,6 +147,9 @@ const MeUpdateSchema = z
       .max(100, 'O nome deve ter no máximo 100 caracteres.')
       .optional(),
     email: z.string().email('Formato de email inválido.').optional(),
+    timezone: z
+      .enum(VALID_TIMEZONES, { errorMap: () => ({ message: 'Fuso horário inválido.' }) })
+      .optional(),
   })
   .partial();
 

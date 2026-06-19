@@ -15,6 +15,18 @@ async function setupMinio() {
     );
   }
 
+  const publicReadPolicy = JSON.stringify({
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Effect: 'Allow',
+        Principal: { AWS: ['*'] },
+        Action: ['s3:GetObject'],
+        Resource: [`arn:aws:s3:::${bucketName}/*`],
+      },
+    ],
+  });
+
   try {
     const exists = await minioClient.bucketExists(bucketName);
 
@@ -24,6 +36,9 @@ async function setupMinio() {
     } else {
       console.info(`Bucket "${bucketName}" já existe no MinIO/S3.`);
     }
+
+    await minioClient.setBucketPolicy(bucketName, publicReadPolicy);
+    console.info(`Política de leitura pública aplicada ao bucket "${bucketName}".`);
 
   } catch (erro) {
     throw new Error(

@@ -58,6 +58,24 @@ class PickupAuthorizationController {
       'Pickup authorization deleted successfully.',
     );
   }
+
+  async uploadPhoto(req, res) {
+    const { id } = req.params;
+    objectIdSchema.parse(id);
+
+    const data = await this.service.uploadPhoto(req, id);
+
+    return CommonResponse.created(res, data);
+  }
+
+  async deletePhoto(req, res) {
+    const { id } = req.params;
+    objectIdSchema.parse(id);
+
+    const data = await this.service.deletePhoto(req, id);
+
+    return CommonResponse.success(res, data);
+  }
 }
 
 export default PickupAuthorizationController;

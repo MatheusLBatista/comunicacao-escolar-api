@@ -12,6 +12,39 @@ class EventService {
     this.userRepository = new UserRepository();
   }
 
+  async _assertTeacherClassPermission(userId, schoolId, scope, targetIds) {
+    const user = await this.userRepository.getById(userId);
+    const membership = user?.memberships?.find(
+      (m) => m.school_id?.toString() === schoolId?.toString() && m.active !== false,
+    );
+
+    if (!membership || membership.role !== 'teacher') return;
+
+    if (scope === 'all') {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'target',
+        details: [],
+        customMessage: 'Professores só podem publicar para suas próprias turmas.',
+      });
+    }
+
+    const teacherClasses = await this.classRepository.findByTeacher(userId, schoolId);
+    const teacherClassIds = new Set(teacherClasses.map((c) => c._id.toString()));
+
+    const unauthorized = targetIds.find((id) => !teacherClassIds.has(id.toString()));
+    if (unauthorized) {
+      throw new CustomError({
+        statusCode: HttpStatusCodes.FORBIDDEN.code,
+        errorType: 'forbidden',
+        field: 'target.target_ids',
+        details: [],
+        customMessage: 'Professores só podem publicar para turmas às quais pertencem.',
+      });
+    }
+  }
+
   async resolveSchoolScope(req) {
     const userId = req?.user_id || req?.user?.id;
     if (!userId) return {};
@@ -85,6 +118,13 @@ class EventService {
     await this._assertSchoolMembership(
       parsedData.created_by,
       parsedData.school_id,
+    );
+
+    await this._assertTeacherClassPermission(
+      parsedData.created_by,
+      parsedData.school_id,
+      parsedData.target?.scope ?? 'all',
+      parsedData.target?.target_ids ?? [],
     );
 
     await this.validateTarget(parsedData.target, parsedData.school_id);

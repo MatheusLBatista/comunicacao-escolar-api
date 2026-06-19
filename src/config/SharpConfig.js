@@ -5,10 +5,11 @@ export default async function compress(file) {
   const metadata = await sharp(file).metadata();
 
   switch (metadata.format) {
-    case 'jpeg' || 'jpeg': {
+    case 'jpeg': {
       const arq = await sharp(file)
+        .rotate()
         .resize({ width: 1024 })
-        .jpeg({ quality: 80, compressionLevel: 9 })
+        .jpeg({ quality: 80 })
         .toBuffer();
 
       return [arq, metadata];
@@ -16,8 +17,9 @@ export default async function compress(file) {
 
     case 'png': {
       const arq = await sharp(file)
+        .rotate()
         .resize({ width: 1024 })
-        .png({ compressionLevel: 9, palette: true })
+        .png({ compressionLevel: 9 })
         .toBuffer();
 
       return [arq, metadata];
@@ -25,6 +27,7 @@ export default async function compress(file) {
 
     case 'webp': {
       const arq = await sharp(file)
+        .rotate()
         .resize({ width: 1024 })
         .webp({ quality: 80 })
         .toBuffer();
