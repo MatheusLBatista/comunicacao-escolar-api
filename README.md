@@ -45,38 +45,45 @@ cp .env.example .env
 
 Edite o arquivo `.env` com os valores adequados ao seu ambiente. As principais variáveis são:
 
-| Variável                       | Descrição                                       | Exemplo                                              |
-| :----------------------------- | :---------------------------------------------- | :--------------------------------------------------- |
-| `PORT`                         | Porta do servidor                               | `3010`                                               |
-| `FRONTEND_PORT`                | Porta do frontend (usada no Docker Compose)     | `3001`                                               |
-| `NODE_ENV`                     | Ambiente (`development` / `production`)         | `development`                                        |
-| `DEBUGLOG`                     | Ativa logs detalhados de rotas (`true`/`false`) | `true`                                               |
-| `DB_URL`                       | URL de conexão com o MongoDB                    | `mongodb://localhost:27017/comunicacao-escolar`      |
-| `DB_URL_TEST`                  | URL do banco de dados de testes                 | `mongodb://localhost:27017/comunicacao-escolar-test` |
-| `JWT_SECRET_ACCESS_TOKEN`      | Chave secreta do access token                   | _(gere uma chave segura)_                            |
-| `JWT_SECRET_REFRESH_TOKEN`     | Chave secreta do refresh token                  | _(gere uma chave segura)_                            |
-| `JWT_SECRET_PASSWORD_RECOVERY` | Chave secreta para recuperação de senha         | _(gere uma chave segura)_                            |
-| `JWT_SECRET_INVITE`            | Chave secreta para convite de usuários          | _(gere uma chave segura)_                            |
-| `JWT_ACCESS_TOKEN_EXPIRATION`  | Tempo de expiração do access token              | `1d`                                                 |
-| `JWT_REFRESH_TOKEN_EXPIRATION` | Tempo de expiração do refresh token             | `7d`                                                 |
-| `EMAIL_USER`                   | E-mail Gmail para envio de notificações         | `seu@gmail.com`                                      |
-| `EMAIL_APP_PASSWORD`           | Senha de app do Gmail                           | _(gerada nas configurações do Google)_               |
-| `COMPANY_NAME`                 | Nome da instituição (aparece nos e-mails)       | `Comunicação Escolar`                                |
-| `FRONTEND_URL`                 | URL do frontend (para links em e-mails)         | `http://localhost:3000`                              |
-| `MINIO_ENDPOINT`               | Endpoint do MinIO                               | `localhost`                                          |
-| `MINIO_PORT`                   | Porta da API do MinIO                           | `9000`                                               |
-| `MINIO_CONSOLE_PORT`           | Porta do console web do MinIO                   | `9001`                                               |
-| `MINIO_ACCESS_KEY`             | Chave de acesso do MinIO                        | `minioadmin`                                         |
-| `MINIO_SECRET_KEY`             | Chave secreta do MinIO                          | `minioadmin`                                         |
-| `MINIO_BUCKET`                 | Nome do bucket de usuários                      | `usuarios`                                           |
-| `MINIO_BUCKET_2`               | Nome do bucket de itens/anexos                  | `itens`                                              |
-| `MINIO_PUBLIC_URL`             | URL pública de acesso ao MinIO                  | `http://localhost:9000`                              |
-| `ADMIN_NAME`                   | Nome do admin criado pelas seeds                | `Administrador`                                      |
-| `ADMIN_EMAIL`                  | E-mail do admin criado pelas seeds              | `admin@admin.com`                                    |
-| `ADMIN_PASSWORD`               | Senha do admin criado pelas seeds               | `Senha@123`                                          |
-| `FIREBASE_PROJECT_ID`          | ID do projeto Firebase (push notifications)     | _(do console Firebase)_                              |
-| `FIREBASE_CLIENT_EMAIL`        | E-mail da conta de serviço Firebase             | _(do console Firebase)_                              |
-| `FIREBASE_PRIVATE_KEY`         | Chave privada da conta de serviço Firebase      | _(do console Firebase)_                              |
+| Variável                         | Descrição                                                                                           | Exemplo                                              |
+| :------------------------------- | :-------------------------------------------------------------------------------------------------- | :--------------------------------------------------- |
+| `PORT`                           | Porta do servidor                                                                                   | `3010`                                               |
+| `FRONTEND_PORT`                  | Porta do frontend (usada no Docker Compose)                                                         | `3001`                                               |
+| `NODE_ENV`                       | Ambiente (`development` / `production`)                                                             | `development`                                        |
+| `DEBUGLOG`                       | Ativa logs detalhados de rotas (`true`/`false`)                                                     | `true`                                               |
+| `CORS_ORIGIN`                    | Origem permitida pelo CORS (`*` em dev, domínio específico em produção)                             | `*`                                                  |
+| `DB_URL`                         | URL de conexão com o MongoDB                                                                        | `mongodb://localhost:27017/comunicacao-escolar`      |
+| `DB_URL_TEST`                    | URL do banco de dados de testes                                                                     | `mongodb://localhost:27017/comunicacao-escolar-test` |
+| `JWT_SECRET_ACCESS_TOKEN`        | Chave secreta do access token                                                                       | _(gere uma chave segura)_                            |
+| `JWT_SECRET_REFRESH_TOKEN`       | Chave secreta do refresh token                                                                      | _(gere uma chave segura)_                            |
+| `JWT_SECRET_PASSWORD_RECOVERY`   | Chave secreta para recuperação de senha                                                             | _(gere uma chave segura)_                            |
+| `JWT_SECRET_INVITE`              | Chave secreta para convite de usuários                                                              | _(gere uma chave segura)_                            |
+| `JWT_ACCESS_TOKEN_EXPIRATION`    | Tempo de expiração do access token                                                                  | `1d`                                                 |
+| `JWT_REFRESH_TOKEN_EXPIRATION`   | Tempo de expiração do refresh token                                                                 | `7d`                                                 |
+| `JWT_PASSWORD_RECOVERY_EXPIRATION` | Tempo de expiração do token de recuperação de senha                                               | `15m`                                                |
+| `SINGLE_SESSION_REFRESH_TOKEN`   | Força única sessão ativa por usuário, invalidando tokens anteriores ao fazer novo login (`true`/`false`) | `false`                                      |
+| `EMAIL_USER`                     | E-mail Gmail para envio de notificações                                                             | `seu@gmail.com`                                      |
+| `EMAIL_APP_PASSWORD`             | Senha de app do Gmail                                                                               | _(gerada nas configurações do Google)_               |
+| `COMPANY_NAME`                   | Nome da instituição (aparece nos e-mails)                                                           | `Comunicação Escolar`                                |
+| `FRONTEND_URL`                   | URL do frontend (para links em e-mails)                                                             | `http://localhost:3000`                              |
+| `MINIO_ENDPOINT`                 | Endpoint do MinIO                                                                                   | `localhost`                                          |
+| `MINIO_PORT`                     | Porta da API do MinIO                                                                               | `9000`                                               |
+| `MINIO_CONSOLE_PORT`             | Porta do console web do MinIO                                                                       | `9001`                                               |
+| `MINIO_USE_SSL`                  | Habilita SSL na conexão com o MinIO (`true`/`false`)                                                | `false`                                              |
+| `MINIO_ACCESS_KEY`               | Chave de acesso do MinIO                                                                            | `minioadmin`                                         |
+| `MINIO_SECRET_KEY`               | Chave secreta do MinIO                                                                              | `minioadmin`                                         |
+| `MINIO_BUCKET`                   | Nome do bucket (avatares, anexos e arquivos)                                                        | `comunicacao-escolar`                                |
+| `MINIO_PUBLIC_URL`               | URL pública de acesso ao MinIO (usada nas URLs retornadas pela API)                                 | `http://localhost:9000`                              |
+| `SWAGGER_USER`                   | Usuário para acessar o Swagger em produção (sem essa variável, o `/docs` retorna 404 em produção)   | `admin`                                              |
+| `SWAGGER_PASSWORD`               | Senha para acessar o Swagger em produção                                                            | _(defina uma senha segura)_                          |
+| `GOOGLE_CLIENT_ID`               | Client ID do OAuth 2.0 para autenticação com Google                                                 | _(do console do Google Cloud)_                       |
+| `ADMIN_NAME`                     | Nome do admin criado pelas seeds                                                                    | `Administrador`                                      |
+| `ADMIN_EMAIL`                    | E-mail do admin criado pelas seeds                                                                  | `admin@admin.com`                                    |
+| `ADMIN_PASSWORD`                 | Senha do admin criado pelas seeds                                                                   | `Senha@123`                                          |
+| `FIREBASE_SERVICE_ACCOUNT_JSON`  | JSON completo da conta de serviço Firebase (opção recomendada, uma única variável)                  | _(do console Firebase → Contas de serviço)_          |
+| `FIREBASE_PROJECT_ID`            | ID do projeto Firebase, alternativa ao JSON completo                                                | _(do console Firebase)_                              |
+| `FIREBASE_CLIENT_EMAIL`          | E-mail da conta de serviço Firebase, alternativa ao JSON completo                                   | _(do console Firebase)_                              |
+| `FIREBASE_PRIVATE_KEY`           | Chave privada da conta de serviço Firebase, alternativa ao JSON completo                            | _(do console Firebase)_                              |
 
 **3. Suba a infraestrutura (MongoDB + MinIO)**
 
