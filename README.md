@@ -125,13 +125,16 @@ npm run start:production
 O servidor ficará disponível em `http://localhost:{PORT}`.
 A documentação Swagger estará disponível em `http://localhost:{PORT}/docs`.
 
-> **Desenvolvimento com Android Studio (emulador):** para que o app acesse a API rodando localmente, execute o redirecionamento de porta via ADB:
+> **Desenvolvimento com Android Studio (emulador):** o emulador Android não acessa `localhost` da máquina host diretamente. Use `adb reverse` para redirecionar as portas necessárias:
 >
 > ```bash
-> adb reverse tcp:PORT tcp:PORT
+> adb reverse tcp:3010 tcp:3010   # API
+> adb reverse tcp:9000 tcp:9000   # MinIO (imagens e arquivos)
 > ```
 >
-> Substitua `PORT` pelo valor definido na variável `PORT` do `.env` (ex.: `3010`).
+> Ajuste `3010` se tiver alterado a variável `PORT` no `.env`. Sem o reverse da porta 9000, imagens de perfil e anexos não carregam no app mesmo que a API responda normalmente.
+>
+> Para **dispositivo físico**, use o IP da máquina na rede local em vez de `localhost` nas variáveis `MINIO_PUBLIC_URL` e no `RetrofitClient` do app mobile.
 
 ## Testes
 
