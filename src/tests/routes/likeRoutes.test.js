@@ -13,7 +13,7 @@ const ADMIN = {
 };
 
 const TEACHER = {
-  email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+  email: process.env.TEACHER_EMAIL || 'teacher@teacher.com',
   password: process.env.TEACHER_PASSWORD || 'Senha@123',
 };
 

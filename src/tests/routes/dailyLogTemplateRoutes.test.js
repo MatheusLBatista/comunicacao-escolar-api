@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const BASE_URL = process.env.INTEGRATION_BASE_URL || `http://localhost:${PORT}`;
 
 const asId = (value) => {
@@ -153,6 +153,8 @@ describe('DailyLogTemplate - integração de rotas', () => {
   let studentUser;
   let teacherUser;
   let teacherToken;
+  let parentUser;
+  let parentToken;
   let createdTemplate;
   const templateIdsToCleanup = [];
 
@@ -167,19 +169,28 @@ describe('DailyLogTemplate - integração de rotas', () => {
       seedLabel: 'StudentDailyLogTemplate',
     });
 
-    teacherUser = await createGlobalUser({
+    teacherUser = await createSchoolUser({
       token: adminToken,
+      schoolId,
+      role: 'teacher',
       seedLabel: 'TeacherDailyLogTemplate',
     });
-
-    await request(BASE_URL)
-      .post(`/schools/${schoolId}/members`)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ user_id: teacherUser.id, role: 'teacher' });
 
     teacherToken = await loginWithCredentials(
       teacherUser.email,
       teacherUser.password,
+    );
+
+    parentUser = await createSchoolUser({
+      token: adminToken,
+      schoolId,
+      role: 'parent',
+      seedLabel: 'ParentDailyLogTemplate',
+    });
+
+    parentToken = await loginWithCredentials(
+      parentUser.email,
+      parentUser.password,
     );
 
     createdTemplate = await createDailyLogTemplate({
@@ -420,7 +431,7 @@ describe('DailyLogTemplate - integração de rotas', () => {
   test('deve negar acesso para usuario sem permissao ativa', async () => {
     const response = await request(BASE_URL)
       .get('/daily-log-templates')
-      .set('Authorization', `Bearer ${teacherToken}`);
+      .set('Authorization', `Bearer ${parentToken}`);
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty('error', true);
@@ -528,7 +539,7 @@ describe('DailyLogTemplate - integração de rotas', () => {
   test('deve negar acesso ao PATCH para usuario sem permissao', async () => {
     const response = await request(BASE_URL)
       .patch(`/daily-log-templates/${createdTemplate.id}`)
-      .set('Authorization', `Bearer ${teacherToken}`)
+      .set('Authorization', `Bearer ${parentToken}`)
       .send({
         fields: [
           {

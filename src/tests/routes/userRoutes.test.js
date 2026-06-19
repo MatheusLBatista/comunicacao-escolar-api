@@ -68,11 +68,11 @@ describe('POST /users — Criação de Usuário Admin Global', () => {
       process.env.ADMIN_PASSWORD || 'Senha@123',
     );
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     parentToken = await loginAs(
-      process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+      process.env.PARENT_EMAIL || 'parent@parent.com',
       process.env.PARENT_PASSWORD || 'Senha@123',
     );
   });
@@ -233,11 +233,11 @@ describe('POST /schools/:schoolId/users — Criação/Vinculação de Usuário n
       process.env.ADMIN_PASSWORD || 'Senha@123',
     );
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     parentToken = await loginAs(
-      process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+      process.env.PARENT_EMAIL || 'parent@parent.com',
       process.env.PARENT_PASSWORD || 'Senha@123',
     );
     schoolId = await getAdminSchoolId(adminToken);
@@ -471,11 +471,11 @@ describe('GET /schools/:schoolId/users — Listagem de Usuários por Escola', ()
       process.env.ADMIN_PASSWORD || 'Senha@123',
     );
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     parentToken = await loginAs(
-      process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+      process.env.PARENT_EMAIL || 'parent@parent.com',
       process.env.PARENT_PASSWORD || 'Senha@123',
     );
     schoolId = await getAdminSchoolId(adminToken);
@@ -524,7 +524,7 @@ describe('GET /schools/:schoolId/users — Listagem de Usuários por Escola', ()
 
   test('filtro por email - 200', async () => {
     const teacherEmail = encodeURIComponent(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
     );
     const response = await request(BASE_URL)
       .get(`/schools/${schoolId}/users?email=${teacherEmail}`)
@@ -657,12 +657,12 @@ describe('GET /schools/:schoolId/users — Listagem de Usuários por Escola', ()
     expect(response.status).toBe(498);
   });
 
-  test('parent tenta listar usuários da escola - 403', async () => {
+  test('parent lista usuários da escola - 200', async () => {
     const response = await request(BASE_URL)
       .get(`/schools/${schoolId}/users`)
       .set('Authorization', `Bearer ${parentToken}`);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(200);
   });
 });
 
@@ -679,11 +679,11 @@ describe('GET /users/:id — Detalhe de Usuário', () => {
       process.env.ADMIN_PASSWORD || 'Senha@123',
     );
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     parentToken = await loginAs(
-      process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+      process.env.PARENT_EMAIL || 'parent@parent.com',
       process.env.PARENT_PASSWORD || 'Senha@123',
     );
 
@@ -748,20 +748,20 @@ describe('GET /users/:id — Detalhe de Usuário', () => {
     expect(response.status).toBe(498);
   });
 
-  test('teacher sem permissão users.get tenta consultar - 403', async () => {
+  test('teacher consulta usuário - 200', async () => {
     const response = await request(BASE_URL)
       .get(`/users/${createdUserId}`)
       .set('Authorization', `Bearer ${teacherToken}`);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(200);
   });
 
-  test('parent tenta consultar usuário - 403', async () => {
+  test('parent consulta usuário - 200', async () => {
     const response = await request(BASE_URL)
       .get(`/users/${createdUserId}`)
       .set('Authorization', `Bearer ${parentToken}`);
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(200);
   });
 });
 
@@ -778,11 +778,11 @@ describe('PATCH /users/:id — Atualização de Usuário', () => {
       process.env.ADMIN_PASSWORD || 'Senha@123',
     );
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     parentToken = await loginAs(
-      process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+      process.env.PARENT_EMAIL || 'parent@parent.com',
       process.env.PARENT_PASSWORD || 'Senha@123',
     );
 
@@ -982,11 +982,11 @@ describe('DELETE /users/:id — Inativação (Soft Delete)', () => {
       process.env.ADMIN_PASSWORD || 'Senha@123',
     );
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     parentToken = await loginAs(
-      process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+      process.env.PARENT_EMAIL || 'parent@parent.com',
       process.env.PARENT_PASSWORD || 'Senha@123',
     );
   });

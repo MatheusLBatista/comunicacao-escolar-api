@@ -258,11 +258,11 @@ describe('Event - integração de rotas', () => {
     expect(response.body).toHaveProperty('error', true);
     expect(response.body).toHaveProperty(
       'message',
-      'Para scope=class, informe o id da turma.',
+      'Para scope=class, informe ao menos uma turma em target_ids.',
     );
   });
 
-  test('deve retornar 422 ao criar event com target_id de class inexistente', async () => {
+  test('deve retornar 422 ao criar event com target_ids de class inexistente', async () => {
     const payload = {
       school_id: schoolId,
       title: `Evento class inexistente ${Date.now()}`,
@@ -270,7 +270,7 @@ describe('Event - integração de rotas', () => {
       start_date: '2026-04-13T09:00:00.000Z',
       target: {
         scope: 'class',
-        target_id: '000000000000000000000000',
+        target_ids: ['000000000000000000000000'],
       },
       active: true,
     };
@@ -284,7 +284,7 @@ describe('Event - integração de rotas', () => {
     expect(response.body).toHaveProperty('error', true);
     expect(response.body).toHaveProperty(
       'message',
-      'target.target_id inválido.',
+      'Um ou mais IDs em target_ids são inválidos.',
     );
   });
 

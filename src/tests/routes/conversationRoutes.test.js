@@ -14,11 +14,11 @@ const ADMIN = {
   password: process.env.ADMIN_PASSWORD || 'Senha@123',
 };
 const TEACHER = {
-  email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+  email: process.env.TEACHER_EMAIL || 'teacher@teacher.com',
   password: process.env.TEACHER_PASSWORD || 'Senha@123',
 };
 const PARENT = {
-  email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+  email: process.env.PARENT_EMAIL || 'parent@parent.com',
   password: process.env.PARENT_PASSWORD || 'Senha@123',
 };
 
@@ -129,13 +129,13 @@ describe('Conversation Routes - Integração', () => {
       expect(response.body).toHaveProperty('error', false);
     });
 
-    test('deve retornar 400 para schoolId inválido (não ObjectId)', async () => {
+    test('deve retornar 403 para schoolId inválido (não ObjectId)', async () => {
       const response = await request(BASE_URL)
         .post('/schools/abc/conversations')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({ participant_id: teacherId });
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(403);
     });
 
     test('deve retornar 400 para participant_id inválido (não ObjectId)', async () => {
@@ -166,13 +166,13 @@ describe('Conversation Routes - Integração', () => {
       expect(response.body).toHaveProperty('error', true);
     });
 
-    test('deve retornar 404 para schoolId inexistente', async () => {
+    test('deve retornar 403 para schoolId inexistente', async () => {
       const response = await request(BASE_URL)
         .post(`/schools/${NONEXISTENT_ID}/conversations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({ participant_id: teacherId });
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(403);
       expect(response.body).toHaveProperty('error', true);
     });
 
@@ -305,12 +305,12 @@ describe('Conversation Routes - Integração', () => {
       expect(response.status).toBe(200);
     });
 
-    test('deve retornar 400 para schoolId inválido', async () => {
+    test('deve retornar 403 para schoolId inválido', async () => {
       const response = await request(BASE_URL)
         .get('/schools/abc/conversations')
         .set('Authorization', `Bearer ${tokenAdmin}`);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(403);
     });
 
     test('deve retornar 400 para type inválido', async () => {

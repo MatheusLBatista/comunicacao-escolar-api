@@ -56,7 +56,7 @@ describe('AuditLog - integração de rotas', () => {
     );
     schoolId = await getFirstSchoolId(token);
     teacherToken = await loginAs(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
 

@@ -106,7 +106,7 @@ describe('PickupAuthorization - integração de rotas', () => {
       authorized_by: parentId,
       authorized_person: {
         name: 'Maria Ferreira',
-        document: `${Date.now()}`,
+        document: String(Date.now()).slice(2),
         relationship: 'Tia',
         photo_url: null,
       },
@@ -172,7 +172,7 @@ describe('PickupAuthorization - integração de rotas', () => {
       authorized_by: parentId,
       authorized_person: {
         name: 'Pedro Ferreira',
-        document: `${Date.now() + 1}`,
+        document: String(Date.now() + 1).slice(2),
         relationship: 'Tio',
         photo_url: null,
       },
@@ -204,7 +204,7 @@ describe('PickupAuthorization - integração de rotas', () => {
       authorized_by: studentId,
       authorized_person: {
         name: 'Joana Ferreira',
-        document: `${Date.now() + 2}`,
+        document: String(Date.now() + 2).slice(2),
         relationship: 'Mãe',
         photo_url: null,
       },

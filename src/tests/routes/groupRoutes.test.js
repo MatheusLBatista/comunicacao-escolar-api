@@ -89,7 +89,7 @@ describe('Grupos', () => {
   });
   it('Deve falhar ao tentar listar grupos não sendo um administrador', async () => {
     const login = await logar(
-      process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+      process.env.TEACHER_EMAIL || 'teacher@teacher.com',
       process.env.TEACHER_PASSWORD || 'Senha@123',
     );
     tokenUser = login.body?.data?.user?.access_token;

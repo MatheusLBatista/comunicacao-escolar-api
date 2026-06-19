@@ -105,7 +105,7 @@ async function createPickupAuthorization({
     authorized_by: parentId,
     authorized_person: {
       name: 'Autorizado Integracao',
-      document: `${Date.now()}`,
+      document: String(Date.now()).slice(2),
       relationship: 'Tia',
       photo_url: null,
     },

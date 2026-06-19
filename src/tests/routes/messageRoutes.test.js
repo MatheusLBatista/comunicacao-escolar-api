@@ -14,11 +14,11 @@ const ADMIN = {
   password: process.env.ADMIN_PASSWORD || 'Senha@123',
 };
 const TEACHER = {
-  email: process.env.TEACHER_EMAIL || 'maria.teacher@escola.com',
+  email: process.env.TEACHER_EMAIL || 'teacher@teacher.com',
   password: process.env.TEACHER_PASSWORD || 'Senha@123',
 };
 const PARENT = {
-  email: process.env.PARENT_EMAIL || 'ana.parent@escola.com',
+  email: process.env.PARENT_EMAIL || 'parent@parent.com',
   password: process.env.PARENT_PASSWORD || 'Senha@123',
 };
 
