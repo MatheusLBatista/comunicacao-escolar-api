@@ -150,7 +150,9 @@ class UserRepository {
   }
 
   async getByRecoveryCode(codigo) {
-    return await this.model.findOne({ password_recovery_code: codigo });
+    return await this.model
+      .findOne({ password_recovery_code: codigo })
+      .select('+password_recovery_code +password_recovery_code_exp');
   }
 
   async getByInviteToken(token) {
