@@ -149,11 +149,8 @@ export default async function userSeed() {
   // Create parents
   const parents = [];
   for (let i = 0; i < 3; i++) {
-    // Each parent linked to 1-2 students
-    const linkedStudents = studentIds.slice(
-      i,
-      Math.min(i + 2, studentIds.length),
-    );
+    const start = i * 2;
+    const linkedStudents = studentIds.slice(start, start + 2);
 
     parents.push({
       full_name: fakeMappings.User.full_name(),

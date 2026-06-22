@@ -116,7 +116,7 @@ const LinkToSchoolSchema = z
         message: "Role deve ser 'teacher' ou 'parent'.",
       }),
     }),
-    student: StudentInputSchema.optional(),
+    student: StudentInputSchema.nullable().optional(),
   })
   .refine((data) => data.user_id || data.email, {
     message: 'Informe user_id ou email do usuário a ser vinculado.',

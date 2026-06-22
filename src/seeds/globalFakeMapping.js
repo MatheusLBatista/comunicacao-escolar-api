@@ -101,6 +101,7 @@ export const fakeMappings = {
 
   DailyLog: {
     teacher_id: () => new mongoose.Types.ObjectId(),
+    class_id: () => null,
     dailylogtemplate_id: () => new mongoose.Types.ObjectId(),
     is_present: () => fakebr.random.boolean(),
     entries: () => [

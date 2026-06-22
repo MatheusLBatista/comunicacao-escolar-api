@@ -96,6 +96,16 @@ class DailyLogService {
   async create(parsedData, req) {
     await this.validateReferences(parsedData);
 
+    if (parsedData.student_id && parsedData.school_id) {
+      const student = await this.userRepository.getById(parsedData.student_id);
+      const membership = student?.memberships?.find(
+        (m) => m.school_id?.toString() === parsedData.school_id?.toString()
+      );
+      if (membership?.class_id) {
+        parsedData.class_id = membership.class_id;
+      }
+    }
+
     const data = await this.repository.create(parsedData);
 
     this.auditLogService.logAsync(req || { user_id: parsedData.teacher_id }, {

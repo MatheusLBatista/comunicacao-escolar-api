@@ -17,6 +17,11 @@ class DailyLog {
           required: true,
           index: true,
         },
+        class_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'class',
+          default: null,
+        },
         teacher_id: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Users',
